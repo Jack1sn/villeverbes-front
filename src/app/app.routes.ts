@@ -3,27 +3,23 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 
 import { FuncionarioComponent } from './pages/funcionario/funcionario.component';
-import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario.component';
-import {Fase2Component} from './pages/fase2/fase2.component';
-import {Fase3Component} from './pages/fase3/fase3.component';
-import { Fase1Component } from './pages/fase1/fase1.component';
-import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
-import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
 
+import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario.component';
+import { HomeComponent } from './pages/home/home.component';
 import { VisualizarRankingComponent } from './pages/visualizar-ranking/visualizar-ranking.component';
-import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
+import { RankingComponent } from './pages/ranking/ranking.component';
 import { authGuard } from './auth.guard';
 import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.component';
-
-import { EfetuarManutencaoComponent } from './pages/efetuar-manutencao/efetuar-manutencao.component';
-import { HomeComponent } from './pages/home/home.component';
-import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.component';
-import { RankingComponent } from './pages/ranking/ranking.component';
-import { RespostasCertasComponent } from './pages/respostas-certas/respostas-certas.component';
 import { ManutencaoComponent } from './pages/manutencao/manutencao.component';
+import { Fase1Component } from './pages/fase1/fase1.component';
+import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.component';
+import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
+import { Fase2Component } from './pages/fase2/fase2.component';
+import { Fase3Component } from './pages/fase3/fase3.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login', 
+    component: LoginComponent },
   {
     path: 'autocadastro',
     component: AutoCadastroComponent,
@@ -32,32 +28,62 @@ export const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['Jogador'] },
   },
   {
     path: 'home-funcionarios',
     component: HomeFuncionarioComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN'] },
+    data: { expectedRoles: ['FUNCIONARIO', 'ADMIN'] },
   },
-  {
-    path: 'manutencao',
-    component: ManutencaoComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN']  },
-  },
+ 
   {
     path: 'funcionario',
     component: FuncionarioComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['ADMIN'] },
   },
+ 
   {
-    path: 'respostascertas/:id',
-    component: RespostasCertasComponent,
+    path: 'manutencao',
+    component: ManutencaoComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['Jogador'] },
+    data: { expectedRoles: ['FUNCIONARIO', 'ADMIN'] },
   },
+ 
+   
+  {
+    path: 'fase1',
+    component: Fase1Component,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['JOGADOR'] },
+  },
+  {
+    path: 'fase2',
+    component: Fase2Component,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['JOGADOR'] },
+  },
+  {
+    path: 'fase3',
+    component: Fase3Component,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['JOGADOR'] },
+  },
+  {
+    path: 'crudsentencas',
+    component: CrudsentencasComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['FUNCIONARIO', 'ADMIN'] },
+  },
+  {
+    path: 'crudfases',
+    component: CrudfasesComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['FUNCIONARIO', 'ADMIN'] },
+  },
+  
+    
   {
     path: 'ranking/:id',
     component: RankingComponent,
@@ -65,50 +91,11 @@ export const routes: Routes = [
     data: { expectedRoles: ['JOGADOR'] },
   },
   {
-    path: 'fase1/:id',
-    component: Fase1Component,
+    path: 'visualizar-ranking/:id',
+    component: VisualizarRankingComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'ambientecasa',
-    component: AmbientecasaComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'ambienteparque',
-    component: AmbienteparqueComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'ambientecasa',
-    component: AmbienteuniversidadeComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'efetuar-manutencao',
-    component: EfetuarManutencaoComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN'] },
-  },
-  {
-    path: 'crud-fases/:id',
-    component: CrudsentencasComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN'] },
-  },
-  {
-    path: 'crud-frases/:id',
-    component: CrudsentencasComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN'] },
-  },
-  
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: '**', redirectTo: '/login' },
+    data: { expectedRoles: ['ADMIN'] },
+  }
 ];
 
 @NgModule({
