@@ -13,7 +13,7 @@ import { Usuario } from '../../models/usuario';
 @Component({
   selector: 'app-auto-cadastro',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective, NgxMaskPipe],
+  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective],
   providers: [provideNgxMask()],
   templateUrl: './auto-cadastro.component.html',
   styleUrls: ['./auto-cadastro.component.css']
