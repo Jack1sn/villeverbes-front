@@ -61,13 +61,13 @@ export class LoginComponent {
   redirectUser(perfil: string) {
     switch (perfil) {
       case 'ADMIN':
-      case 'FUNCIONARIO':   this.router.navigate(['/home-funcionarios']);
+      case 'FUNCIONARIO':   this.router.navigate(['/homefuncionario']);
         break;
       case 'JOGADOR':
-        this.router.navigate(['/home-cliente']);
+        this.router.navigate(['/home']);
         break;
       default:
-        this.router.navigate(['/login']);
+        this.router.navigate([' ']);
         break;
     }
   }
