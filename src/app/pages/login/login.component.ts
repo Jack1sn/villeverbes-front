@@ -1,79 +1,44 @@
-import { Component, TemplateRef } from '@angular/core';
+
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../auth.service';
-import { RouterModule } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AxiosError } from 'axios';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms'; // Para usar ngModel
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../auth.service'; // Corrigido o caminho do AuthService
+import { Login } from '../../models/login'; // Corrigido o caminho para o modelo de login
+
 @Component({
   selector: 'app-login',
   standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule ], // Importando módulos necessários
+  
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  imports: [CommonModule, FormsModule, RouterModule],
+  styleUrls: ['./login.component.css'] // Corrigido styleUrls para ficar correto com Angular
 })
 export class LoginComponent {
-  errorMessage: string = '';
-  successMessage: string = '';
-  
   email: string = '';
   senha: string = '';
+  errorMessage: string = ' Erro ao ...';
+  successMessage: string = 'Sucesso...';
 
-  constructor(
-    private authService: AuthService,
-    private modalService: NgbModal,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    if (this.authService.isAuthenticated()) {
-      const userData = this.authService.getUser();
-      this.redirectUser(userData.perfil);
-    }
-  }
+  // Método de login
+  async realizarLogin( ) {
+    const loginData: Login = {
+      email: this.email,
+      senha: this.senha
+    };
 
-
-  async realizarLogin(content: any) {
     try {
-      await this.authService.login({ email: this.email, senha: this.senha });
-      const userData = this.authService.getUser();
+      await this.authService.login(loginData);
       this.successMessage = 'Login realizado com sucesso!';
       this.errorMessage = '';
-      this.modalService.open(content);
-
       setTimeout(() => {
-        this.modalService.dismissAll();
-        this.redirectUser(userData.perfil);
+        this.router.navigate(['/home']); // Ajuste o caminho da sua rota para onde deseja ir após o login
       }, 1000);
     } catch (error) {
-      if ((error as AxiosError).status === 401) {
-        this.errorMessage = 'E-mail ou senha incorretos';
-      } else {
-        this.errorMessage = 'Erro ao realizar o login. Tente novamente.';
-      }
+      this.errorMessage = 'E-mail ou senha incorretos';
       this.successMessage = '';
-      this.modalService.open(content);
     }
-  }
-
-
-  redirectUser(perfil: string) {
-    switch (perfil) {
-      case 'ADMIN':
-      case 'FUNCIONARIO':   this.router.navigate(['/homefuncionario']);
-        break;
-      case 'JOGADOR':
-        this.router.navigate(['/home']);
-        break;
-      default:
-        this.router.navigate([' ']);
-        break;
-    }
-  }
-
-
-  openModal(content: TemplateRef<any>) {
-    this.modalService.open(content, { centered: true });
   }
 }

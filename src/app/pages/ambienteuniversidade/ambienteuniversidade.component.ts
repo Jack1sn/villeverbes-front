@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import {Router} from '@angular/router'
 @Component({
   selector: 'app-ambienteuniversidade',
   standalone: true,
@@ -9,4 +9,8 @@ import { Component } from '@angular/core';
 })
 export class AmbienteuniversidadeComponent {
 
+  constructor(private router: Router) {}
+  navigate(destino: string): void {
+    this.router.navigate(['/' + destino]);
+  }
 }

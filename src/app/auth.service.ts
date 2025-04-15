@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Login } from './models/login';
+import { environment } from '../../src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private userRole: string | null = null;
-  private baseUrl = 'http://localhost:8080';
+  private baseUrl = environment.apiUrl;
 
   constructor(private router: Router) {
     const user = this.getUser();
@@ -17,19 +18,28 @@ export class AuthService {
     }
   }
 
+  /**
+   * Realiza login com Axios e armazena usuário no localStorage.
+   */
   async login(loginData: Login): Promise<void> {
     const url = `${this.baseUrl}/login`;
-    try {
-      const response = await axios.post(url, loginData);
-      const userData = response.data.usuario;
-      this.userRole = userData.perfil;
-      localStorage.setItem('user', JSON.stringify(userData));
 
-      return response.data;
+    try {
+      const response = await axios.post(url, loginData, {
+        withCredentials: true, // ✅ Permite envio/recebimento de cookies (JSESSIONID)
+      });
+
+      if (response.data) {
+        // Armazenando os dados do usuário no localStorage
+        localStorage.setItem('user', JSON.stringify(response.data));
+        this.userRole = response.data.perfil;
+      }
     } catch (error) {
-      throw error;
+      // Se ocorrer um erro, trata-o
+      this.handleError(error);
     }
   }
+
   logout(): void {
     localStorage.removeItem('user');
     this.userRole = null;
@@ -52,5 +62,34 @@ export class AuthService {
   getUserName(): string | null {
     const user = this.getUser();
     return user ? user.nome : null;
+  }
+
+  /**
+   * Tratamento de erro com cast seguro para AxiosError.
+   */
+  private handleError(error: unknown): void {
+    let errorMessage = 'Ocorreu um erro desconhecido';
+
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // Verifique o código de status para fornecer mensagens específicas
+        if (error.response.status === 401) {
+          errorMessage = 'E-mail ou senha incorretos';
+        } else if (error.response.status === 500) {
+          errorMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
+        } else {
+          errorMessage = error.response.data?.message || 'Erro desconhecido';
+        }
+      } else if (error.request) {
+        // Se não houver resposta do servidor
+        errorMessage = 'Erro na requisição, sem resposta do servidor';
+      }
+    }
+
+    // Aqui você pode adicionar um feedback para o usuário, exibir um alerta ou logar o erro
+    console.error('Erro na requisição:', errorMessage);
+    alert(errorMessage); // Exemplo de como exibir uma mensagem para o usuário
+
+    throw new Error(errorMessage);
   }
 }

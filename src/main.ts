@@ -1,12 +1,15 @@
 ///<reference types="@angular/localize" />
 
 import { bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/app.component';
-import { RouterModule , provideRouter} from '@angular/router';
-import { routes } from './app/app.routes';
+import { provideHttpClient } from '@angular/common/http';  // Para o HttpClient
+import { provideRouter } from '@angular/router';  // Para as rotas
+import { AppComponent } from './app/app.component';  // Seu componente principal
+import { routes } from './app/app.routes';  // Suas rotas (caso tenha configurado)
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes), // Mova isso para aqui
+    provideHttpClient(),  // Habilita o HttpClient para a aplicação
+    provideRouter(routes)  // As rotas (caso tenha configurado)
   ]
-});
+})
+  .catch((err) => console.error(err));

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-
+import { LoginComponent} from './pages/login/login.component';
 import { FuncionarioComponent } from './pages/funcionario/funcionario.component';
 
 import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario.component';
@@ -11,6 +10,9 @@ import { RankingComponent } from './pages/ranking/ranking.component';
 import { authGuard } from './auth.guard';
 import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.component';
 import { ManutencaoComponent } from './pages/manutencao/manutencao.component';
+import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
+import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
+import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
 import { Fase1Component } from './pages/fase1/fase1.component';
 import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.component';
 import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
@@ -24,6 +26,20 @@ export const routes: Routes = [
     path: 'autocadastro',
     component: AutoCadastroComponent,
   },
+
+  {
+    path: 'ambienteparque',
+    component: AmbienteparqueComponent,
+  },
+
+  {
+    path: 'ambienteuniversidade',
+    component: AmbienteuniversidadeComponent,
+  },
+
+    { path: 'ambientecasa', 
+      component: AmbientecasaComponent },
+  
   {
     path: 'home',
     component: HomeComponent,
