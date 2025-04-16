@@ -107,15 +107,15 @@ html, body {
   /* Container do perfil do usuário */
   .user-profile {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 45px;
+    left: 45px;
     text-align: center;
   }
   
   /* Ícone do usuário */
   .user-icon {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 2px solid #00aaff;
     background-color: white;

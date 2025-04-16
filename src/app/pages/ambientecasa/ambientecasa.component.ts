@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { Router} from '@angular/router'
+import { HeaderComponent } from "../header/header.component";
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-ambientecasa',
   standalone: true,
-  imports: [ ],
+  imports: [HeaderComponent, RouterModule],
   templateUrl: './ambientecasa.component.html',
   styleUrl: './ambientecasa.component.css'
 })

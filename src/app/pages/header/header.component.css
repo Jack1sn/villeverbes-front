@@ -1,0 +1,66 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  /* Header fixo no topo com cor azul */
+  .header {
+    height: 1cm;
+    width: 100vw;
+    background-color: #93c5fa;
+  
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+  
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Logo à esquerda */
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Logo */
+  .logo {
+    height: 100%;
+    max-height: 1cm;
+    width: auto;
+  }
+  
+  /* Links centralizados horizontalmente */
+  .nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    display: flex;
+    gap: 30px;
+  }
+  
+  /* Estilo dos links */
+  .nav-links a {
+    text-decoration: none;
+    font-weight: 600;
+    color: white;
+    font-size: 16px;
+    transition: color 0.3s;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  
+  .nav-links a:hover {
+    color: #f73f3f;
+  }
+  
+  p {color:white; 
+     font-size: 20px;
+     font-weight: bold;
+
+  }

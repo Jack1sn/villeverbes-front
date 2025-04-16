@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import {Router} from '@angular/router'
+import {Router, RouterModule} from '@angular/router'
+import { HeaderComponent } from "../header/header.component";
 @Component({
   selector: 'app-ambienteparque',
   standalone: true,
-  imports: [],
+  imports: [HeaderComponent, RouterModule],
   templateUrl: './ambienteparque.component.html',
   styleUrl: './ambienteparque.component.css'
 })

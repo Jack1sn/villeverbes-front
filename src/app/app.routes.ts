@@ -18,10 +18,13 @@ import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.comp
 import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
 import { Fase2Component } from './pages/fase2/fase2.component';
 import { Fase3Component } from './pages/fase3/fase3.component';
-
+import { HeaderComponent } from './pages/header/header.component';
 export const routes: Routes = [
   { path: 'login', 
     component: LoginComponent },
+    { path: 'header',
+      component: HeaderComponent,
+    },
   {
     path: 'autocadastro',
     component: AutoCadastroComponent,
