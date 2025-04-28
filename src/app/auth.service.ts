@@ -19,23 +19,37 @@ export class AuthService {
   }
 
   /**
-   * Realiza login com Axios e armazena usuário no localStorage.
+   * Realiza login com Axios ou com usuário temporário (teste).
    */
   async login(loginData: Login): Promise<void> {
+    // ✅ 1. Verifica se é o usuário temporário
+    if (
+      loginData.email === 'usuario@gmail.com' &&
+      loginData.senha === '123'
+    ) {
+      const usuarioTemporario = {
+        nome: 'Usuário Temporário',
+        email: loginData.email,
+        perfil: 'TEMP' // Pode ser 'aluno', 'admin', etc., conforme seu sistema
+      };
+      localStorage.setItem('user', JSON.stringify(usuarioTemporario));
+      this.userRole = usuarioTemporario.perfil;
+      return;
+    }
+
+    // ✅ 2. Caso contrário, tenta login com servidor
     const url = `${this.baseUrl}/login`;
 
     try {
       const response = await axios.post(url, loginData, {
-        withCredentials: true, // ✅ Permite envio/recebimento de cookies (JSESSIONID)
+        withCredentials: true,
       });
 
       if (response.data) {
-        // Armazenando os dados do usuário no localStorage
         localStorage.setItem('user', JSON.stringify(response.data));
         this.userRole = response.data.perfil;
       }
     } catch (error) {
-      // Se ocorrer um erro, trata-o
       this.handleError(error);
     }
   }
@@ -64,15 +78,11 @@ export class AuthService {
     return user ? user.nome : null;
   }
 
-  /**
-   * Tratamento de erro com cast seguro para AxiosError.
-   */
   private handleError(error: unknown): void {
     let errorMessage = 'Ocorreu um erro desconhecido';
 
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        // Verifique o código de status para fornecer mensagens específicas
         if (error.response.status === 401) {
           errorMessage = 'E-mail ou senha incorretos';
         } else if (error.response.status === 500) {
@@ -81,15 +91,12 @@ export class AuthService {
           errorMessage = error.response.data?.message || 'Erro desconhecido';
         }
       } else if (error.request) {
-        // Se não houver resposta do servidor
         errorMessage = 'Erro na requisição, sem resposta do servidor';
       }
     }
 
-    // Aqui você pode adicionar um feedback para o usuário, exibir um alerta ou logar o erro
     console.error('Erro na requisição:', errorMessage);
-    alert(errorMessage); // Exemplo de como exibir uma mensagem para o usuário
-
+    alert(errorMessage);
     throw new Error(errorMessage);
   }
 }

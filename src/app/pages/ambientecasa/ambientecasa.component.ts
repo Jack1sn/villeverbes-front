@@ -22,17 +22,17 @@ export class AmbientecasaComponent implements OnInit {
   perguntaAtual: number | null = null;
 
   frases: { [key: number]: string[] } = {
-    1: ['Je _______ le lit.', 'Je _______ la table.'],
-    2: ['Tu _______ la fenêtre.', 'Tu _______ la porte.'],
-    3: ['Il _______ la porte.', 'Il _______ le rideau.'],
-    4: ['Nous _______ le repas.', 'Nous _______ la vaisselle.'],
-    5: ['Vous _______ les devoirs.', 'Vous _______ le travail.'],
-    6: ['Elles _______ la télé.', 'Elles _______ la radio.'],
-    7: ['Je _______ dans la cuisine.', 'Je _______ la soupe.'],
-    8: ['Tu _______ les vêtements.', 'Tu _______ le t-shirt.'],
-    9: ['Il _______ le sol.', 'Il _______ le tapis.'],
-    10: ['Nous _______ le frigo.', 'Nous _______ la porte.'],
-    11: ['Vous _______ le canapé.', 'Vous _______ la chaise.'],
+    1: ['Je _______ le lit. (faire)', 'Je _______ la table. (faire)'],
+    2: ['Tu _______ la fenêtre. (ouvrir)', 'Tu _______ la porte. (ouvrir)'],
+    3: ['Il _______ la porte. (fermer)', 'Il _______ le rideau. (fermer)'],
+    4: ['Nous _______ le repas. (préparer)', 'Nous _______ la vaisselle. (préparer)'],
+    5: ['Vous _______ les devoirs. (faire)', 'Vous _______ le travail. (faire)'],
+    6: ['Elles _______ la télé. (regarder)', 'Elles _______ la radio. (écouter)'],
+    7: ['Je _______ dans la cuisine. (cuisiner)', 'Je _______ la soupe. (cuisiner)'],
+    8: ['Tu _______ les vêtements. (plier)', 'Tu _______ le t-shirt. (plier)'],
+    9: ['Il _______ le sol. (nettoyer)', 'Il _______ le tapis. (nettoyer)'],
+    10: ['Nous _______ le frigo. (ouvrir)', 'Nous _______ la porte. (ouvrir)'],
+    11: ['Vous _______ le canapé. (débarrasser)', 'Vous _______ la chaise. (débarrasser)'],
   };
 
   respostasCorretas: { [key: number]: string } = {

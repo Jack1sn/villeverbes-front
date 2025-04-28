@@ -169,20 +169,20 @@ html, body {
 /* Quadro de Personagens no canto direito */
 .personagem-box {
   position: fixed;
-  top: 20px;
+  top: 60px;
   right: 20px;
   background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  width: 250px;
+  width: 240px;
   z-index: 10; /* Para garantir que o quadro fique acima de outros elementos */
 }
 
 /* Título do quadro de personagens */
 .personagem-title {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 15px;
   color: #1d048d;
 }
