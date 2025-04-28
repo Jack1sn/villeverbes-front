@@ -1,27 +1,45 @@
-
 <app-header></app-header>
 
 <div class="background">
-    <!-- Linha superior com usuário e título -->
-    <div class="top-bar">
-      <div class="user-profile">
-        <img class="user-icon" src="assets/vvimagens/usuario2.png" alt="Usuário" />
-        <span class="user-name">Utilisateur</span>
-      </div>
-      <h2 class="titulos">Bienvenue dans votre Environnement Maison.</h2>
-   
-    <div class="direction-line">
-        <div class="circle" (click)="navigate('ambientecasa')">
-          <img src="assets/vvimagens/casavv.jpg" alt="Casa" />
-          <span>Maison</span>
-        </div>
-        </div>
+  <!-- Barra superior -->
+  <div class="top-bar">
+    <div class="user-profile">
+      <img class="user-icon" src="assets/vvimagens/usuario2.png" alt="Usuário" />
+      <span class="user-name">{{ personagemSelecionado || 'Utilisateur' }}</span>
     </div>
-  
-    <!-- Logo no canto inferior direito -->
-    <div class="logo-container">
-      <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />
-      <span class="logo-text">Ville des Verbes</span>
+    <h2 class="titulos"> Bienvenue {{personagemSelecionado}}, Choisissez un Numero!</h2>
+  </div>
+
+  <!-- Bolinhas -->
+  <div class="direction-line">
+    <div 
+      *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
+      class="circle casa{{i}}" 
+      [ngClass]="{'clicada': isBolaClicada(i)}"
+      (click)="selecionarFrase(i)">
+      <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
+      <span>{{i}}</span>
     </div>
   </div>
-  
+
+  <!-- Frase -->
+  <div class="frase-box" *ngIf="fraseSelecionada">
+    <p>{{ fraseSelecionada }}</p>
+    <input type="text" [(ngModel)]="respostaDigitada" placeholder="Conjuguez ici..." (keyup.enter)="verificarResposta()" />
+    <button (click)="verificarResposta()">Réponse</button>
+    <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations!' ? 'green' : 'red' }">
+      {{ resultado }}
+    </p>
+  </div>
+
+  <!-- Barra de progresso -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" [style.width.%]="progresso"></div>
+  </div>
+
+  <!-- Logo -->
+  <div class="logo-container">
+    <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />
+    <span class="logo-text">Ville des Verbes</span>
+  </div>
+</div>

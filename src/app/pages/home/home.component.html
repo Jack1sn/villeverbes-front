@@ -8,26 +8,43 @@
     </div>
   
     <div class="direction-line">
-      <div class="circle" (click)="navigate('ambientecasa')">
-        <img src="assets/vvimagens/casavv.jpg" alt="Casa" />
+      <div class="circle casa" (click)="navigate('ambientecasa')">
+        <img src="assets/vvimagens/ambcasa.jpeg" alt="Casa" />
+        <h1 class="cirle h1">1</h1>
         <span>Maison</span>
       </div>
-  
-      <div class="line"></div>
-  
-      <div class="circle" (click)="navigate('ambienteparque')">
+    
+      <div class="circle parque" (click)="navigate('ambienteparque')">
         <img src="assets/vvimagens/parque.jpg" alt="Parque" />
-        <span>PLace</span>
+        <h1 class="cirle h2">2</h1>
+        <span>Place</span>
       </div>
-  
-      <div class="line"></div>
-  
-      <div class="circle" (click)="navigate('ambienteuniversidade')">
-        <img src="assets/vvimagens/universidade.jpg" alt="Universidade" />
+    
+      <div class="circle universidade" (click)="navigate('ambienteuniversidade')">
+        <img src="assets/vvimagens/chaapeu.jpg" alt="Universidade" />
+        <h1 class="cirle h3">3</h1>
         <span>Université</span>
       </div>
+      <div class="circle selo" (click)="navigate('selo')">
+        <img src="assets/vvimagens/selo.png" alt="Selo" />
+        <h1 class="cirle h1">FIN</h1>
+        <span>Selo</span>
+      </div>
     </div>
-  
+    <div class="personagem-box">
+      <h2 class="personagem-title">Choisissez um Personnage</h2>
+      <ul class="personagem-list">
+        <li (click)="selecionarPersonagem('Jacques')">Jacques</li>
+        <li (click)="selecionarPersonagem('Marie')">Marie</li>
+        <li (click)="selecionarPersonagem('André')">André</li>
+        <li (click)="selecionarPersonagem('Pierre')">Pierre</li>
+        <li (click)="selecionarPersonagem('Monique')">Monique</li>
+      </ul>
+      <p *ngIf="personagemSelecionado" class="personagem-selecionado">
+        Personnage: <strong>{{ personagemSelecionado }}</strong>
+      </p>
+    </div>
+
     <!-- Logo e texto do jogo -->
 <div class="logo-container">
     <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />

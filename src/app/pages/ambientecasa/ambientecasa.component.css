@@ -1,6 +1,6 @@
  /* Fundo da tela */
  .background {
-    background: url('../../../assets/vvimagens/ambientecasa.png') no-repeat center center;
+    background: url('../../../assets/vvimagens/ambcasa.jpeg') no-repeat center center;
     background-size: cover;
     height: 100vh;
     width: 100vw;
@@ -53,8 +53,8 @@
     background-color: rgba(255, 255, 255, 0.6);
     border: 2px solid #00aaff;
     border-radius: 50%;
-    width: 180px;
-    height: 180px;
+    width: 90px;
+    height: 90px;
     padding: 5px;
     display: flex;
     flex-direction: column;
@@ -73,8 +73,8 @@
   
   /* Imagens dentro das bolinhas */
   .circle img {
-    width: 120px;
-    height: 120px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     margin-bottom: 6px;
   }
@@ -128,4 +128,104 @@
     margin-top: 4px;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
   }
+  .direction-line {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
   
+  .circle {
+    position: absolute;
+    background-color: rgba(35, 4, 87, 0.6);
+    border: 2px solid #00aaff;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+    z-index: 2;
+  }
+  .circle:hover {
+    transform: scale(1.05);
+  }
+  .circle img {
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    margin-bottom: 6px;
+  }
+  .circle span {
+    font-size: 20px;
+    font-weight: normal;
+    color: #fff;
+  }
+  
+  /* Posicionamento individual */
+  .casa1  { top: 100px; left: 100px; }
+  .casa2  { top: 250px; left: 150px; }
+  .casa3  { top: 400px; left: 100px; }
+  .casa4  { top: 550px; left: 200px; }
+  .casa5  { top: 100px; left: 300px; }
+  .casa6  { top: 250px; left: 350px; }
+  .casa7  { top: 400px; left: 300px; }
+  .casa8  { top: 550px; left: 400px; }
+  .casa9  { top: 100px; left: 500px; }
+  .casa10 { top: 250px; left: 550px; }
+  .casa11 { top: 400px; left: 500px; }
+  
+  /* Caixa da frase */
+  .frase-box {
+    position: absolute;
+    top: 120px;
+    right: 60px;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .frase-box p {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .frase-box input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+  }
+  /* Caixa da frase (já existe) */
+.frase-box button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 16px;
+}
+
+/* Barra de progresso */
+.progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  left:700px;
+  top: 550px;
+  width: 40%;
+  height: 15px;
+  background-color: #ddd;
+}
+
+.progress-bar {
+  height: 100%;
+  
+  background-color: #00cc66;
+  transition: width 0.3s ease;
+}
+
+.clicada {
+  background-color: yellow !important;
+  border: 2px solid #f1c40f !important;
+  box-shadow: 0 0 12px 4px rgba(255, 255, 0, 0.7);
+}
