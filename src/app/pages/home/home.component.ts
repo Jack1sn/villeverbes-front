@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { PersonagemService } from '../../services/personagem.service'; // Importe o serviço de personagem
 import { HeaderComponent } from '../header/header.component';
 import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-home',
   standalone: true,

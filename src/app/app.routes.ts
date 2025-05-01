@@ -19,11 +19,16 @@ import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
 import { Fase2Component } from './pages/fase2/fase2.component';
 import { Fase3Component } from './pages/fase3/fase3.component';
 import { HeaderComponent } from './pages/header/header.component';
+import { CrudAmbienteComponent } from './pages/crud-ambiente/crud-ambiente.component';
 export const routes: Routes = [
+
   { path: 'login', 
     component: LoginComponent },
     { path: 'header',
       component: HeaderComponent,
+    },
+    {path: 'crudAmbiente',
+    component: CrudAmbienteComponent,
     },
   {
     path: 'autocadastro',
@@ -114,7 +119,10 @@ export const routes: Routes = [
     component: VisualizarRankingComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['ADMIN'] },
-  }
+  },
+
+   // Fallback (opcional)
+   { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({

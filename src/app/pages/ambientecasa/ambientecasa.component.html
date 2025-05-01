@@ -1,5 +1,6 @@
 <app-header></app-header>
 
+
 <div class="background">
   <!-- Barra superior -->
   <div class="top-bar">
@@ -7,39 +8,74 @@
       <img class="user-icon" src="assets/vvimagens/usuario2.png" alt="Usuário" />
       <span class="user-name">{{ personagemSelecionado || 'Utilisateur' }}</span>
     </div>
-    <h2 class="titulos"> Bienvenue {{personagemSelecionado}}, Choisissez un Numero! <br> Indicatif Present.</h2>
+    <h2 class="titulos">
+      Bienvenue {{ personagemSelecionado }}, Choisissez un Numero!<br />
+      <strong>Tempo:</strong> {{ tempoVerbal }}
+    </h2>
   </div>
 
-  <!-- Bolinhas -->
-  <div class="direction-line">
-    <div 
-      *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
-      class="circle casa{{i}}" 
-      [ngClass]="{'clicada': isBolaClicada(i)}"
-      (click)="selecionarFrase(i)">
-      <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
-      <span>{{i}}</span>
-    </div>
+  <!-- Imagem de fundo -->
+  <div class="ambiente" [ngStyle]="{'background-image': 'url(' + fundoImagem + ')'}">
   </div>
 
-  <!-- Frase -->
+  <!-- Bolinhas numeradas -->
+  <div 
+    *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
+    class="circle casa{{i}}" 
+    [ngClass]="getCorClasse(i)"
+    (click)="selecionarFrase(i)">
+    <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
+    <span>{{ i }}</span>
+  </div>
+
+  <!-- Frase e campo de resposta -->
   <div class="frase-box" *ngIf="fraseSelecionada">
     <p>{{ fraseSelecionada }}</p>
-    <input type="text" [(ngModel)]="respostaDigitada" placeholder="Conjuguez ici..." (keyup.enter)="verificarResposta()" />
+
+    <input
+  #respostaInput
+  type="text"
+  [ngModel]="respostaDigitada | transLetras"
+  (ngModelChange)="respostaDigitada = $event"
+  placeholder="Conjuguez ici..."
+  (keyup.enter)="verificarResposta()"
+/>
+
     <button (click)="verificarResposta()">Réponse</button>
+
     <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations!' ? 'green' : 'red' }">
       {{ resultado }}
     </p>
   </div>
 
+  <!-- Botões de navegação -->
+  <div class="absolute bottom-28 right-16 flex gap-x-4" *ngIf="fraseSelecionada">
+    <!-- Botão RETOUR -->
+    <button
+      (click)="navigate('home')"
+      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3 21V3a1 1 0 011-1h9.5a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1zM13.5 12H10" />
+      </svg>
+      RETOUR
+    </button>
+
+    <!-- Botão AVANCER -->
+    <button
+      (click)="navigate('ambienteparque')"
+      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+      AVANCER
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </button>
+  </div>
+
   <!-- Barra de progresso -->
   <div class="progress-bar-container">
     <div class="progress-bar" [style.width.%]="progresso"></div>
-  </div>
-
-  <!-- Logo -->
-  <div class="logo-container">
-    <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />
-    <span class="logo-text">Ville des Verbes</span>
   </div>
 </div>
