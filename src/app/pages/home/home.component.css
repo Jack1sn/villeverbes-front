@@ -53,10 +53,12 @@ html, body {
 
 /* Imagens dentro das bolinhas */
 .circle img {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 20%;
   margin-bottom: 6px;
+  text-decoration-color: #f0f331;
+  color: #f0f0f0;
 }
 
 /* Texto dentro das bolinhas */
@@ -72,43 +74,42 @@ html, body {
   font-weight: bold;
   color: #fdfafa;
   font-size: 45px;
-  margin-top: -10px;
+  margin-top: 30px;
   display: flex;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+ 
 }
 .circle h2 {
   font-weight: bold;
   color: #3806ee;
-  font-size: 35px;
-  margin-top: -10px;
+  font-size: 45px;
+  margin-top: 30px;
   display: flex;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 .circle h3 {
   font-weight: bold;
   color: #1ef55f;
-  font-size: 35px;
-  margin-top: -10px;
+  font-size: 45px;
+  margin-top: 30px;
   display: flex;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+ 
 }
 /* Posicionamento individual de cada bolinha */
 .circle.casa {
-  top: 5px;
+  top: 200px;
   left: 300px;
 }
 
 .circle.parque {
-  top: 120px;
+  top: 145px;
   left: 550px;
 }
 
 .circle.universidade {
-  top: -50px;
+  top: 70px;
   left: 800px;
 }
 .circle.selo {
-  top: 120px;
+  top: 80px;
   left: 1000px;
 }
 
@@ -169,8 +170,8 @@ html, body {
 /* Quadro de Personagens no canto direito */
 .personagem-box {
   position: fixed;
-  top: 60px;
-  right: 20px;
+  top: 300px;
+  justify-content: center;
   background-color: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;

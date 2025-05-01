@@ -6,6 +6,7 @@ import { HeaderComponent } from '../header/header.component';
 import { CrudAmbienteService } from '../../services/crudAmbiente.service';
 import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
+import { ProgressoService } from '../../services/progresso.service';
 
 @Component({
   selector: 'app-ambientecasa',
@@ -58,7 +59,8 @@ export class AmbientecasaComponent implements OnInit {
     private router: Router,
     private personagemService: PersonagemService,
     private crudService: CrudAmbienteService,
-    private transLetrasPipe: TransLetrasPipe
+    private transLetrasPipe: TransLetrasPipe,
+    private progressoService: ProgressoService,
   ) {}
 
   ngOnInit(): void {

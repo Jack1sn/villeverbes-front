@@ -1,5 +1,13 @@
 
 <app-header></app-header>
+<!-- Botão flutuante para abrir o modal -->
+<button
+  (click)="abrirModal()"
+  class="fixed top-72 right-36 bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded shadow-lg z-50">
+  Vous pouvez choisir un personnage pour demarrer le jeu.
+</button>
+
+
 <div class="background">
     <!-- Ícone e nome do usuário -->
     <div class="user-profile">
@@ -7,48 +15,77 @@
       <span class="user-name"> Utilisateur</span>
     </div>
   
-    <div class="direction-line">
-      <div class="circle casa" (click)="navigate('ambientecasa')">
-        <img src="assets/vvimagens/ambcasa.jpeg" alt="Casa" />
-        <h1 class="cirle h1">1</h1>
-        <span>Maison</span>
+    <div class="circle casa" (click)="navigate('ambientecasa')">
+      <!-- Progresso no canto superior direito -->
+      <div class="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10">
+        {{ progressoCasa }}/11
       </div>
     
-      <div class="circle parque" (click)="navigate('ambienteparque')">
-        <img src="assets/vvimagens/parque.jpg" alt="Parque" />
-        <h1 class="cirle h2">2</h1>
-        <span>Place</span>
+      <!-- Número no centro -->
+      <div class="text-white text-3xl font-bold">1</div>
+    
+      <!-- Nome do ambiente -->
+      <span>Maison</span>
+    </div>
+    <div class="circle parque" (click)="navigate('ambienteparque')">
+      <!-- Progresso no topo direito -->
+      <div class="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10">
+        {{ progressoParque }}/11
       </div>
     
-      <div class="circle universidade" (click)="navigate('ambienteuniversidade')">
-        <img src="assets/vvimagens/chaapeu.jpg" alt="Universidade" />
-        <h1 class="cirle h3">3</h1>
-        <span>Université</span>
+      <!-- Número do ambiente -->
+      <div class="text-white text-3xl font-bold">2</div>
+    
+      <!-- Nome do ambiente -->
+      <span>Place</span>
+    </div>
+    
+    
+    <div class="circle universidade" (click)="navigate('ambienteuniversidade')">
+      <!-- Progresso no topo direito -->
+      <div class="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10">
+        {{ progressoUniversidade }}/11
       </div>
+    
+      <!-- Número do ambiente -->
+      <div class="text-white text-3xl font-bold">3</div>
+    
+      <!-- Nome do ambiente -->
+      <span>Université</span>
+    </div>
+    
+    
       <div class="circle selo" (click)="navigate('selo')">
         <img src="assets/vvimagens/selo.png" alt="Selo" />
         <h1 class="cirle h1">FIN</h1>
         <span>Selo</span>
       </div>
-    </div>
-    <div class="personagem-box">
-      <h2 class="personagem-title">Choisissez un Personnage </h2>
-      <ul class="personagem-list">
-        <li (click)="selecionarPersonagem('Jacques')">Jacques</li>
-        <li (click)="selecionarPersonagem('Marie')">Marie</li>
-        <li (click)="selecionarPersonagem('André')">André</li>
-        <li (click)="selecionarPersonagem('Pierre')">Pierre</li>
-        <li (click)="selecionarPersonagem('Monique')">Monique</li>
-      </ul>
-      <p *ngIf="personagemSelecionado" class="personagem-selecionado">
-        Personnage: <strong>{{ personagemSelecionado }}</strong>
-      </p>
-    </div>
+    
+  <!-- Modal de Seleção de Personagem -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
+    <!-- Botão fechar -->
+    <button (click)="fecharModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+      ✕
+    </button>
 
-    <!-- Logo e texto do jogo -->
-<div class="logo-container">
-    <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />
-    <span class="logo-text">Ville des Verbes</span>
+    <h2 class="text-lg font-semibold text-blue-900 mb-4 text-center">Choisissez un Personnage</h2>
+    <ul class="space-y-3">
+      <li *ngFor="let personagem of ['Jacques', 'Marie', 'André', 'Pierre', 'Monique']"
+          (click)="selecionarPersonagem(personagem)"
+          class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+        <img [src]="'assets/vvimagens/' + personagem.toLowerCase() + '.jpg'" 
+             alt="{{ personagem }}" 
+             class="w-10 h-10 rounded-full object-cover border border-gray-300" />
+        <span class="text-gray-800 font-medium">{{ personagem }}</span>
+      </li>
+    </ul>
+
+    <p *ngIf="personagemSelecionado" class="text-sm text-center text-green-700 mt-4">
+      Personnage sélectionné: <strong>{{ personagemSelecionado }}</strong>
+    </p>
   </div>
+</div>
+
   </div>
   
