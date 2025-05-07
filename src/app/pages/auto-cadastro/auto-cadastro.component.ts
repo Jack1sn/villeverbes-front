@@ -95,7 +95,7 @@ export class AutoCadastroComponent {
       };
 
       try {
-        const response = await this.JogadorService.autoCadastro(Jogador);
+        const response = await this.jogadorService.autoCadastro(Jogador);
         this.successMessage = 'Cadastro realizado com sucesso!';
         this.errorMessage = '';
         this.modalService.open(content);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { Login } from './models/login';
 import { environment } from '../../src/environments/environment';
 
@@ -19,65 +19,87 @@ export class AuthService {
   }
 
   /**
-   * Realiza login com Axios ou com usuário temporário (teste).
+   * Realiza o cadastro de um novo usuário (autocadastro).
    */
-  async login(loginData: Login): Promise<void> {
-    // ✅ 1. Verifica se é o usuário temporário
-    if (
-      loginData.email === 'usuario@gmail.com' &&
-      loginData.senha === '123'
-    ) {
-      const usuarioTemporario = {
-        nome: 'Usuário Temporário',
-        email: loginData.email,
-        perfil: 'TEMP' // Pode ser 'aluno', 'admin', etc., conforme seu sistema
-      };
-      localStorage.setItem('user', JSON.stringify(usuarioTemporario));
-      this.userRole = usuarioTemporario.perfil;
-      return;
-    }
-
-    // ✅ 2. Caso contrário, tenta login com servidor
-    const url = `${this.baseUrl}/login`;
+  async autoCadastro(usuarioData: any): Promise<void> {
+    const url = `${this.baseUrl}/jogador/autocadastro`;  // Endpoint do autocadastro
 
     try {
-      const response = await axios.post(url, loginData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(url, usuarioData);
 
       if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        localStorage.setItem('user', JSON.stringify(response.data));  // Salva os dados do usuário no localStorage
         this.userRole = response.data.perfil;
+        this.router.navigate(['/login']);  // Redireciona para a página inicial após o cadastro
       }
     } catch (error) {
       this.handleError(error);
     }
   }
 
+  /**
+   * Realiza o login de um usuário existente.
+   */
+  async login(loginData: Login): Promise<void> {
+    const url = `${this.baseUrl}/login`;  // Endpoint do login
+
+    try {
+      const response = await axios.post(url, loginData, {
+        withCredentials: true,  // Adicione se for necessário enviar cookies/autenticação
+      });
+
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));  // Salva os dados do usuário no localStorage
+        this.userRole = response.data.perfil;
+        this.router.navigate(['/home']);  // Redireciona para a página inicial após o login
+      }
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  /**
+   * Faz o logout do usuário.
+   */
   logout(): void {
     localStorage.removeItem('user');
     this.userRole = null;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']);  // Redireciona para a página de login após o logout
   }
 
+  /**
+   * Obtém o papel (role) do usuário.
+   */
   getRole(): string | null {
     return this.userRole;
   }
 
+  /**
+   * Verifica se o usuário está autenticado.
+   */
   isAuthenticated(): boolean {
     return this.userRole !== null;
   }
 
+  /**
+   * Obtém os dados do usuário do localStorage.
+   */
   getUser(): any {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
+  /**
+   * Obtém o nome do usuário.
+   */
   getUserName(): string | null {
     const user = this.getUser();
     return user ? user.nome : null;
   }
 
+  /**
+   * Trata os erros na requisição HTTP.
+   */
   private handleError(error: unknown): void {
     let errorMessage = 'Ocorreu um erro desconhecido';
 
@@ -96,7 +118,7 @@ export class AuthService {
     }
 
     console.error('Erro na requisição:', errorMessage);
-    alert(errorMessage);
-    throw new Error(errorMessage);
+    alert(errorMessage);  // Exibe o erro ao usuário
+    throw new Error(errorMessage);  // Lança um erro para interromper a execução
   }
 }
