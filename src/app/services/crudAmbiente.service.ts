@@ -5,8 +5,6 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class CrudAmbienteService {
-  // backend 
-  // private apiUrl = 'http://localhost:8080/api';
 
   private ambientesMock: any[] = [
     {
@@ -15,26 +13,64 @@ export class CrudAmbienteService {
       tempoVerbal: 'Présent',
       fundoImagem: '',
       frases: [
-        { pronome: 'Je', verbo: 'mange', resposta: 'Je mange une pomme' }
+        {
+          pronome: 'Je',
+          verbo: 'manger',
+          complemento: 'une pomme',
+          resposta: 'mange'
+        }
+      ]
+    },
+    {
+      id: 2,
+      nome: 'Parque',
+      tempoVerbal: 'Présent',
+      fundoImagem: '',
+      frases: [  {
+        pronome: 'Nous',
+        verbo: 'Faire',
+        complemento: 'faisons',
+        resposta: 'étudiait'
+      }]
+    },  {
+      id: 3,
+      nome: 'Université',
+      tempoVerbal: 'Présent',
+      fundoImagem: '',
+      frases: [
+        {
+          pronome: 'Elle',
+          verbo: 'Étudier',
+          complemento: 'la médicine',
+          resposta: 'étudie'
+        }
       ]
     }
   ];
 
-  private pronomesMock: string[] = ['Je', 'Tu', 'Il', 'Elle', 'Nous', 'Vous', 'Ils'];
-  private temposVerbaisMock: string[] = ['Présent', 'Passé Composé', 'Futur'];
-  private respostasCertasMock = [
-    { frase: 'Je mange une pomme.', resposta: 'mange' },
-    { frase: 'Tu bois de l\’eau.', resposta: 'bois' },
-    { frase: 'Il voit le chien.', resposta: 'voit' },
-    { frase: 'Nous avons une voiture.', resposta: 'avons' },
-    { frase: 'Vous êtes à la maison.', resposta: 'êtes' },
-    { frase: 'Ils jouent au parc.', resposta: 'jouent' },
-    { frase: 'Je finis mes devoirs.', resposta: 'finis' },
-    { frase: 'Elle lit un livre.', resposta: 'lit' },
-    { frase: 'Nous partons à 8h.', resposta: 'partons' }
+  private pronomesMock: string[] = ['Je', 'Tu', 'Il', 'Elle', 'Nous', 'Vous', 'Ils', 'Elles'];
+  
+  private temposVerbaisMock: string[] = [
+    'Présent', 
+    'Passé Composé', 
+    'Futur', 
+    'Imparfait', 
+    'Passé Simple'
   ];
 
- 
+  private respostasCertasMock = [
+    { frase: 'Je ______ une pomme.', resposta: 'mange' },
+    { frase: 'Tu ____ de l’eau.', resposta: 'bois' },
+    { frase: 'Il _____ le chien.', resposta: 'voit' },
+    { frase: 'Nous ____ une voiture.', resposta: 'avons' },
+    { frase: 'Vous ___ à la maison.', resposta: 'êtes' },
+    { frase: 'Ils ____ au parc.', resposta: 'jouent' },
+    { frase: 'Je ___ mes devoirs.', resposta: 'finis' },
+    { frase: 'Elle ___ un livre.', resposta: 'lit' },
+    { frase: 'Nous _____ à 8h.', resposta: 'partons' }
+  ];
+
+  // ======= Métodos públicos mockados =======
 
   getAmbientes(): Observable<any[]> {
     return of(this.ambientesMock);
@@ -71,9 +107,11 @@ export class CrudAmbienteService {
     return of({ success: true });
   }
 
-  // ======== Código real com backend (comentado) ========
+  // ======= Código real com backend (comentado) =======
 
   /*
+  private apiUrl = 'http://localhost:8080/api';
+
   constructor(private http: HttpClient) {}
 
   getAmbientes(): Observable<any[]> {

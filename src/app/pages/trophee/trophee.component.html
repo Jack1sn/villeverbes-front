@@ -1,0 +1,108 @@
+
+<br>
+<app-header></app-header>
+
+<!-- Container flex para centralizar o conteúdo -->
+<div class="min-h-screen w-screen bg-gray-50 flex flex-col"> 
+    <div class="flex-grow w-full px-72 py-6">
+
+    <!-- Título -->
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+      Troféus Conquistados
+    </h1>
+
+    <!-- Total de Ambientes -->
+    <div class="text-center mb-8">
+      <p class="text-xl font-medium text-gray-700">
+        Total de Ambientes:
+        <span class="text-green-600 font-bold text-2xl">3</span>
+      </p>
+    </div>
+
+    <!-- Se jogador (com ID na URL) -->
+    <div *ngIf="userId" class="overflow-x-auto">
+      <table class="min-w-full border border-gray-300 text-center">
+        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+          <tr>
+            <th class="border px-6 py-3">Selo x Ambiente</th>
+            <th class="border px-6 py-3">Selo</th>
+            <th class="border px-6 py-3">Médail</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of trofeus" class="hover:bg-gray-50">
+            <td class="border px-6 py-2">{{ item.selo }}</td>
+            <td class="border px-6 py-2">{{ item.trofeu }}</td>
+            <td class="border px-6 py-2">
+              <!-- Medalhas com Tailwind CSS -->
+              <div class="flex justify-center items-center">
+                <div
+                  *ngIf="item.trofeu === 'Bronze'"
+                  class="w-12 h-12 bg-gradient-to-b from-yellow-500 to-yellow-700 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  B
+                </div>
+                <div
+                  *ngIf="item.trofeu === 'Prata'"
+                  class="w-12 h-12 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  P
+                </div>
+                <div
+                  *ngIf="item.trofeu === 'Ouro'"
+                  class="w-12 h-12 bg-gradient-to-b from-yellow-600 to-yellow-900 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  O
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Se admin (sem ID na URL) -->
+    <div *ngIf="!userId" class="overflow-x-auto mt-10">
+      <table class="min-w-full border border-gray-300 text-center">
+        <thead class="bg-blue-100 text-blue-800 uppercase text-sm">
+          <tr>
+            <th class="border px-6 py-3">Usuário</th>
+            <th class="border px-6 py-3">Selo x Ambiente</th>
+            <th class="border px-6 py-3">Médail</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of trofeus" class="hover:bg-blue-50">
+            <td class="border px-6 py-2">{{ item.usuario }}</td>
+            <td class="border px-6 py-2">{{ item.selo }}</td>
+            <td class="border px-6 py-2">
+              <div class="flex items-center justify-center gap-2">
+                {{ item.trofeu }}
+                <!-- Medalhas com Tailwind CSS -->
+                <div
+                  *ngIf="item.trofeu === 'Bronze'"
+                  class="w-12 h-12 bg-gradient-to-b from-yellow-500 to-yellow-700 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  B
+                </div>
+                <div
+                  *ngIf="item.trofeu === 'Prata'"
+                  class="w-12 h-12 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  P
+                </div>
+                <div
+                  *ngIf="item.trofeu === 'Ouro'"
+                  class="w-12 h-12 bg-gradient-to-b from-yellow-600 to-yellow-900 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                >
+                  O
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

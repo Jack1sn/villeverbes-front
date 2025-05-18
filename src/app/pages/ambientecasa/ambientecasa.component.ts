@@ -7,6 +7,7 @@ import { CrudAmbienteService } from '../../services/crudAmbiente.service';
 import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
 import { ProgressoService } from '../../services/progresso.service';
+import { AmbienteCasaService } from '../../services/ambientecasa.service';
 
 @Component({
   selector: 'app-ambientecasa',
@@ -14,12 +15,13 @@ import { ProgressoService } from '../../services/progresso.service';
   imports: [CommonModule, FormsModule, HeaderComponent, TransLetrasPipe],
   templateUrl: './ambientecasa.component.html',
   styleUrls: ['./ambientecasa.component.css'],
-  providers:[TransLetrasPipe],
+  providers:[TransLetrasPipe,],
 })
 export class AmbientecasaComponent implements OnInit {
   personagemSelecionado: string | null = null;
   tempoVerbal: string = '';
   fundoImagem: string = '';
+  mensagemFinalVisivel: boolean = false;
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -54,6 +56,7 @@ export class AmbientecasaComponent implements OnInit {
   };
 
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
+  acertos: number=0;
 
   constructor(
     private router: Router,
@@ -61,6 +64,7 @@ export class AmbientecasaComponent implements OnInit {
     private crudService: CrudAmbienteService,
     private transLetrasPipe: TransLetrasPipe,
     private progressoService: ProgressoService,
+    private ambientecasaService:AmbienteCasaService,
   ) {}
 
   ngOnInit(): void {
@@ -117,18 +121,42 @@ export class AmbientecasaComponent implements OnInit {
     });
   }
 
+  
   verificarResposta(): void {
     if (this.perguntaAtual === null || !this.fraseAtual) return;
-
+  
     const respostaCorreta = this.fraseAtual.respostaCorreta;
-
-    if (this.respostaDigitada.trim().toLowerCase() === respostaCorreta.toLowerCase()) {
+    const estaCorreta = this.ambientecasaService.verificarRespostaDigitada(
+      this.respostaDigitada,
+      respostaCorreta
+    );
+  
+    if (estaCorreta) {
+      this.acertos += 1;
       this.progresso = Math.min(this.progresso + (100 / this.totalPerguntas), 100);
       this.bolinhasEstado[this.perguntaAtual] = 'correta';
+  
+      if (this.perguntaAtual === 11) {
+        if (this.acertos / this.totalPerguntas >= 0.6) {
+          this.mensagemFinalVisivel = true;
+          setTimeout(() => {
+            this.router.navigate(['/ambienteparque']);
+          }, 6000);
+        } else {
+          this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
+        }
+      } else {
+        const proxima = this.perguntaAtual + 1;
+        setTimeout(() => {
+          this.selecionarFrase(proxima);
+        }, 600);
+      }
     } else {
       this.bolinhasEstado[this.perguntaAtual] = 'incorreta';
     }
   }
+  
+  
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';

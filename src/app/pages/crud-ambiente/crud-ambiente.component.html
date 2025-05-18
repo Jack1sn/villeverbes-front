@@ -1,84 +1,145 @@
-<div class="crud-ambiente p-6 bg-white rounded shadow-md">
-    <h2 class="text-xl font-bold mb-4">Configurações do Ambiente</h2>
+<app-header></app-header>
+<!-- Estrutura Principal -->
+
+<div class="min-h-screen w-screen bg-gray-50 flex flex-col">
+  <!-- Cabeçalho -->
   
-    <!-- Tabela de Ambientes -->
-    <table class="w-full table-auto border border-gray-300 mb-6">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="p-2 border">Nome</th>
-          <th class="p-2 border">Tempo Verbal</th>
-          <th class="p-2 border">Frases</th>
-          <th class="p-2 border">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let ambiente of ambientes; let i = index">
-          <td class="p-2 border">{{ ambiente.nome }}</td>
-          <td class="p-2 border">{{ ambiente.tempoVerbal }}</td>
-          <td class="p-2 border">
-            <ul>
-              <li *ngFor="let frase of ambiente.frases">
-                {{ frase.pronome }} _______ {{ frase.verbo }} ({{ frase.resposta }})
-              </li>
-            </ul>
-          </td>
-          <td class="p-2 border">
-            <button class="bg-blue-500 text-white px-3 py-1 rounded mr-2" (click)="openFraseModal(i)">Adicionar Frase</button>
-            <button class="bg-red-500 text-white px-3 py-1 rounded" (click)="deleteAmbiente(i)">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- Botão para abrir modal de novo ambiente -->
-    <button class="bg-green-600 text-white px-4 py-2 rounded" (click)="openAmbienteModal()">Adicionar Ambiente</button>
-  
-    <!-- Modal Ambiente -->
-    <div *ngIf="isAmbienteModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded w-[90%] max-w-md">
-        <h3 class="text-lg font-bold mb-4">Adicionar Novo Ambiente</h3>
-        <form (ngSubmit)="addAmbiente()">
-          <label class="block mb-2">Nome:</label>
-          <input type="text" [(ngModel)]="novoAmbiente.nome" name="nome" required class="w-full p-2 border rounded mb-4">
-  
-          <label class="block mb-2">Tempo Verbal:</label>
-          <select [(ngModel)]="novoAmbiente.tempoVerbal" name="tempoVerbal" class="w-full p-2 border rounded mb-4">
-            <option *ngFor="let tempo of temposVerbais" [value]="tempo">{{ tempo }}</option>
-          </select>
-  
-          <label class="block mb-2">Imagem de Fundo:</label>
-          <input type="file" (change)="onImageSelected($event)" class="mb-4">
-  
-          <div class="flex justify-end">
-            <button type="button" class="bg-gray-400 text-white px-3 py-1 rounded mr-2" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded">Registrar</button>
-          </div>
-        </form>
+  <!-- Conteúdo principal -->
+  <div class="flex-grow w-full px-72 py-6">
+    <div class="w-full max-w-[1600px] mx-auto">
+      <br>
+      <h2 class="text-3xl font-bold mb-6 text-gray-800">Configurações do Ambiente</h2>
+
+      <!-- Tabela de Ambientes -->
+      <div class="overflow-x-auto mb-6 shadow border border-gray-200 rounded-lg bg-white">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100 text-gray-700">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-medium">Nome</th>
+              <th class="px-4 py-3 text-left text-sm font-medium">Tempo Verbal</th>
+              <th class="px-4 py-3 text-left text-sm font-medium">Frases</th>
+              <th class="px-4 py-3 text-center text-sm font-medium">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ambiente of ambientes; let i = index" class="bg-white border-b">
+              <td class="px-4 py-2">{{ ambiente.nome }}</td>
+              <td class="px-4 py-2">{{ ambiente.tempoVerbal }}</td>
+              <td class="px-4 py-2">
+                <ul class="space-y-1">
+                  <li *ngFor="let frase of ambiente.frases; let j = index" class="flex justify-between items-center bg-gray-50 px-2 py-1 rounded shadow-sm">
+                    <span class="text-sm text-gray-700">
+                      {{ j + 1 }}. {{ frase.pronome }} ---<strong>({{ frase.verbo }})</strong> {{ frase.complemento }} 
+                      <span class="text-blue-600 underline italic">{{ frase.resposta }}</span>
+                    </span>
+                    <div class="flex space-x-2">
+                      <button (click)="editFrase(i, j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16.862 4.487a2.1 2.1 0 013.05 2.891l-9.193 9.193a2.1 2.1 0 01-1.05.562l-4.36.872.872-4.36a2.1 2.1 0 01.562-1.05l9.193-9.193z" />
+                        </svg>
+                      </button>
+                      <button (click)="deleteFrase(i, j)" class="text-red-500 hover:text-red-700" title="Excluir frase">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                          stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </td>
+              <td class="px-4 py-2 text-center">
+                <button class="text-blue-600 hover:text-blue-800" (click)="openFraseModal(i)" title="Adicionar frase">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+                <button class="ml-3 text-red-600 hover:text-red-800" (click)="deleteAmbiente(i)" title="Excluir ambiente">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  
-    <!-- Modal Frase -->
-    <div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded w-[90%] max-w-md">
-        <h3 class="text-lg font-bold mb-4">Adicionar Nova Frase</h3>
-        <form >
-          <label class="block mb-2">Pronome:</label>
-          <select [(ngModel)]="novaFrase.pronome" name="pronome" class="w-full p-2 border rounded mb-4">
-            <option *ngFor="let p of pronomes" [value]="p">{{ p }}</option>
-          </select>
-  
-          <label class="block mb-2">Verbo (Infinitivo):</label>
-          <input type="text" [(ngModel)]="novaFrase.verbo" name="verbo" required class="w-full p-2 border rounded mb-4">
-  
-          <label class="block mb-2">Resposta (Verbo Conjugado):</label>
-          <input type="text" [(ngModel)]="novaFrase.resposta" name="resposta" required class="w-full p-2 border rounded mb-4">
-  
-          <div class="flex justify-end">
-            <button type="button" class="bg-gray-400 text-white px-3 py-1 rounded mr-2" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Registrar Frase</button>
-          </div>
-        </form>
+
+      <!-- Botão Adicionar Ambiente -->
+      <button (click)="openAmbienteModal()"
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded inline-flex items-center space-x-2 shadow">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span>Adicionar Ambiente</span>
+      </button>
+
+      <!-- Modal Novo Ambiente -->
+      <div *ngIf="isAmbienteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+          <h3 class="text-lg font-bold mb-4">Adicionar Novo Ambiente</h3>
+          <form (ngSubmit)="addAmbiente()">
+            <label class="block mb-2">Nome:</label>
+            <input type="text" [(ngModel)]="novoAmbiente.nome" name="nome" required
+              class="w-full p-2 border rounded mb-4" />
+
+            <label class="block mb-2">Tempo Verbal:</label>
+            <select [(ngModel)]="novoAmbiente.tempoVerbal" name="tempoVerbal" required
+              class="w-full p-2 border rounded mb-4">
+              <option *ngFor="let tempo of temposVerbais" [value]="tempo">{{ tempo }}</option>
+            </select>
+
+            <label class="block mb-2">Imagem de Fundo:</label>
+            <input type="file" (change)="onImageSelected($event)" class="mb-4" />
+
+            <div class="flex justify-end">
+              <button type="button" (click)="closeModal()"
+                class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancelar</button>
+              <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Registrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Frase -->
+      <div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
+          <h3 class="text-lg font-bold mb-4">
+            {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
+          </h3>
+
+          <form (ngSubmit)="saveFrase()">
+            <label class="block mb-1 font-medium">Pronome:</label>
+            <select [(ngModel)]="novaFrase.pronome" name="pronome" required class="w-full p-2 border rounded mb-4">
+              <option *ngFor="let p of pronomes" [value]="p">{{ p }}</option>
+            </select>
+
+            <label class="block mb-1 font-medium">Verbo (Infinitivo):</label>
+            <input type="text" [(ngModel)]="novaFrase.verbo" name="verbo" required class="w-full p-2 border rounded mb-4" />
+
+            <label class="block mb-1 font-medium">Complemento:</label>
+            <input type="text" [(ngModel)]="novaFrase.complemento" name="complemento" class="w-full p-2 border rounded mb-4" />
+
+            <label class="block mb-1 font-medium">Resposta (Verbo Conjugado):</label>
+            <input type="text" [(ngModel)]="novaFrase.resposta" name="resposta" required class="w-full p-2 border rounded mb-4" />
+
+            <div class="flex justify-end gap-2 mt-4">
+              <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
+                Cancelar
+              </button>
+              <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                {{ isEditingFrase ? 'Atualizar' : 'Salvar Frase' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-  
+</div>

@@ -1,1 +1,30 @@
-<p>ranking works!</p>
+<app-header></app-header>
+<br>
+<div class="p-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Ranking do Jogador</h2>
+  
+    <div *ngIf="jogador; else erroOuCarregando">
+      <table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="px-4 py-2 text-left border-b">Nome Jogador</th>
+            <th class="px-4 py-2 text-left border-b">Posição</th>
+            <th class="px-4 py-2 text-left border-b">Selo Ambiente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-2 border-b">{{ jogador.nome }}</td>
+            <td class="px-4 py-2 border-b">{{ jogador.posicao }}</td>
+            <td class="px-4 py-2 border-b">{{ jogador.seloAmbiente }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <ng-template #erroOuCarregando>
+      <p class="text-red-600" *ngIf="erro">{{ erro }}</p>
+      <p *ngIf="!erro">Carregando ranking...</p>
+    </ng-template>
+  </div>
+  
