@@ -1,0 +1,67 @@
+/* header.component.css */
+.header-background {
+    background-image: url('/assets/vvimagens/telaini.png');  /* Caminho absoluto da imagem */
+    background-size: cover;  /* Garante que a imagem cubra toda a tela */
+    background-position: center center;  /* Centraliza a imagem */
+    background-repeat: no-repeat;  /* Não repete a imagem */
+    width: 100vw;  /* 100% da largura da tela */
+    height: 100vh;  /* 100% da altura da tela */
+    display: flex; 
+    
+    justify-content: center;  /* Centraliza o conteúdo horizontalmente */
+    align-items: center;  /* Centraliza o conteúdo verticalmente */
+    text-align: center;  /* Centraliza o texto */
+    color: white;  /* Cor do texto */
+  }
+  
+  /* Estilo do título e do subtítulo */
+  .header-background h1 {
+    font-size: 70px;  /* Tamanho do título */
+    font-weight: bold;
+    margin-top: -150px;
+    margin-bottom: 20px;  /* Margem abaixo do título */
+  }
+  
+  .header-background p {
+    font-size: 1.5rem;  /* Tamanho do subtítulo */
+    margin-top: 0;
+  }
+  
+  /* Estilo dos botões */
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    position: absolute;
+    bottom:25px;  
+    width: 100%;  
+  }
+  
+  .button-container button {
+    padding: 12px 20px;  /* Tamanho dos botões */
+    font-size: 1.25rem;  /* Tamanho do texto nos botões */
+    border-radius: 8px;  /* Bordas arredondadas */
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .button-container button:hover {
+    transform: scale(1.05);  
+  }
+  
+  
+  .button-blue {
+    background-color: #007bff;
+    color: rgb(5, 5, 5);
+  }
+  
+  .button-green {
+    background-color: #28a745;
+    color: rgb(12, 12, 12);
+  }
+  
+  .button-yellow {
+    background-color: #ffc107;
+    color: rgb(17, 16, 16);
+  }
+  

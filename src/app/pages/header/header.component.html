@@ -1,32 +1,40 @@
 <header class="header">
   <div class="header-left">
     <img src="../../assets/vvimagens/vvsbg.png" alt="Logo" class="logo" />
-    <p> Ville des Verbes</p>
+    <p> Ville de Verbes</p>
   </div>
   <nav class="nav-links flex space-x-6 items-center">
-    <!-- Home link with icon -->
+    <!-- Home link -->
     <a [routerLink]="getHomeLink()" class="flex items-center text-gray-700 hover:text-blue-500">
       <i class="fas fa-home mr-2"></i> Home
     </a>
 
-    <!-- Ranking link with icon -->
+    <!-- Ranking link -->
     <a [routerLink]="getRankingLink()" class="flex items-center text-gray-700 hover:text-blue-500">
       <i class="fas fa-trophy mr-2"></i> Ranking
     </a>
 
-    <!-- Médails link with icon -->
+    <!-- Troféu link -->
     <a [routerLink]="getTropheeLink()" class="flex items-center text-gray-700 hover:text-blue-500">
       <i class="fas fa-medal mr-2"></i> Médails
     </a>
 
-    <!-- Configuration link with icon -->
+    <!-- Configuration link -->
     <a [routerLink]="getConfigurationLink()" class="flex items-center text-gray-700 hover:text-blue-500">
       <i class="fas fa-cogs mr-2"></i> Configuration
     </a>
 
-    <!-- Log out link with icon -->
-    <a (click)="logout()" class="flex items-center text-gray-700 hover:text-blue-500">
-      <i class="fas fa-sign-out-alt mr-2"></i> Log out
-    </a>
+    <!-- Condicional de Login / Logout -->
+    <ng-container *ngIf="isAuthenticated; else showLogin">
+      <a (click)="logout()" class="flex items-center text-gray-700 hover:text-blue-500">
+        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+      </a>
+    </ng-container>
+
+    <ng-template #showLogin>
+      <a [routerLink]="'/login'" class="flex items-center text-gray-700 hover:text-blue-500">
+        <i class="fas fa-sign-in-alt mr-2"></i> Login
+      </a>
+    </ng-template>
   </nav>
 </header>

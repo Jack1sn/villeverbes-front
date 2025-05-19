@@ -23,13 +23,20 @@ import { HomeAdminComponent } from './pages/home-admin/home-admin.component';
 import { CrudAdminsComponent } from './pages/crud-admins/crud-admins.component';
 import { TropheeComponent } from './pages/trophee/trophee.component';
 import { ConfigJogadorComponent } from './pages/config-jogador/config-jogador.component';
-
+import { TelaInicialComponent } from './pages/tela-inicial/tela-inicial.component'; 
 export const routes: Routes = [
 
+  { path: 'tela-inicial', component: TelaInicialComponent },
   { path: 'login', component: LoginComponent },
   { path: 'autocadastro', component: AutoCadastroComponent },
+
   { path: 'header', component: HeaderComponent },
-  { path: 'crudAmbiente', component: CrudAmbienteComponent },
+
+
+  { path: 'crudAmbiente', component: CrudAmbienteComponent, 
+    canActivate:[authGuard],
+    data:{expectedRoles:['ADMIN','SUPERADMIN']}
+   },
 
   // Rotas acessíveis apenas para JOGADOR
   {
@@ -152,7 +159,7 @@ export const routes: Routes = [
   },
 
   // Redirecionamento padrão
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'tela-inicial',pathMatch: 'full' }
 ];
 
 @NgModule({

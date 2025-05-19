@@ -1,0 +1,26 @@
+/* login.component.css */
+
+/* Fundo da página de login */
+.login-background {
+    background-image: url('/assets/vvimagens/telaini.png'); /* Caminho para a imagem */
+    background-size: cover; /* Faz com que a imagem cubra toda a tela */
+    background-position: center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Impede que a imagem se repita */
+    width: 100vw; /* 100% da largura da tela */
+    height: 100vh; /* 100% da altura da tela */
+    display: flex; /* Flexbox para centralizar o conteúdo */
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    align-items: center; /* Centraliza o conteúdo verticalmente */
+    color: rgb(7, 7, 7); /* Cor do texto, você pode ajustar conforme necessário */
+  }
+  
+  /* Adicionando um pouco de espaçamento no conteúdo do formulário */
+  .login-container {
+    background-color:  white; /*rgba(255, 255, 255, 0.8); Fundo branco com transparência */
+    padding: 2rem; /* Espaçamento interno */
+    border-radius: 8px; /* Borda arredondada */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 100%; /* Para que o formulário ocupe 100% da largura possível */
+    max-width: 400px; /* Largura máxima para o formulário */
+  }
+  

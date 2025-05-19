@@ -1,67 +1,96 @@
-import { Component } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
+import { Component, NgModule, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-header',
-  standalone: true,
-  imports: [RouterModule],
+  standalone:true,
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
+  imports:[ RouterModule, CommonModule]
 })
-export class HeaderComponent {
-  role: string | null = null;
-  userId: string | null = null;
+export class HeaderComponent implements OnInit {
+  userName: string | null = null;
+  userRole: string | null = null;
+  isAuthenticated: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {
-    // Obtendo o role e userId do serviço de autenticação
-    this.role = this.authService.getRole();
-    this.userId = this.authService.getUserId();
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.checkAuthenticationStatus();
   }
 
-  // Método para gerar o link da página Home, dependendo do papel do usuário (admin ou jogador)
-  getHomeLink(): string {
-    if (this.role === 'ADMIN') {
-      return '/home-admin'; // Admin acessa a página de home específica do admin
-    } else if (this.role === 'JOGADOR') {
-      return '/home'; // Jogador acessa a página de home padrão
+  /**
+   * Verifica se o usuário está autenticado e atualiza o nome e o perfil.
+   */
+  checkAuthenticationStatus(): void {
+    this.isAuthenticated = this.authService.isAuthenticated();
+    if (this.isAuthenticated) {
+      this.userName = this.authService.getUserName();
+      this.userRole = this.authService.getRole();
+    } else {
+      this.userName = null;
+      this.userRole = null;
     }
-    return '/'; // Caso não haja role, redireciona para a página inicial
   }
 
-  // Método para gerar o link do ranking, dependendo do papel do usuário (admin ou jogador)
-  getRankingLink(): string {
-    if (this.role === 'ADMIN') {
-      return `/visualizar-ranking`; // Admin acessa a visualização de ranking sem ID de usuário
-    } else if (this.role === 'JOGADOR' && this.userId) {
-      return `/ranking/${this.userId}`; // Jogador acessa o ranking com o seu ID
-    }
-    return '/'; // Caso não haja role, redireciona para a página inicial
-  }
-
-  // Método para gerar o link do troféu, dependendo do papel do usuário (admin ou jogador)
-  getTropheeLink(): string {
-    if (this.role === 'ADMIN') {
-      return '/trophee'; // Admin acessa a página de troféus geral
-    } else if (this.role === 'JOGADOR' && this.userId) {
-      return `/trophee/${this.userId}`; // Jogador acessa a página de troféus com seu ID
-    }
-    return '/'; // Caso não haja role, redireciona para a página inicial
-  }
-
-  // Método para gerar o link de configuração, dependendo do papel do usuário (admin ou jogador)
-  getConfigurationLink(): string {
-    if (this.role === 'ADMIN') {
-      return '/crudAmbiente';  // Admin acessa a página de configuração de ambientes
-    } else if (this.role === 'JOGADOR') {
-      return '/config-jogador';  // Jogador acessa a página de configuração personalizada
-    }
-    return '/';  // Retorna o caminho raiz caso não tenha um perfil definido
-  }
-
-  // Método de logout que chama o AuthService e redireciona para a página de login
+  /**
+   * Método para o logout do usuário.
+   */
   logout(): void {
-    this.authService.logout(); // Chama o método de logout do AuthService
+    this.authService.logout(); // Chama o logout no AuthService
+    this.checkAuthenticationStatus(); // Atualiza o status de autenticação
     this.router.navigate(['/login']); // Redireciona para a página de login
+  }
+
+  /**
+   * Obtém o link correto para o Home dependendo do perfil do usuário.
+   */
+  getHomeLink(): string {
+    if (this.userRole === 'ADMIN') {
+      return '/home-admin'; // Admin
+    } else if (this.userRole === 'JOGADOR') {
+      return '/home'; // Jogador
+    }
+    return '/'; // Caso não tenha perfil ou não esteja autenticado
+  }
+
+  /**
+   * Obtém o link do Ranking dependendo do perfil do usuário.
+   */
+  getRankingLink(): string {
+    if (this.userRole === 'ADMIN') {
+      return '/visualizar-ranking'; // Admin
+    } else if (this.userRole === 'JOGADOR') {
+      return `/ranking/${this.authService.getUserId()}`; // Jogador
+    }
+    return '/';
+  }
+
+  /**
+   * Obtém o link para os Troféus dependendo do perfil do usuário.
+   */
+  getTropheeLink(): string {
+    if (this.userRole === 'ADMIN') {
+      return '/trophee'; // Admin
+    } else if (this.userRole === 'JOGADOR') {
+      return `/trophee/${this.authService.getUserId()}`; // Jogador
+    }
+    return '/';
+  }
+
+  /**
+   * Obtém o link para as configurações dependendo do perfil do usuário.
+   */
+  getConfigurationLink(): string {
+    if (this.userRole === 'ADMIN') {
+      return '/crudAmbiente'; // Admin
+    } else if (this.userRole === 'JOGADOR') {
+      return '/config-jogador'; // Jogador
+    }
+    return '/';
   }
 }
