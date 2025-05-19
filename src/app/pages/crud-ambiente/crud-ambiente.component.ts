@@ -6,6 +6,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { HeaderComponent } from '../header/header.component';
 
+// Definindo as interfaces para estrutura de dados
 interface Frase {
   pronome: string;
   verbo: string;
@@ -29,72 +30,98 @@ interface Ambiente {
   imports: [FormsModule, CommonModule, FontAwesomeModule, HeaderComponent]
 })
 export class CrudAmbienteComponent implements OnInit {
-  // Ícones FontAwesome
+  // Ícones do FontAwesome
   faTrash = faTrash;
   faEdit = faEdit;
   faPlus = faPlus;
 
-  // Dados carregados
+  // Dados do componente
   ambientes: Ambiente[] = [];
-  temposVerbais: string[] = [];
   pronomes: string[] = [];
+  temposVerbais: string[] = ['Présent', 'Futur', 'Imparfait', 'Passé Composé', 'Conditionnel'];
 
-  // Modelos de criação/edição
-  novoAmbiente: Ambiente = { nome: '', tempoVerbal: '', fundoImagem: '', frases: [] };
+  novoAmbiente: Ambiente = { nome: '', tempoVerbal: '', frases: [] };
   novaFrase: Frase = { pronome: '', verbo: '', complemento: '', resposta: '' };
 
-  // Controle de modais
   isAmbienteModalOpen = false;
   isFraseModalOpen = false;
 
-  // Controle de edição de frase
   ambienteSelecionadoIndex = -1;
   fraseEditandoIndex = -1;
   isEditingFrase = false;
 
+  // Frases fixas por ambiente
+  frasesFixasPorAmbiente: { [key: string]: Frase[] } = {
+    'Casa': [{ pronome: 'Je', verbo: 'suis', complemento: 'à la maison', resposta: 'suis' }],
+    'Parque': [{ pronome: 'Nous', verbo: 'marchons', complemento: 'dans le parc', resposta: 'marchons' }],
+    'Université': [{ pronome: 'Ils', verbo: 'étudient', complemento: 'à l\'université', resposta: 'étudient' }]
+  };
+
   constructor(private crudService: CrudAmbienteService) {}
 
   ngOnInit(): void {
+    // Carregar os ambientes da API e adicionar as frases fixas
     this.carregarAmbientes();
-    this.carregarTemposVerbais();
     this.carregarPronomes();
   }
 
-  // ====== Carregamento de Dados ======
-
+  // Carregar os dados dos ambientes da API
   carregarAmbientes(): void {
     this.crudService.getAmbientes().subscribe(data => {
-      this.ambientes = data;
+      // Adicionar frases fixas ou criar uma frase padrão caso não haja frases
+      this.ambientes = data.map(ambiente => {
+        let frases = this.frasesFixasPorAmbiente[ambiente.nome];
+
+        // Se não houver frases fixas, adiciona uma frase padrão
+        if (!frases || frases.length === 0) {
+          frases = [{ pronome: 'Il', verbo: 'est', complemento: 'là', resposta: 'est' }];
+        }
+
+        return {
+          ...ambiente,
+          frases: [...frases]  // Atribuindo as frases ao ambiente
+        };
+      });
+
+      // Log para depuração
+      console.log('Ambientes carregados:', this.ambientes);
     });
   }
 
-  carregarTemposVerbais(): void {
-    this.crudService.getTemposVerbais().subscribe(data => {
-      this.temposVerbais = data;
-    });
-  }
-
+  // Carregar os pronomes
   carregarPronomes(): void {
     this.crudService.getPronomes().subscribe(data => {
       this.pronomes = data;
     });
   }
 
-  // ====== Modal Ambiente ======
-
+  // Modal para criar um novo ambiente
   openAmbienteModal(): void {
-    this.novoAmbiente = { nome: '', tempoVerbal: '', fundoImagem: '', frases: [] };
+    this.novoAmbiente = { nome: '', tempoVerbal: '', frases: [] };
     this.isAmbienteModalOpen = true;
   }
 
+  // Adicionar novo ambiente
   addAmbiente(): void {
     if (!this.novoAmbiente.nome || !this.novoAmbiente.tempoVerbal) return;
+  
+    // Garantir que as frases fixas estão associadas corretamente
+    if (this.frasesFixasPorAmbiente[this.novoAmbiente.nome]) {
+      this.novoAmbiente.frases = [...this.frasesFixasPorAmbiente[this.novoAmbiente.nome]];
+    } else {
+      this.novoAmbiente.frases = [{ pronome: 'Il', verbo: 'est', complemento: 'là', resposta: 'est' }];  // Frase padrão
+    }
+  
     this.crudService.addAmbiente(this.novoAmbiente).subscribe(() => {
       this.carregarAmbientes();
       this.closeModal();
+    }, error => {
+      console.error('Erro ao adicionar o ambiente', error);
     });
   }
+  
 
+  // Excluir ambiente
   deleteAmbiente(index: number): void {
     const ambiente = this.ambientes[index];
     if (ambiente?.id) {
@@ -104,8 +131,7 @@ export class CrudAmbienteComponent implements OnInit {
     }
   }
 
-  // ====== Modal Frase (Adicionar ou Editar) ======
-
+  // Modal para adicionar ou editar frases
   openFraseModal(index: number): void {
     this.novaFrase = { pronome: '', verbo: '', complemento: '', resposta: '' };
     this.ambienteSelecionadoIndex = index;
@@ -114,6 +140,7 @@ export class CrudAmbienteComponent implements OnInit {
     this.isFraseModalOpen = true;
   }
 
+  // Editar frase
   editFrase(ambienteIndex: number, fraseIndex: number): void {
     const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
     this.novaFrase = { ...frase };
@@ -123,15 +150,14 @@ export class CrudAmbienteComponent implements OnInit {
     this.isFraseModalOpen = true;
   }
 
+  // Salvar frase (adicionar ou editar)
   saveFrase(): void {
     const ambiente = this.ambientes[this.ambienteSelecionadoIndex];
     if (!ambiente) return;
 
     if (this.isEditingFrase && this.fraseEditandoIndex >= 0) {
-      // Editar frase existente
       ambiente.frases[this.fraseEditandoIndex] = { ...this.novaFrase };
     } else {
-      // Adicionar nova frase
       ambiente.frases.push({ ...this.novaFrase });
     }
 
@@ -140,6 +166,7 @@ export class CrudAmbienteComponent implements OnInit {
     });
   }
 
+  // Excluir frase
   deleteFrase(ambienteIndex: number, fraseIndex: number): void {
     const ambiente = this.ambientes[ambienteIndex];
     if (!ambiente || !ambiente.frases[fraseIndex]) return;
@@ -150,8 +177,7 @@ export class CrudAmbienteComponent implements OnInit {
     });
   }
 
-  // ====== Utilitários ======
-
+  // Fechar os modais
   closeModal(): void {
     this.isAmbienteModalOpen = false;
     this.isFraseModalOpen = false;
@@ -160,6 +186,7 @@ export class CrudAmbienteComponent implements OnInit {
     this.fraseEditandoIndex = -1;
   }
 
+  // Lidar com a seleção de imagens para fundo
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input?.files?.[0]) {
