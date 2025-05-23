@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   /**
-   * 🔐 Adiciona token JWT (falso ou real) nas requisições Axios
+   * 🔐 Adiciona token JWT nas requisições Axios
    */
   private configurarInterceptor(): void {
     axios.interceptors.request.use((config) => {
@@ -33,91 +33,24 @@ export class AuthService {
   }
 
   /**
-   * ✅ Login com simulação de usuários locais
+   * ✅ Login via API real
    */
   async login(loginData: Login): Promise<void> {
-    const usarLoginSimulado = true; // Altere para false ao usar backend real
-
-    if (usarLoginSimulado) {
-      // 👤 Lista de usuários fictícios
-      const usuariosFicticios = [
-        {
-          email: 'admin@email.com',
-          senha: '123',
-          perfil: 'ADMIN',
-          nome: 'Admin Simulado',
-          id: '1',
-        },
-        {
-          email: 'jogador@email.com',
-          senha: '123',
-          perfil: 'JOGADOR',
-          nome: 'Jogador Simulado',
-          id: '2',
-        },
-        {
-          email: 'superadmin@email.com',
-          senha: '123',
-          perfil: 'SUPERADMIN',
-          nome: 'Superadmin Simulado',
-          id: '3',
-        },
-      ];
-
-      // 🔍 Verifica se existe o usuário
-      const usuario = usuariosFicticios.find(
-        (u) => u.email === loginData.email && u.senha === loginData.senha
-      );
-
-      if (!usuario) {
-        alert('E-mail ou senha incorretos.');
-        return;
-      }
-
-      // 🧪 Simula resposta do backend
-      const dadosSimulados = {
-        token: 'token-falso-simulacao',
-        usuario: {
-          nome: usuario.nome,
-          perfil: usuario.perfil,
-          id: usuario.id, // ID do usuário
-        },
-      };
-
-      // 💾 Salva e redireciona conforme o perfil
-      this.salvarDados(dadosSimulados);
-
-      switch (usuario.perfil) {
-        case 'SUPERADMIN':
-          this.router.navigate(['/home-admins']);
-          break;
-        case 'ADMIN':
-          this.router.navigate(['/crudAbiente']);
-          break;
-        case 'JOGADOR':
-        default:
-          this.router.navigate(['/home']);
-      }
-
-      return;
-    }
-
-    // 🌐 Login real via API (use quando backend estiver pronto)
-    /*
-    const url = `${this.baseUrl}/login`;
+    const url = `${this.baseUrl}/auth/login`;  // URL para o login na API real
 
     try {
-      const response = await axios.post(url, loginData);
+      const response = await axios.post(url, loginData);  // Envia as credenciais para a API
+
+      // Verifica se o token foi recebido
       if (response.data && response.data.token) {
-        this.salvarDados(response.data);
-        this.router.navigate(['/home']);
+        this.salvarDados(response.data);  // Armazena os dados (token e informações do usuário)
+        this.router.navigate(['/home']);  // Redireciona para a tela inicial
       } else {
         throw new Error('Token JWT não recebido.');
       }
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error);  // Lida com possíveis erros
     }
-    */
   }
 
   /**
@@ -127,37 +60,46 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     this.userRole = null;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']);  // Redireciona para a tela de login
   }
 
   /**
    * ✅ Armazena token e dados do usuário localmente
    */
   private salvarDados(data: any): void {
-    localStorage.setItem('user', JSON.stringify(data));
-    localStorage.setItem('token', data.token);
-    this.userRole = data.usuario.perfil;
+    localStorage.setItem('user', JSON.stringify(data));  // Armazena os dados do usuário
+    localStorage.setItem('token', data.token);  // Armazena o token JWT
+    this.userRole = data.usuario.perfil;  // Define o perfil do usuário (ADMIN, JOGADOR, etc)
   }
 
   /**
    * ✅ Retorna o token salvo
    */
   getToken(): string | null {
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = this.decodeJwt(token);  // Decodifica o token JWT para verificar sua validade
+      if (decoded.exp < Date.now() / 1000) {
+        this.logout();  // Token expirado, realiza logout
+        return null; 
+      }
+      return token;
+    }
+    return null;
   }
 
   /**
    * ✅ Retorna se o usuário está autenticado
    */
   isAuthenticated(): boolean {
-    return this.getToken() !== null;
+    return this.getToken() !== null;  // Verifica se o token está presente e válido
   }
 
   /**
    * ✅ Retorna o perfil (ADMIN, JOGADOR, etc)
    */
   getRole(): string | null {
-    return this.userRole;
+    return this.userRole;  // Retorna o perfil do usuário
   }
 
   /**
@@ -173,7 +115,7 @@ export class AuthService {
    */
   getUserName(): string | null {
     const user = this.getUser();
-    return user ? user.usuario.nome : null;
+    return user ? user.usuario.nome : null;  // Retorna o nome do usuário
   }
 
   /**
@@ -204,11 +146,21 @@ export class AuthService {
         }
       } else if (error.request) {
         errorMessage = 'Servidor não respondeu.';
+      } else {
+        errorMessage = error.message || 'Erro desconhecido';
       }
     }
 
     console.error('Erro:', errorMessage);
-    alert(errorMessage);
-    throw new Error(errorMessage);
+    alert(errorMessage);  // Exibe mensagem de erro
+    throw new Error(errorMessage);  // Lança o erro para tratamento adicional
+  }
+
+  /**
+   * Decode o token JWT
+   */
+  private decodeJwt(token: string): any {
+    const payload = token.split('.')[1];  // Extrai a parte do payload do JWT
+    return JSON.parse(atob(payload));  // Decodifica o payload do JWT
   }
 }

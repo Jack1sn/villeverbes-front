@@ -23,6 +23,8 @@ export class HomeComponent {
   progressoCasa: number = 0;
   progressoParque: number = 0;
   progressoUniversidade: number = 0;
+  usuarioNome: string = 'Utilisateur'; // Valor padrão
+
 
 
   constructor(
@@ -36,7 +38,13 @@ export class HomeComponent {
     this.progressoCasa = this.progressoService.getProgresso('casa');
     this.progressoParque = this.progressoService.getProgresso('parque');
     this.progressoUniversidade = this.progressoService.getProgresso('universidade');
+
+    const nomeSalvo = localStorage.getItem('usuarioNome');
+    if (nomeSalvo) {
+      this.usuarioNome = nomeSalvo;
+    }
   }
+  
 
   // Método de navegação para outras páginas
   navigate(destino: string): void {
@@ -64,7 +72,7 @@ export class HomeComponent {
     if (this.respostaDigitada.toLowerCase() === 'suis') {
       this.resultado = 'OK';
     } else {
-      this.resultado = 'Mau! Essayez encore';
+      this.resultado = 'Uuuff! Essayez encore';
     }
   }
 
@@ -74,6 +82,7 @@ abrirModal(): void {
   this.showModal = true;
 }
 
+//---------------
 
 
 

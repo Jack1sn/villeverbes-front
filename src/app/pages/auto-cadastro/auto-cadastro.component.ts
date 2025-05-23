@@ -95,6 +95,9 @@ export class AutoCadastroComponent {
       };
 
       try {
+
+        localStorage.setItem('usuarioNome', Jogador.nome); // guarda no nome do usuario no localstorage
+        
         const response = await this.jogadorService.autoCadastro(Jogador);
         this.successMessage = 'Cadastro realizado com sucesso!';
         this.errorMessage = '';
@@ -115,6 +118,7 @@ export class AutoCadastroComponent {
     }
   }
 
+  
 
 
 }
