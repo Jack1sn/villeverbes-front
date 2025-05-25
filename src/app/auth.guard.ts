@@ -51,9 +51,9 @@ export const authGuard: CanActivateFn = (
   // Caso o usuário não tenha permissão
   if (!hasAccess) {
     if (!environment.production) {
-      console.log('Usuário não tem permissão para acessar esta página. Redirecionando para login...');
+     // console.log('Usuário não tem permissão para acessar esta página. Redirecionando para login...');
     }
-    alert('Você não tem permissão para acessar esta página.');
+    //alert('Você não tem permissão para acessar esta página.');
     router.navigate(['/login']);
     return false;
   }

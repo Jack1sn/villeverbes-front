@@ -12,7 +12,13 @@
     justify-content: center; /* Centraliza o conteúdo horizontalmente */
     align-items: center; /* Centraliza o conteúdo verticalmente */
     color: rgb(7, 7, 7); /* Cor do texto, você pode ajustar conforme necessário */
-  }
+
+    
+      position: relative;
+      padding: 2rem;
+    }
+    
+
   
   /* Adicionando um pouco de espaçamento no conteúdo do formulário */
   .login-container {
@@ -24,3 +30,22 @@
     max-width: 400px; /* Largura máxima para o formulário */
   }
   
+  /* Estiliza o botão X */
+
+.fechar-botao {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  color: black;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+.fechar-botao:hover {
+  color: red;
+}
+ 
+

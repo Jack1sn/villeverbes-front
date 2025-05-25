@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { Login } from '../../models/login';
-import { HeaderComponent } from "../header/header.component";
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-login',
@@ -18,39 +18,56 @@ export class LoginComponent {
   senha: string = '';
   errorMessage: string = '';
   successMessage: string = '';
+  mostrarLogin: boolean = true;
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  async realizarLogin() {
+  async realizarLogin(form: any) {
+    if (form.invalid) {
+      this.errorMessage = 'Preencha todos os campos corretamente.';
+      return;
+    }
+  
     const loginData: Login = {
       email: this.email,
-      senha: this.senha
+      senha: this.senha,
     };
-
+  
     try {
-      // Fazendo login e obtendo os dados do usuário
       await this.authService.login(loginData);
-
-      // Após login bem-sucedido, verifica o perfil do usuário
-      const userRole = this.authService.getRole(); // Verifique o perfil do usuário
-
+      const userRole = this.authService.getRole();
+  
       this.successMessage = 'Login realizado com sucesso!';
       this.errorMessage = '';
-
-      // Redireciona para a rota correspondente ao perfil do usuário
-      if (userRole === 'SUPERADMIN' || userRole === 'ADMIN') {
-        this.router.navigate(['/home-admin']);
-      } else if (userRole === 'JOGADOR') {
-        this.router.navigate(['/home']);
-      } else {
-        this.router.navigate(['/login']);
-      }
-
+  
+      // ⏱ Espera 2 segundos para exibir a mensagem de sucesso
+      setTimeout(() => {
+        this.successMessage = '';
+        this.mostrarLogin = false;
+  
+        // 🔀 Redireciona depois que a mensagem sumir
+        if (userRole === 'COLABORADOR' || userRole === 'ADMIN') {
+          this.router.navigate(['/home-admin']);
+        } else if (userRole === 'JOGADOR') {
+          this.router.navigate(['/home']);
+        } else {
+          this.router.navigate(['/login']);
+        }
+      }, 3000);
+  
     } catch (error) {
-      // Captura erro e exibe mensagem de erro
-      console.error('Erro ao fazer login', error);
       this.errorMessage = 'E-mail ou senha incorretos';
       this.successMessage = '';
+  
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 3000);
     }
+  }
+  
+  
+
+  fecharLogin() {
+    this.mostrarLogin = false;
   }
 }

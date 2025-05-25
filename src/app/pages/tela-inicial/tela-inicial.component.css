@@ -45,7 +45,7 @@
     justify-content: center;
     gap: 80px;
     position: absolute;
-    bottom:25px;  
+    bottom:45px;  
     width: 100%;  
   }
   
@@ -76,4 +76,5 @@
     background-color: #ffc107;
     color: rgb(17, 16, 16);
   }
+  
   

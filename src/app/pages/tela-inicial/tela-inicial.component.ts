@@ -1,39 +1,72 @@
-// tela-inicial.component.ts
 import { Component } from '@angular/core';
-import { Router} from   '@angular/router';
+import { Router } from '@angular/router';
 import { HeaderComponent } from "../header/header.component";
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpParams, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-tela-inicial',
-  standalone:true,
+  standalone: true,
   templateUrl: './tela-inicial.component.html',
   styleUrls: ['./tela-inicial.component.css'],
-  imports: [HeaderComponent]
+  imports: [HeaderComponent, FormsModule, CommonModule]
 })
 export class TelaInicialComponent {
-  constructor(private router: Router) {}
+  mostrarAjuda = false;
+  emailRemetente = '';
+  mensagemAjuda = '';
+  sucesso = false;
+  erro = false;
 
-  // Método para redirecionar para a página Home
-  
+  constructor(private router: Router, private http: HttpClient) {}
 
-  // Método para tratar o login
   login(): void {
-    this.router.navigate(['/login']);  // Redireciona para a página de login
+    this.router.navigate(['/login']);
   }
 
-  // Método para exibir a ajuda
-  showHelp(): void {
-    alert('Aqui está a ajuda!');  // Aqui você pode mostrar mais interações, como um modal
-  }
-
-  // Método para iniciar o jogo
   startGame(): void {
-    this.router.navigate(['/game']);  // Redireciona para a página do jogo
+    this.router.navigate(['/game']);
   }
 
   goToGEPTA(): void {
-    window.open('https://gepta.weebly.com/', '_blank'); // Abre em nova aba
+    window.open('https://gepta.weebly.com/', '_blank');
+  }
+
+  enviarAjuda(form: NgForm): void {
+    if (!form.valid) return;
+
+    this.sucesso = false;
+    this.erro = false;
+
+    const params = new HttpParams()
+      .set('para', 'villedesverbes@gmail.com')
+      .set('assunto', 'Pedido de ajuda.')
+      .set('texto', `Email do remetente: ${this.emailRemetente}\n\nMensagem:\n${this.mensagemAjuda}`);
+
+    this.http.post('http://localhost:8080/email/simples', null, {
+      params,
+      responseType: 'text'
+    }).subscribe({
+      next: ( resposta) => {
+
+        console.log('Resposta do servidor:', resposta);
+        this.sucesso = true;
+        this.erro = false;
+        this.emailRemetente = '';
+        this.mensagemAjuda = '';
+        form.resetForm();
+        
+        setTimeout(() => {
+          this.mostrarAjuda = false;
+          this.sucesso = false;
+         
+        }, 3000);
+      },
+      error: (err) => {
+        console.error('Erro ao enviar mensagem:', err);
+        this.erro = true;
+      }
+    });
   }
 }
-  
-

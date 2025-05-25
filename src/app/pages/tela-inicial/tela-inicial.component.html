@@ -1,26 +1,94 @@
-<!-- header.component.html -->
+<!-- Componente de Cabeçalho -->
 <app-header></app-header>
 
-<!-- Aplicando a classe no fundo -->
-<div class="header-background">
-  <!-- Cabeçalho -->
-  <div>
-    <h1 class="text-6xl font-bold text-center leading-tight tracking-wide 
-    text-white-800 mb-4">Ville de Verbes</h1>
-
-    <p class="text-3xl ">Apprenez le français dans un jeu amusant</p>
+<!-- Fundo principal -->
+<div class="header-background flex flex-col items-center justify-center text-center min-h-screen px-4 bg-gradient-to-br from-blue-800 to-blue-400 text-white">
+  
+  <!-- Título -->
+  <div class="mb-10">
+    <h1 class="text-6xl font-bold tracking-wide drop-shadow-md">Ville de Verbes</h1>
+    <p class="text-2xl mt-4 font-medium">Apprenez le français dans un jeu amusant</p>
   </div>
 
-  <!-- Botões -->
+  <!-- Botões principais -->
   <div class="button-container">
-    <button (click)="showHelp()" class="button-blue">
-      <i class="fas fa-question-circle mr-2"></i> Ajuda ?
+    <button (click)="mostrarAjuda = true" class="button-blue flex items-center gap-2">
+      <i class="fas fa-question-circle"></i> Aide ?
     </button>
-    <button (click)="login()" class="button-green">
-      <i class="fas fa-play mr-2"></i> Começar
+    <button (click)="login()" class="button-green flex items-center gap-2">
+      <i class="fas fa-play"></i> Démarrer
     </button>
-    <button (click)="goToGEPTA()" class="button-yellow">
-      <i class="fas fa-graduation-cap mr-2"></i> GEPTA
+    <button (click)="goToGEPTA()" class="button-yellow flex items-center gap-2">
+      <i class="fas fa-graduation-cap"></i> GEPTA
     </button>
+  </div>3
+
+  <!-- Modal de Ajuda -->
+  <div *ngIf="mostrarAjuda" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 relative text-gray-800">
+
+      <!-- Botão de fechar -->
+      <button (click)="mostrarAjuda = false" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">×</button>
+ 
+      <!-- Formulário com validação -->
+      <h3 class="text-2xl font-bold text-blue-700 mb-4 text-center">Envoyez un message</h3>
+      <form #ajudaForm="ngForm" (ngSubmit)="enviarAjuda(ajudaForm)" novalidate>
+
+
+        <!-- Email -->
+        <label for="email" class="block text-sm font-medium text-gray-700">Votre e-mail</label>
+
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          required 
+          [(ngModel)]="emailRemetente"
+          #emailInput="ngModel"
+          class="border p-2 rounded w-full"
+          [class.border-red-500]="emailInput.invalid && emailInput.touched"
+        />
+        
+        <!-- Mensagem de erro se o e-mail for inválido -->
+        <div *ngIf="emailInput.invalid && emailInput.touched" class="text-red-600 text-sm mt-1">
+          Por favor, insira um e-mail válido.
+        </div>
+        
+        <!-- Mensagem -->
+        <div class="mb-4">
+          <label for="mensagem" class="block text-sm font-medium text-gray-700">Message</label>
+          <textarea id="mensagem" name="mensagem" [(ngModel)]="mensagemAjuda" maxlength="300" required rows="4"
+                    class="w-full mt-1 px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+                    #mensagem="ngModel"></textarea>
+          <div class="text-sm text-gray-500 mt-1">
+            {{ mensagemAjuda.length }}/300 caractères
+          </div>
+          <div *ngIf="mensagem.invalid && mensagem.touched" class="text-red-500 text-sm mt-1">
+            Le message est requis.
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="submit" [disabled]="ajudaForm.invalid"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-semibold shadow">
+            Envoyer
+          </button>
+          <button type="button" (click)="mostrarAjuda = false"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md font-medium shadow">
+            Annuler
+          </button>
+        </div>
+
+        <!-- Feedback -->
+        <div *ngIf="sucesso" class="text-green-600 font-semibold mt-4">
+          Message envoyé avec succès !
+        </div>
+        <div *ngIf="erro" class="text-red-600 font-semibold mt-4">
+          Erreur lors de l'envoi du message. Essayez de nouveau.
+        </div>
+      </form>
+    </div>
   </div>
+
 </div>

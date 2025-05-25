@@ -35,7 +35,7 @@ export const routes: Routes = [
 
   { path: 'crudAmbiente', component: CrudAmbienteComponent, 
     canActivate:[authGuard],
-    data:{expectedRoles:['ADMIN','SUPERADMIN']}
+    data:{expectedRoles:['ADMIN','COLABORADOR']}
    },
 
   // Rotas acessíveis apenas para JOGADOR
@@ -83,7 +83,7 @@ export const routes: Routes = [
     path: 'congig-jogador',
     component: ConfigJogadorComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOGADOR', 'ADMIN', 'COLABORADOR'] },
   },
 
 
@@ -95,26 +95,26 @@ export const routes: Routes = [
     path: 'home-admin',
     component: HomeAdminComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN', 'ADMIN'] },
+    data: { expectedRoles: [ 'ADMIN', 'COLABORADOR'] },
   },
   {
     path: 'crud-admins',
     component: CrudAdminsComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN'] },
+    data: { expectedRoles: ['ADMIN'] },
   },
   {
     path: 'crudAbiente',
     component: CrudAmbienteComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
 
   {
     path: 'trophee',
     component: TropheeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
   // Fases para jogadores
   {
@@ -141,13 +141,13 @@ export const routes: Routes = [
     path: 'crudsentencas',
     component: CrudsentencasComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
   {
     path: 'crudfases',
     component: CrudfasesComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['SUPERADMIN', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
 
   // Ranking visualização por admin
@@ -155,7 +155,7 @@ export const routes: Routes = [
     path: 'visualizar-ranking/:id',
     component: VisualizarRankingComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['ADMIN'] },
+    data: { expectedRoles: ['ADMIN', 'COLABORADOR'] },
   },
 
   // Redirecionamento padrão
