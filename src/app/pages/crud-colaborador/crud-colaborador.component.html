@@ -1,0 +1,53 @@
+
+<app-header></app-header>
+<h2 class="text-3xl font-semibold mb-6 text-gray-800 text-center">Cadastro de Colaboradores</h2>
+
+<form [formGroup]="colaboradorForm" (ngSubmit)="salvar()" class="space-y-4 max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+  <input formControlName="nome" placeholder="Nome"
+         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+  <input formControlName="email" placeholder="Email"
+         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+  <input formControlName="telefone" placeholder="Telefone"
+         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+  <input formControlName="senha" placeholder="Senha" type="password"
+         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+  <div class="flex justify-end space-x-3 pt-2">
+    <button type="submit"
+            class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow transition">
+      <span class="material-icons mr-2">Enregistrer</span>
+    </button>
+
+    <button type="button" (click)="resetar()"
+            class="flex items-center bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded shadow transition">
+      <span class="material-icons mr-2">Nettoyer</span>
+    </button>
+  </div>
+</form>
+
+<hr class="my-10 border-t border-gray-300" />
+
+<!-- Lista de Colaboradores -->
+<div class="max-w-3xl mx-auto">
+  <div *ngFor="let colab of colaboradores"
+       class="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800">{{ colab.nome }}</h3>
+      <p class="text-gray-600">{{ colab.email }} | {{ colab.telefone }}</p>
+    </div>
+    <div class="flex space-x-2">
+      <button (click)="editar(colab)"
+              class="flex items-center bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded transition">
+        <span class="material-icons mr-1">Editer</span>
+      </button>
+
+      <button (click)="excluir(colab.id!)"
+              class="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition">
+        <span class="material-icons mr-1">Suprimer</span>
+      </button>
+    </div>
+  </div>
+</div>

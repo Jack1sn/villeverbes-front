@@ -18,13 +18,33 @@
     <a [routerLink]="getTropheeLink()" class="flex items-center text-gray-700 hover:text-blue-500">
       <i class="fas fa-medal mr-2"></i> Médails
     </a>
+    <a
+    *ngIf="getAjudaLink()"
+    [routerLink]="getAjudaLink()"
+    class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-2 rounded-md hover:bg-blue-100 transition"
+  >
+    <i class="fas fa-question-circle"></i>
+    Ajuda
+  </a>
+  
 
-    <!-- Configuration link -->
+  <a
+  *ngIf="getColaboradorLink()"
+  [routerLink]="getColaboradorLink()"
+  class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+>
+  <i class="fas fa-users text-white-500"></i>
+  <span>Colaboradores</span>
+</a>
+
+
+    
     <a [routerLink]="getConfigurationLink()" class="flex items-center text-gray-700 hover:text-blue-500">
-      <i class="fas fa-cogs mr-2"></i> Configuration
+      <i class="fas fa-cogs mr-2"></i> Config.
     </a>
+   
 
-    <!-- Condicional de Login / Logout -->
+  
     <ng-container *ngIf="isAuthenticated; else showLogin">
       <a (click)="logout()" class="flex items-center text-gray-700 hover:text-blue-500">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout

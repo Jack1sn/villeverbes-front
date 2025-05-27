@@ -11,17 +11,23 @@
   </div>
 
   <!-- Botões principais -->
+
+   
   <div class="button-container">
+
+    <button (click)="mostrarInformacao = true" class="button-yellow flex items-center gap-2">
+      <i class="fas fa-info-circle"></i> Information 
+    </button>
     <button (click)="mostrarAjuda = true" class="button-blue flex items-center gap-2">
       <i class="fas fa-question-circle"></i> Aide ?
     </button>
     <button (click)="login()" class="button-green flex items-center gap-2">
       <i class="fas fa-play"></i> Démarrer
     </button>
-    <button (click)="goToGEPTA()" class="button-yellow flex items-center gap-2">
+    <button (click)="mostrarGepta =true" class="button-blue-light flex items-center gap-2">
       <i class="fas fa-graduation-cap"></i> GEPTA
     </button>
-  </div>3
+  </div>
 
   <!-- Modal de Ajuda -->
   <div *ngIf="mostrarAjuda" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -91,4 +97,95 @@
     </div>
   </div>
 
+
+
+  <!-- Modal de Informação -->
+<div *ngIf="mostrarInformacao" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative text-gray-800">
+
+    <!-- Botão de fechar -->
+    <button (click)="mostrarInformacao = false" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">×</button>
+
+    <!-- Conteúdo da Informação -->
+    <h3 class="text-2xl font-bold text-blue-700 mb-4 text-center">À propos de Ville de Verbes</h3>
+    <p class="text-gray-800 text-base md:text-lg font-medium leading-relaxed text-justify px-4 py-2 bg-white rounded-lg shadow-sm"
+   style="font-family: 'Times New Roman', serif;">
+  <strong class="text-black">Ville de Verbes</strong>, l'un des projets du groupe GEPTA ,  est un système web gamifié et interactif conçu pour entraîner les verbes en français.
+  Il permet aux apprenants de pratiquer de manière ludique, avec des activités dynamiques, tout en progressant dans la langue de manière efficace.
+</p>
+
+  </div>
 </div>
+
+
+<!-- Modal do GEPTA -->
+<div *ngIf="mostrarGepta" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 relative text-gray-800"
+       style="font-family: 'Times New Roman', Times, serif; text-align: justify;">
+
+    <!-- Botão de fechar -->
+    <button (click)="mostrarGepta = false" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">×</button>
+
+  <!-- Título -->
+<h3 class="text-3xl font-extrabold text-center mb-6">
+  <i class="fas fa-graduation-cap mr-2"></i> 
+  <span class="text-blue-700">GEPTA</span>
+</h3>
+
+<!-- Conteúdo -->
+<div class="text-gray-700 text-sm leading-relaxed space-y-4 text-left pr-4">
+  <div class="flex">
+    <span class="min-w-[70px] font-semibold">GEPTA –</span>
+    <span>Grupo de Estudos e Pesquisas em Tecnologia Aplicada.</span>
+  </div>
+  <div class="flex">
+    <span class="min-w-[70px] font-semibold">SEPT –</span>
+    <span>Setor de Educação Profissional e Tecnológica.</span>
+  </div>
+  <div class="flex">
+    <span class="min-w-[70px] font-semibold">UFPR –</span>
+    <span>Universidade Federal do Paraná. - Brasil.</span>
+  </div>
+ <div class="flex">
+    <span class="min-w-[70px] font-semibold">Projeto –</span>
+    <span>Ville de Verbes</span>
+  </div>
+
+
+
+
+
+      <!-- Colaboradores -->
+      
+        <p class="font-semibold text-blue-700">Colaboradores:</p>
+
+        <h4 class="font-semibold text-blue-700 mt-2">Alunos</h4>
+        <ul class="list-disc list-inside ml-4 space-y-1">
+          <li>
+            Eduardo  Aluizio Bello – 
+            <a href="mailto:eduardo.bello@ufpr.br" class="text-blue-600 hover:underline">
+              eduardo.bello&#64;ufpr.br
+            </a>
+          </li>
+          <li>
+            Jackson Mardi – 
+            <a href="mailto:jacksonmardi@ufpr.br" class="text-blue-600 hover:underline">
+              jacksonmardi&#64;ufpr.br
+            </a>
+          </li>
+        </ul>
+
+        <h4 class="font-semibold text-blue-700 mt-4">Orientador</h4>
+        <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+          <li>
+            Prof. Luiz Antonio Pereira Neves – 
+            <a href="mailto:neves@ufpr.br" class="text-blue-600 hover:underline">
+              neves&#64;ufpr.br
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+

@@ -93,4 +93,24 @@ export class HeaderComponent implements OnInit {
     }
     return '/';
   }
+
+  getAjudaLink(): string | null {
+    if (this.userRole === 'ADMIN') {
+      return '/ajuda';
+    }
+    return null;
+  }
+  
+
+  getColaboradorLink(): string | null {
+    if (this.userRole === 'ADMIN') {
+      return '/crud-colaborador'; // Admin vê CRUD
+    } else if (this.userRole === 'COLABORADOR') {
+      return '/home-admin'; // Colaborador vê uma home diferente
+    }
+    return null; // Oculta para outros papéis (ex: JOGADOR)
+  }
+  
+
+
 }

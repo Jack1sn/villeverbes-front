@@ -2,7 +2,7 @@
 
 /* Fundo da página de login */
 .login-background {
-    background-image: url('/assets/vvimagens/telaini.png'); /* Caminho para a imagem */
+    background-image: url('assets/vvimagens/Image_login.jpg'); /* Caminho para a imagem */
     background-size: cover; /* Faz com que a imagem cubra toda a tela */
     background-position: center; /* Centraliza a imagem */
     background-repeat: no-repeat; /* Impede que a imagem se repita */

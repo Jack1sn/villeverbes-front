@@ -16,7 +16,7 @@
   
   /* Estilo do título e do subtítulo */
   .header-background h1 {
-    font-size: 120px;  /* Tamanho do título */
+    font-size: 150px;  /* Tamanho do título */
     font-family: 'Bahnschrift Light Condensed', 'Segoe UI', sans-serif;
     font-weight: 300;
     margin-top: -150px;
@@ -77,4 +77,12 @@
     color: rgb(17, 16, 16);
   }
   
+  .button-blue-light {
+    background-color: #050505;
+    color: #f8f2f2;
+  }
   
+.h3 { text-decoration-color: #050505;
+  text-shadow: #f8f2f2; 
+
+}

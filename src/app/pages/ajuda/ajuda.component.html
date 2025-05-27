@@ -1,0 +1,19 @@
+
+<app-header></app-header>
+<br>
+<br>
+
+<div class="p-4">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Mensagens de Ajuda Recebidas</h2>
+  
+    <div *ngIf="carregando" class="text-blue-600">Carregando mensagens...</div>
+    <div *ngIf="erro" class="text-red-600">Erro ao carregar mensagens. Tente novamente.</div>
+    <div *ngIf="!carregando && mensagens.length === 0" class="text-gray-500">Nenhuma mensagem encontrada.</div>
+  
+    <div *ngFor="let msg of mensagens" class="bg-white rounded shadow p-4 mb-4 border border-gray-200">
+      <div class="text-sm text-gray-500 mb-1">Data: {{ msg.dataEnvio | date:'dd/MM/yy' }}</div>
+      <div class="text-sm font-semibold text-blue-600 mb-1">Email: {{ msg.remetente }}</div>
+      <p class="text-gray-700 whitespace-pre-line">{{ msg.mensagem }}</p>
+    </div>
+  </div>
+  

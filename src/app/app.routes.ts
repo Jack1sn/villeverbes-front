@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { FuncionarioComponent } from './pages/funcionario/funcionario.component';
-import { HomeFuncionarioComponent } from './pages/home-funcionario/home-funcionario.component';
-import { HomeComponent } from './pages/home/home.component';
 import { VisualizarRankingComponent } from './pages/visualizar-ranking/visualizar-ranking.component';
 import { RankingComponent } from './pages/ranking/ranking.component';
 import { authGuard } from './auth.guard';
 import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.component';
-import { ManutencaoComponent } from './pages/manutencao/manutencao.component';
 import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
 import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
 import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
@@ -20,10 +16,12 @@ import { Fase3Component } from './pages/fase3/fase3.component';
 import { HeaderComponent } from './pages/header/header.component';
 import { CrudAmbienteComponent } from './pages/crud-ambiente/crud-ambiente.component';
 import { HomeAdminComponent } from './pages/home-admin/home-admin.component';
-import { CrudAdminsComponent } from './pages/crud-admins/crud-admins.component';
 import { TropheeComponent } from './pages/trophee/trophee.component';
 import { ConfigJogadorComponent } from './pages/config-jogador/config-jogador.component';
 import { TelaInicialComponent } from './pages/tela-inicial/tela-inicial.component'; 
+import { AjudaComponent } from './pages/ajuda/ajuda.component';
+import { HomeComponent } from './pages/home/home.component';
+import { CrudColaboradorComponent } from './pages/crud-colaborador/crud-colaborador.component';
 export const routes: Routes = [
 
   { path: 'tela-inicial', component: TelaInicialComponent },
@@ -98,8 +96,8 @@ export const routes: Routes = [
     data: { expectedRoles: [ 'ADMIN', 'COLABORADOR'] },
   },
   {
-    path: 'crud-admins',
-    component: CrudAdminsComponent,
+    path: 'crud-colaborador',
+    component: CrudColaboradorComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['ADMIN'] },
   },
@@ -116,6 +114,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
+
+  {
+    path: 'ajuda',
+    component: AjudaComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
+  },
+  
   // Fases para jogadores
   {
     path: 'fase1',

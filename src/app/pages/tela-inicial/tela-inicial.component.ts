@@ -69,4 +69,10 @@ export class TelaInicialComponent {
       }
     });
   }
+
+  mostrarInformacao = false;
+  mostrarGepta = false;
+
 }
+
+
