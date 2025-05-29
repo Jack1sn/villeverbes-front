@@ -1,0 +1,75 @@
+/* Centralizar o conteúdo da tela */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f7fafc; /* Cor de fundo suave */
+  }
+  
+  main {
+    width: 100%;
+    max-width: 1280px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #4A4A4A;
+  }
+  
+  /* Estilo dos botões */
+  button {
+    font-size: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* Estilo do card de colaborador */
+  div p {
+    color: #6b7280; /* Cinza claro */
+  }
+  
+  div {
+    padding: 16px;
+  }
+  
+  div:hover {
+    background-color: #f3f4f6; /* Cor de hover */
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Modal */
+  dialog {
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  dialog form {
+    margin-top: 20px;
+  }
+  
+  input {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  

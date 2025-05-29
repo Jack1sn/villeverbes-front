@@ -22,6 +22,7 @@ import { TelaInicialComponent } from './pages/tela-inicial/tela-inicial.componen
 import { AjudaComponent } from './pages/ajuda/ajuda.component';
 import { HomeComponent } from './pages/home/home.component';
 import { CrudColaboradorComponent } from './pages/crud-colaborador/crud-colaborador.component';
+import { VisualisarColaboradorComponent } from './pages/visualisar-colaborador/visualisar-colaborador.component';
 export const routes: Routes = [
 
   { path: 'tela-inicial', component: TelaInicialComponent },
@@ -101,6 +102,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { expectedRoles: ['ADMIN'] },
   },
+  {
+    path: 'visualisar-colaborador',
+    component: VisualisarColaboradorComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['ADMIN'] },
+  },
+
   {
     path: 'crudAbiente',
     component: CrudAmbienteComponent,

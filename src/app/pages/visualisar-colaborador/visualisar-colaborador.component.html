@@ -1,0 +1,93 @@
+<app-header></app-header>
+
+<!-- Container flex para centralizar o conteúdo -->
+<div class="min-h-screen w-screen bg-gray-50 flex flex-col">
+  <div class="flex-grow w-full px-72 py-6">
+    <br>
+    <!-- Título -->
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+      Colaboradores
+    </h1>
+
+    <!-- Se houver mensagem de erro -->
+    <div *ngIf="mensagemErro" class="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-sm mb-6 mx-auto max-w-4xl">
+      <strong class="font-bold">Erro!</strong> {{ mensagemErro }}
+    </div>
+
+    <!-- Caso não haja colaboradores -->
+    <div *ngIf="colaboradores.length === 0 && !mensagemErro" class="text-center text-gray-500 mb-6">
+      Nenhum colaborador cadastrado.
+    </div>
+
+    <!-- Lista de colaboradores -->
+    <div *ngIf="colaboradores.length > 0" class="overflow-x-auto max-w-4xl mx-auto">
+
+      <!-- Tabela de colaboradores -->
+      <table class="min-w-full border border-gray-300 text-center">
+        <!-- Cabeçalho da tabela -->
+        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+          <tr>
+            <th class="border px-6 py-3">Nome</th>
+            <th class="border px-6 py-3">Email</th>
+            <th class="border px-6 py-3">Perfil</th>
+            <th class="border px-6 py-3">Ações</th>
+          </tr>
+        </thead>
+
+        <!-- Corpo da tabela -->
+        <tbody class="text-gray-600">
+          <tr *ngFor="let colab of colaboradores" class="hover:bg-gray-50">
+            <td class="border px-6 py-2">{{ colab.nome }}</td>
+            <td class="border px-6 py-2">{{ colab.email }}</td>
+            <td class="border px-6 py-2">{{ colab.perfil }}</td>
+            <td class="border px-6 py-2">
+              <!-- Ações -->
+              <div class="flex justify-center gap-4">
+                <!-- Botão de Edição -->
+                <button (click)="editar(colab)" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-sm transition duration-200 flex items-center">
+                  <i class="fa fa-pencil-alt mr-2"></i> Editar
+                </button>
+
+                <!-- Botão de Exclusão -->
+                <button (click)="excluir(colab.id)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm transition duration-200 flex items-center">
+                  <i class="fa fa-trash-alt mr-2"></i> Excluir
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal de Edição -->
+    <dialog id="modalEditar" class="rounded-lg p-6 shadow-xl max-w-md w-full bg-white">
+      <h2 class="text-xl font-bold mb-4 text-center">Editar Colaborador</h2>
+      <form [formGroup]="colaboradorForm" (ngSubmit)="salvarEdicao()" class="space-y-4">
+
+        <!-- Campos do formulário -->
+        <div>
+          <input formControlName="nome" placeholder="Nome" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        </div>
+        <div>
+          <input formControlName="email" placeholder="Email" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        </div>
+        <div>
+          <input formControlName="telefone" placeholder="Telefone" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        </div>
+        <div>
+          <input formControlName="senha" placeholder="Senha" type="password" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-end space-x-4 mt-6">
+          <button type="button" (click)="fecharModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200">
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200" [disabled]="colaboradorForm.invalid">
+            Salvar
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+</div>

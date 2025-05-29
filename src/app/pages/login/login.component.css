@@ -1,22 +1,22 @@
 /* login.component.css */
 
-/* Fundo da página de login */
 .login-background {
-    background-image: url('assets/vvimagens/Image_login.jpg'); /* Caminho para a imagem */
-    background-size: cover; /* Faz com que a imagem cubra toda a tela */
-    background-position: center; /* Centraliza a imagem */
-    background-repeat: no-repeat; /* Impede que a imagem se repita */
-    width: 100vw; /* 100% da largura da tela */
-    height: 100vh; /* 100% da altura da tela */
-    display: flex; /* Flexbox para centralizar o conteúdo */
-    justify-content: center; /* Centraliza o conteúdo horizontalmente */
-    align-items: center; /* Centraliza o conteúdo verticalmente */
-    color: rgb(7, 7, 7); /* Cor do texto, você pode ajustar conforme necessário */
+  background-image: url('/assets/vvimagens/Image_login.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.5); /* Substitui bg-black bg-opacity-50 */
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(7, 7, 7);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
 
-    
-      position: relative;
-      padding: 2rem;
-    }
     
 
   

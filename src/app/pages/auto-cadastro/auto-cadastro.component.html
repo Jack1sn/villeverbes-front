@@ -1,4 +1,6 @@
 
+<app-header></app-header>
+<div class="autocadastro-background fixed inset-0 z-0"> 
 <ng-template #content let-modal>
     <div class="modal-header">
       <h4 class="modal-title text-title font-nunito">Mensagem</h4>
@@ -42,25 +44,7 @@
   <div
     class="flex flex-col min-w-[100vw] w-full min-h-screen overflow-x-hidden items-center justify-start gap-10"
   >
-    <header
-      class="flex flex-row min-h-20 w-full min-w-[100vw] items-center shadow font-nunito"
-    >
-      <nav
-        class="flex flex-row w-full h-full items-center px-8 xl:px-28 justify-center"
-      >
-        <img
-          class="h-auto w-[164px] cursor-pointer"
-          src="../../../assets/Logovv.png"
-          alt="Ville des Verbe Logo"
-        />
-        <div class="flex flex-1 h-full min-w-[1px] max-w-[1px] bg-[#000]"></div>
-        <div
-          class="text-2xl mt-1 rounded-full font-semibold select-none text-title"
-        >
-           Cadastro
-        </div>
-      </nav>
-    </header>
+  <h2><strong> Cadastro</strong></h2>
   
     <div class="bg-white border border-divider rounded-lg shadow p-8">
       <form [formGroup]="cadastroForm" (ngSubmit)="cadastrar(content)">
@@ -200,4 +184,4 @@
       </form>
     </div>
   </div>
-  
+</div>

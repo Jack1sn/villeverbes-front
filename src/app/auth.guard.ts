@@ -22,6 +22,7 @@ export const authGuard: CanActivateFn = (
   }
 
   const user = authService.getUser();
+  console.log('Usuário no guard:', user);
 
   // Verifica se os dados do usuário estão completos
   if (!user || !user.usuario || !user.usuario.perfil) {

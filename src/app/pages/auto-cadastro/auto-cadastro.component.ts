@@ -8,12 +8,13 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Component, TemplateRef } from '@angular/core';
 import { JogadorService } from '../../services/jogador.service';
 import { Usuario } from '../../models/usuario';
+import { HeaderComponent } from "../header/header.component";
 
 
 @Component({
   selector: 'app-auto-cadastro',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective],
+  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective, HeaderComponent],
   providers: [provideNgxMask()],
   templateUrl: './auto-cadastro.component.html',
   styleUrls: ['./auto-cadastro.component.css']

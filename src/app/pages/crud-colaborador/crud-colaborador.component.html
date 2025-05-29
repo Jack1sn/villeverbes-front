@@ -1,53 +1,101 @@
-
 <app-header></app-header>
-<h2 class="text-3xl font-semibold mb-6 text-gray-800 text-center">Cadastro de Colaboradores</h2>
 
-<form [formGroup]="colaboradorForm" (ngSubmit)="salvar()" class="space-y-4 max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-  <input formControlName="nome" placeholder="Nome"
-         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+<!-- Container flex para centralizar o conteúdo -->
+<div class="min-h-screen w-screen bg-gray-50 flex justify-center items-center">
 
-  <input formControlName="email" placeholder="Email"
-         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+  <!-- Frame com largura ajustada e padding reduzido -->
+  <div class="w-full max-w-2xl bg-white p-8 rounded-lg shadow-xl">
 
-  <input formControlName="telefone" placeholder="Telefone"
-         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
-  <input formControlName="senha" placeholder="Senha" type="password"
-         class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
-  <div class="flex justify-end space-x-3 pt-2">
-    <button type="submit"
-            class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow transition">
-      <span class="material-icons mr-2">Enregistrer</span>
-    </button>
-
-    <button type="button" (click)="resetar()"
-            class="flex items-center bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded shadow transition">
-      <span class="material-icons mr-2">Nettoyer</span>
-    </button>
-  </div>
-</form>
-
-<hr class="my-10 border-t border-gray-300" />
-
-<!-- Lista de Colaboradores -->
-<div class="max-w-3xl mx-auto">
-  <div *ngFor="let colab of colaboradores"
-       class="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
-    <div>
-      <h3 class="text-lg font-semibold text-gray-800">{{ colab.nome }}</h3>
-      <p class="text-gray-600">{{ colab.email }} | {{ colab.telefone }}</p>
+    <!-- Cabeçalho com título e link -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Cadastro de Colaboradores</h1>
+      <a routerLink="/visualisar-colaborador"
+         class="text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer">
+        Visualizar Colaboradores
+      </a>
     </div>
-    <div class="flex space-x-2">
-      <button (click)="editar(colab)"
-              class="flex items-center bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded transition">
-        <span class="material-icons mr-1">Editer</span>
-      </button>
 
-      <button (click)="excluir(colab.id!)"
-              class="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition">
-        <span class="material-icons mr-1">Suprimer</span>
-      </button>
+    <!-- Mensagens de Sucesso e Erro -->
+    <div class="max-w-xl mx-auto mb-6" aria-live="polite">
+      <div *ngIf="mensagemSucesso" class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-sm relative" role="alert">
+        <strong class="font-bold">Sucesso! </strong>
+        <span class="block sm:inline">{{ mensagemSucesso }}</span>
+        <button (click)="mensagemSucesso=''" aria-label="Fechar mensagem de sucesso"
+                class="absolute top-0 bottom-0 right-0 px-4 py-3 focus:outline-none">
+          <svg class="fill-current h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" role="img">
+            <title>Fechar</title>
+            <path d="M14.348 5.652a1 1 0 0 0-1.414 0L10 8.586 7.066 5.652a1 1 0 1 0-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 1 0 1.414 1.414L10 11.414l2.934 2.934a1 1 0 0 0 1.414-1.414L11.414 10l2.934-2.934a1 1 0 0 0 0-1.414z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="mensagemErro" class="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-sm relative" role="alert">
+        <strong class="font-bold">Erro! </strong>
+        <span class="block sm:inline">{{ mensagemErro }}</span>
+        <button (click)="mensagemErro=''" aria-label="Fechar mensagem de erro"
+                class="absolute top-0 bottom-0 right-0 px-4 py-3 focus:outline-none">
+          <svg class="fill-current h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" role="img">
+            <title>Fechar</title>
+            <path d="M14.348 5.652a1 1 0 0 0-1.414 0L10 8.586 7.066 5.652a1 1 0 1 0-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 1 0 1.414 1.414L10 11.414l2.934 2.934a1 1 0 0 0 1.414-1.414L11.414 10l2.934-2.934a1 1 0 0 0 0-1.414z"/>
+          </svg>
+        </button>
+      </div>
     </div>
+
+    <!-- Formulário de Cadastro -->
+    <form [formGroup]="colaboradorForm" (ngSubmit)="salvar()" class="space-y-6 mb-6" novalidate>
+      <div class="relative">
+        <input formControlName="nome" placeholder="Nome"
+               [class.border-red-500]="colaboradorForm.get('nome')?.invalid && colaboradorForm.get('nome')?.touched"
+               class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        <div *ngIf="colaboradorForm.get('nome')?.invalid && colaboradorForm.get('nome')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
+          O nome é obrigatório.
+        </div>
+      </div>
+
+      <div class="relative">
+        <input formControlName="email" placeholder="Email"
+               [class.border-red-500]="colaboradorForm.get('email')?.invalid && colaboradorForm.get('email')?.touched"
+               class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        <div *ngIf="colaboradorForm.get('email')?.invalid && colaboradorForm.get('email')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
+          Informe um email válido.
+        </div>
+      </div>
+
+      <div class="relative">
+        <input formControlName="telefone" placeholder="Telefone"
+               [class.border-red-500]="colaboradorForm.get('telefone')?.invalid && colaboradorForm.get('telefone')?.touched"
+               class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        <div *ngIf="colaboradorForm.get('telefone')?.invalid && colaboradorForm.get('telefone')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
+          O telefone é obrigatório.
+        </div>
+      </div>
+
+      <div class="relative">
+        <input formControlName="senha" placeholder="Senha" type="password"
+               [class.border-red-500]="colaboradorForm.get('senha')?.invalid && colaboradorForm.get('senha')?.touched"
+               class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+        <div *ngIf="colaboradorForm.get('senha')?.invalid && colaboradorForm.get('senha')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
+          A senha é obrigatória.
+        </div>
+      </div>
+
+      <!-- Botão de Salvar -->
+      <div class="flex justify-center pt-2">
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-lg transition duration-200"
+                [disabled]="colaboradorForm.invalid">
+          Salvar
+        </button>
+      </div>
+    </form>
+
+    <!-- Lista de Colaboradores -->
+    <div *ngIf="colaboradores.length === 0" class="text-center text-gray-500">
+      <p>Nenhum colaborador cadastrado ainda.</p>
+    </div>
+
   </div>
 </div>
+
+

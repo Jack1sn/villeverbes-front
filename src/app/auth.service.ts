@@ -78,15 +78,21 @@ export class AuthService {
   getToken(): string | null {
     const token = localStorage.getItem('token');
     if (token) {
-      const decoded = this.decodeJwt(token);  // Decodifica o token JWT para verificar sua validade
-      if (decoded.exp < Date.now() / 1000) {
-        this.logout();  // Token expirado, realiza logout
-        return null; 
+      try {
+        const decoded = this.decodeJwt(token);
+        if (decoded?.exp && decoded.exp < Date.now() / 1000) {
+          // Apenas retorna null, não faz logout
+          return null;
+        }
+        return token;
+      } catch (e) {
+        console.error('Token inválido:', e);
+        return null;
       }
-      return token;
     }
     return null;
   }
+  
 
   /**
    * ✅ Retorna se o usuário está autenticado
