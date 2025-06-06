@@ -5,19 +5,14 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { HeaderComponent } from '../header/header.component';
-
-// Definindo as interfaces para estrutura de dados
-interface Frase {
-  pronome: string;
-  verbo: string;
-  complemento: string;
-  resposta: string;
-}
+import { Frase } from './../../models/frase';
+import { firstValueFrom } from 'rxjs';
 
 interface Ambiente {
   id?: number;
   nome: string;
-  tempoVerbal: string;
+  tempo: string;
+  texto:string;
   fundoImagem?: string;
   frases: Frase[];
 }
@@ -30,171 +25,158 @@ interface Ambiente {
   imports: [FormsModule, CommonModule, FontAwesomeModule, HeaderComponent]
 })
 export class CrudAmbienteComponent implements OnInit {
-  // Ícones do FontAwesome
   faTrash = faTrash;
   faEdit = faEdit;
   faPlus = faPlus;
 
-  // Dados do componente
   ambientes: Ambiente[] = [];
-  pronomes: string[] = [];
-  temposVerbais: string[] = ['Présent', 'Futur', 'Imparfait', 'Passé Composé', 'Conditionnel'];
 
-  novoAmbiente: Ambiente = { nome: '', tempoVerbal: '', frases: [] };
-  novaFrase: Frase = { pronome: '', verbo: '', complemento: '', resposta: '' };
+  pronomes: { id: number; texto: string }[] = [];
+  verbos: { id: number; verbo: string }[] = [];
+  tempos: { id: number; tempo: string }[] = [];
 
-  isAmbienteModalOpen = false;
+  novaFrase: Frase = {
+    pronomeId: 0,
+    verboId: 0,
+    complemento: '',
+    tempoId: 0,
+    resposta: ''
+  };
+
   isFraseModalOpen = false;
-
+  isEditingFrase = false;
   ambienteSelecionadoIndex = -1;
   fraseEditandoIndex = -1;
-  isEditingFrase = false;
-
-  // Frases fixas por ambiente
-  frasesFixasPorAmbiente: { [key: string]: Frase[] } = {
-    'Casa': [{ pronome: 'Je', verbo: 'suis', complemento: 'à la maison', resposta: 'suis' }],
-    'Parque': [{ pronome: 'Nous', verbo: 'marchons', complemento: 'dans le parc', resposta: 'marchons' }],
-    'Université': [{ pronome: 'Ils', verbo: 'étudient', complemento: 'à l\'université', resposta: 'étudient' }]
-  };
 
   constructor(private crudService: CrudAmbienteService) {}
 
-  ngOnInit(): void {
-    // Carregar os ambientes da API e adicionar as frases fixas
-    this.carregarAmbientes();
-    this.carregarPronomes();
-  }
+  async ngOnInit(): Promise<void> {
+    try {
+      const [pronomes, verbos, tempos] = await Promise.all([
+        firstValueFrom(this.crudService.getPronomes()),
+        firstValueFrom(this.crudService.getVerbos()),
+        firstValueFrom(this.crudService.getTemposVerbais())
+      ]);
 
-  // Carregar os dados dos ambientes da API
-  carregarAmbientes(): void {
-    this.crudService.getAmbientes().subscribe(data => {
-      // Adicionar frases fixas ou criar uma frase padrão caso não haja frases
-      this.ambientes = data.map(ambiente => {
-        let frases = this.frasesFixasPorAmbiente[ambiente.nome];
+      this.pronomes = pronomes;
+      this.verbos = verbos;
+      this.tempos = tempos;
 
-        // Se não houver frases fixas, adiciona uma frase padrão
-        if (!frases || frases.length === 0) {
-          frases = [{ pronome: 'Il', verbo: 'est', complemento: 'là', resposta: 'est' }];
-        }
-
-        return {
-          ...ambiente,
-          frases: [...frases]  // Atribuindo as frases ao ambiente
-        };
-      });
-
-      // Log para depuração
-      console.log('Ambientes carregados:', this.ambientes);
-    });
-  }
-
-  // Carregar os pronomes
-  carregarPronomes(): void {
-    this.crudService.getPronomes().subscribe(data => {
-      this.pronomes = data;
-    });
-  }
-
-  // Modal para criar um novo ambiente
-  openAmbienteModal(): void {
-    this.novoAmbiente = { nome: '', tempoVerbal: '', frases: [] };
-    this.isAmbienteModalOpen = true;
-  }
-
-  // Adicionar novo ambiente
-  addAmbiente(): void {
-    if (!this.novoAmbiente.nome || !this.novoAmbiente.tempoVerbal) return;
-  
-    // Garantir que as frases fixas estão associadas corretamente
-    if (this.frasesFixasPorAmbiente[this.novoAmbiente.nome]) {
-      this.novoAmbiente.frases = [...this.frasesFixasPorAmbiente[this.novoAmbiente.nome]];
-    } else {
-      this.novoAmbiente.frases = [{ pronome: 'Il', verbo: 'est', complemento: 'là', resposta: 'est' }];  // Frase padrão
-    }
-  
-    this.crudService.addAmbiente(this.novoAmbiente).subscribe(() => {
-      this.carregarAmbientes();
-      this.closeModal();
-    }, error => {
-      console.error('Erro ao adicionar o ambiente', error);
-    });
-  }
-  
-
-  // Excluir ambiente
-  deleteAmbiente(index: number): void {
-    const ambiente = this.ambientes[index];
-    if (ambiente?.id) {
-      this.crudService.deleteAmbiente(ambiente.id).subscribe(() => {
-        this.carregarAmbientes();
-      });
+      this.carregarFrases();
+    } catch (error) {
+      console.error('Erro ao carregar dados iniciais:', error);
     }
   }
 
-  // Modal para adicionar ou editar frases
-  openFraseModal(index: number): void {
-    this.novaFrase = { pronome: '', verbo: '', complemento: '', resposta: '' };
-    this.ambienteSelecionadoIndex = index;
-    this.fraseEditandoIndex = -1;
+  carregarFrases(): void {
+    this.crudService.getFrases().subscribe(frasesDto => {
+      const frasesConvertidas = frasesDto.map(f => this.convertDtoToFrase(f));
+
+      this.ambientes = [{
+        id: 1,
+        nome: 'Casa',
+        tempo: 'Présent',
+        texto:'',
+        frases: frasesConvertidas
+      }];
+    });
+  }
+
+  convertDtoToFrase(dto: any): Frase {
+    return {
+      id: dto.id,
+      pronomeId: dto.pronomeId,
+      verboId: dto.verboInfinitivoId,
+      complemento: dto.complementoDescricao,
+      tempoId: dto.tempoVerbalId,
+      resposta: dto.respostaCorreta
+    };
+  }
+
+  convertFraseToDto(frase: Frase): any {
+    if (!frase.pronome || !frase.verbo || !frase.tempo|| !frase.complemento?.trim()) {
+      throw new Error('Todos os campos devem ser preenchidos corretamente.');
+    }
+
+    return {
+      id: frase.id,
+    pronomeTexto: frase.pronome.trim(),
+    verboTexto: frase.verbo.trim(),
+    tempoVerbalTexto: frase.tempo.trim(),
+    complementoDescricao: frase.complemento.trim(),
+    respostaCorreta: frase.resposta.trim()
+    };
+  }
+
+  openModalAdicionarFrase(ambienteIndex: number): void {
+    this.ambienteSelecionadoIndex = ambienteIndex;
+    this.novaFrase = {
+      pronomeId: 0,
+      verboId: 0,
+      complemento: '',
+      tempoId: 0,
+      resposta: ''
+    };
     this.isEditingFrase = false;
     this.isFraseModalOpen = true;
   }
 
-  // Editar frase
-  editFrase(ambienteIndex: number, fraseIndex: number): void {
-    const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
-    this.novaFrase = { ...frase };
+  openModalEditarFrase(ambienteIndex: number, fraseIndex: number): void {
     this.ambienteSelecionadoIndex = ambienteIndex;
     this.fraseEditandoIndex = fraseIndex;
+    this.novaFrase = { ...this.ambientes[ambienteIndex].frases[fraseIndex] };
     this.isEditingFrase = true;
     this.isFraseModalOpen = true;
   }
 
-  // Salvar frase (adicionar ou editar)
   saveFrase(): void {
+    if (this.ambienteSelecionadoIndex === -1) return;
     const ambiente = this.ambientes[this.ambienteSelecionadoIndex];
-    if (!ambiente) return;
 
-    if (this.isEditingFrase && this.fraseEditandoIndex >= 0) {
-      ambiente.frases[this.fraseEditandoIndex] = { ...this.novaFrase };
-    } else {
-      ambiente.frases.push({ ...this.novaFrase });
+    try {
+      const dto = this.convertFraseToDto(this.novaFrase);
+
+      if (this.isEditingFrase && this.fraseEditandoIndex >= 0) {
+        this.crudService.updateFrase(dto).subscribe(() => {
+          ambiente.frases[this.fraseEditandoIndex] = { ...this.novaFrase };
+          this.closeModal();
+        });
+      } else {
+        this.crudService.addFrase(dto).subscribe(novoDto => {
+          const novaFraseUI = this.convertDtoToFrase(novoDto);
+          ambiente.frases.push(novaFraseUI);
+          this.closeModal();
+        });
+      }
+    } catch (error: any) {
+      alert('Erro: ' + (error?.message || 'Desconhecido'));
     }
-
-    this.crudService.updateAmbiente(ambiente).subscribe(() => {
-      this.closeModal();
-    });
   }
 
-  // Excluir frase
-  deleteFrase(ambienteIndex: number, fraseIndex: number): void {
-    const ambiente = this.ambientes[ambienteIndex];
-    if (!ambiente || !ambiente.frases[fraseIndex]) return;
-
-    ambiente.frases.splice(fraseIndex, 1);
-    this.crudService.updateAmbiente(ambiente).subscribe(() => {
-      this.carregarAmbientes();
-    });
-  }
-
-  // Fechar os modais
   closeModal(): void {
-    this.isAmbienteModalOpen = false;
     this.isFraseModalOpen = false;
-    this.novaFrase = { pronome: '', verbo: '', complemento: '', resposta: '' };
     this.isEditingFrase = false;
     this.fraseEditandoIndex = -1;
+    this.ambienteSelecionadoIndex = -1;
+    this.novaFrase = {
+      pronomeId: 0,
+      verboId: 0,
+      complemento: '',
+      tempoId: 0,
+      resposta: ''
+    };
   }
 
-  // Lidar com a seleção de imagens para fundo
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input?.files?.[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.novoAmbiente.fundoImagem = reader.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+  deleteFrase(ambienteIndex: number, fraseIndex: number): void {
+    const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
+    if (!frase.id) return;
+
+    this.crudService.deleteFrase(frase.id).subscribe(() => {
+      this.ambientes[ambienteIndex].frases.splice(fraseIndex, 1);
+    });
+  }
+
+  trackById(index: number, item: any): number {
+    return item.id;
   }
 }

@@ -1,44 +1,71 @@
+
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CrudAmbienteService {
-  private apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) {}
 
-  getAmbientes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/ambientes`);
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
   getFrases(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/frases`);
+    return this.http.get<any[]>(`${this.apiUrl}/frases-casa`, {
+      headers: this.getAuthHeaders(),
+      withCredentials: true
+    });
   }
 
-  getTemposVerbais(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/tempos`);
+  deleteFrase(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/frases-casa/${id}`, {
+      headers: this.getAuthHeaders(),
+      withCredentials: true
+    });
   }
 
-  getPronomes(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/pronomes`);
+  // Buscar frase específica por ID
+  getFrasePorId(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/frases-casa/${id}`);
   }
 
-  getRespostasCertas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/respostas-certas`);
+  // Adicionar nova frase
+  addFrase(frase: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/frases-casa`, frase);
   }
 
-  addAmbiente(ambiente: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ambientes`, ambiente);
+  // Atualizar frase existente
+  updateFrase(frase: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/frases-casa/${frase.id}`, frase);
   }
 
-  updateAmbiente(ambiente: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/ambientes/${ambiente.id}`, ambiente);
+ 
+
+  
+
+  // ========== ITENS DE SUPORTE (PRONOMES, VERBOS, ETC) ==========
+
+  getPronomes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/pronomes`);
   }
 
-  deleteAmbiente(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/ambientes/${id}`);
+  getVerbos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/verbos`);
+  }
+
+  getComplementos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/complementos`);
+  }
+
+  getTemposVerbais(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/tempos`);
   }
 }

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
-import { CrudAmbienteService } from '../../services/crudAmbiente.service';
 import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
 import { ProgressoService } from '../../services/progresso.service';
@@ -19,23 +18,21 @@ import { AmbienteCasaService } from '../../services/ambientecasa.service';
 })
 export class AmbientecasaComponent implements OnInit {
   personagemSelecionado: string | null = null;
-  tempoVerbal: string = '';
-  fundoImagem: string = '';
+  tempoVerbal: string = 'Présent';
+  fundoImagem: string = 'assets/vvimagens/fundo-casa.png';
   mensagemFinalVisivel: boolean = false;
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
-  fraseSelecionada: string | null = null;
   respostaDigitada: string = '';
   resultado: string | null = null;
   progresso: number = 0;
   totalPerguntas = 11;
   perguntaAtual: number | null = null;
 
-  frases: { [key: number]: { frase: string, respostaCorreta: string } } = {};
-  frasesAleatorias: { [key: number]: { frase: string, respostaCorreta: string }[] } = {};
-
-  fraseAtual: { frase: string, respostaCorreta: string } | null = null;
+  frasesAleatorias: { [key: number]: { frase: string; respostaCorreta: string }[] } = {};
+  fraseAtual: { frase: string; respostaCorreta: string } | null = null;
+  fraseSelecionada: string | null = null;
 
   fraseExibida: { [key: number]: boolean } = {};
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
@@ -44,7 +41,6 @@ export class AmbientecasaComponent implements OnInit {
   constructor(
     private router: Router,
     private personagemService: PersonagemService,
-    private crudService: CrudAmbienteService,
     private transLetrasPipe: TransLetrasPipe,
     private progressoService: ProgressoService,
     private ambientecasaService: AmbienteCasaService,
@@ -52,144 +48,95 @@ export class AmbientecasaComponent implements OnInit {
 
   ngOnInit(): void {
     this.personagemSelecionado = this.personagemService.getPersonagem();
-    this.tempoVerbal = 'Présent'; // Simulação fixa, substitua se usar estado global
-    this.fundoImagem = 'assets/imgs/fundo-casa.png';
 
-    this.carregarFrasesAdicionais();
-
-    // Inicializa o estado das bolinhas
     for (let i = 1; i <= this.totalPerguntas; i++) {
       this.bolinhasEstado[i] = 'naoClicada';
     }
+
+    this.carregarFrases();
   }
 
-  carregarFrasesAdicionais(): void {
-    this.crudService.getRespostasCertas().subscribe(frases => {
-      console.log('Frases da API:', frases);
-      
-      // Verifica se a API retornou frases e usa fallback para a primeira questão
-      if (frases && frases.length > 0) {
-        // Garantir que a questão 1 tenha uma resposta válida
-        this.frases[1] = {
-          frase: frases[0].frase || 'Frase padrão',
-          respostaCorreta: frases[0].resposta || '???'
-        };
-  
-        // Preenche o restante das frases
-        for (let i = 1; i < frases.length && i < this.totalPerguntas; i++) {
-          this.frases[i + 1] = {
-            frase: frases[i].frase || 'Frase padrão',
-            respostaCorreta: frases[i].resposta || '???'
-          };
-        }
-  
-        this.fraseAtual = this.frases[1];
-        this.selecionarFrase(1);
-      } else {
-        console.warn('Nenhuma frase foi retornada pela API, usando questões padrão');
-        
-        // Fallback: Adiciona a primeira questão manualmente
-        this.frases[1] = {
-          frase: 'je _____(laver) mes yeux',
-          respostaCorreta: 'lave'
-        };
-  
-        // Adiciona outras frases padrão, se necessário
-        for (let i = 2; i <= this.totalPerguntas; i++) {
-          this.frases[i] = {
-            frase: `Frase padrão para a questão ${i}`,
-            respostaCorreta: '???'
-          };
-        }
-  
-        this.fraseAtual = this.frases[1];
-        this.selecionarFrase(1);
-      }
-    }, (error) => {
-      console.error('Erro ao carregar as frases:', error);
-      
-      // Caso haja erro na requisição, use frases padrão
-      this.frases[1] = {
-        frase: 'je_____(parler) français .',
-        respostaCorreta: 'parle'
-      };
-      
-      // Preencher outras frases como padrão
-      for (let i = 2; i <= this.totalPerguntas; i++) {
-        this.frases[i] = {
-          frase: `Frase padrão para a questão ${i}`,
-          respostaCorreta: '???'
-        };
-      }
-  
-      this.fraseAtual = this.frases[1];
-      this.selecionarFrase(1);
-    });
-  }
-  
-  
-  
+carregarFrases(): void {
+  this.ambientecasaService.getFrasesCasa().subscribe(frases => {
+    console.log('📥 Frases recebidas:', frases);
 
-  navigate(destino: string): void {
-    this.router.navigate(['/' + destino]);
-  }
-
-  selecionarFrase(numero: number): void {
-    this.respostaDigitada = '';
-    this.resultado = null;
-    this.perguntaAtual = numero;
-    this.bolinhasEstado[numero] = 'clicada';
-
-    if (numero === 1 || numero === 2) {
-      if (!this.fraseExibida[numero]) {
-        this.fraseExibida[numero] = true;
-        this.fraseAtual = this.frases[numero];
-      } else {
-        const alternativas = this.frasesAleatorias[numero];
-        const atual = this.fraseAtual?.frase;
-        const nova = alternativas.find(f => f.frase !== atual) || alternativas[0];
-        this.fraseAtual = nova;
-      }
-    } else {
-      this.fraseAtual = this.frases[numero];
+    if (frases.length < this.totalPerguntas * 2) {
+      console.warn('⚠️ Frases insuficientes para todas as perguntas, completando com padrão.');
     }
 
-    this.fraseSelecionada = this.fraseAtual?.frase || '';
-    setTimeout(() => {
-      this.respostaInputRef?.nativeElement.focus();
-    });
+    for (let i = 1; i <= this.totalPerguntas; i++) {
+      const index = (i - 1) * 2;
+      this.frasesAleatorias[i] = [
+        frases[index] || { frase: `Frase padrão ${i}-A`, respostaCorreta: '???' },
+        frases[index + 1] || { frase: `Frase padrão ${i}-B`, respostaCorreta: '???' }
+      ];
+    }
+
+    this.fraseAtual = this.frasesAleatorias[1][0];
+    this.fraseSelecionada = this.fraseAtual.frase;
+    this.fraseExibida[1] = true;
+
+    this.selecionarFrase(1); // <- chama após preenchimento garantido
+  });
+}
+
+
+  selecionarFrase(numero: number): void {
+  this.respostaDigitada = '';
+  this.resultado = null;
+  this.perguntaAtual = numero;
+  this.bolinhasEstado[numero] = 'clicada';
+
+  const alternativas = this.frasesAleatorias[numero];
+
+  if (!alternativas || alternativas.length < 2) {
+    console.error(`❌ Erro: Frases não carregadas corretamente para a pergunta ${numero}`);
+    this.fraseAtual = {
+      frase: `Frase padrão ${numero}`,
+      respostaCorreta: '???'
+    };
+    this.fraseSelecionada = this.fraseAtual.frase;
+    return;
   }
+
+  const exibidaAnteriormente = this.fraseExibida[numero] ?? false;
+  this.fraseAtual = exibidaAnteriormente ? alternativas[1] : alternativas[0];
+  this.fraseSelecionada = this.fraseAtual.frase;
+  this.fraseExibida[numero] = !exibidaAnteriormente;
+
+  setTimeout(() => {
+    this.respostaInputRef?.nativeElement.focus();
+  });
+}
+
 
   verificarResposta(): void {
     if (this.perguntaAtual === null || !this.fraseAtual) return;
 
-    const respostaCorreta = this.fraseAtual.respostaCorreta;
     const estaCorreta = this.ambientecasaService.verificarRespostaDigitada(
       this.respostaDigitada,
-      respostaCorreta
+      this.fraseAtual.respostaCorreta
     );
 
-    if (estaCorreta) {
+    if (estaCorreta) { this.resultado = 'Félicitations!';
       this.acertos += 1;
       this.progresso = Math.min(this.progresso + (100 / this.totalPerguntas), 100);
       this.bolinhasEstado[this.perguntaAtual] = 'correta';
 
-      if (this.perguntaAtual === 11) {
+      if (this.perguntaAtual === this.totalPerguntas) {
         if (this.acertos / this.totalPerguntas >= 0.6) {
           this.mensagemFinalVisivel = true;
-          setTimeout(() => {
-            this.router.navigate(['/ambienteparque']);
-          }, 6000);
+          setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
         } else {
           this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
         }
       } else {
-        const proxima = this.perguntaAtual + 1;
         setTimeout(() => {
-          this.selecionarFrase(proxima);
+          this.selecionarFrase(this.perguntaAtual! + 1);
         }, 600);
       }
     } else {
+      this.resultado = 'Désolé, vous pouvez essayer de nouveau.';
       this.bolinhasEstado[this.perguntaAtual] = 'incorreta';
     }
   }
@@ -199,8 +146,11 @@ export class AmbientecasaComponent implements OnInit {
     return numero === this.perguntaAtual ? `${estado} respondendo` : estado;
   }
 
-  // Método para atualizar a resposta digitada com a transformação do pipe
   atualizarResposta(valor: string): void {
     this.respostaDigitada = this.transLetrasPipe.transform(valor);
+  }
+
+  navigate(destino: string): void {
+    this.router.navigate(['/' + destino]);
   }
 }

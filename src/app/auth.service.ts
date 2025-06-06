@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 import { Login } from './models/login';
 import { environment } from '../../src/environments/environment';
 
@@ -11,6 +11,18 @@ export class AuthService {
   private userRole: string | null = null;
   private baseUrl = environment.apiUrl;
 
+  private rotasPublicas = [
+    '/auth/login',
+    '/auth/enviar-senha',
+    '/jogador/autocadastro',
+    '/email/simples',
+    '/ajuda-emails',
+    '/api/pronomes',
+    '/api/verbos',
+    '/api/tempos',
+    '/api/complementos',
+  ];
+
   constructor(private router: Router) {
     this.configurarInterceptor();
     const user = this.getUser();
@@ -20,60 +32,70 @@ export class AuthService {
   }
 
   /**
-   * 🔐 Adiciona token JWT nas requisições Axios
+   * ✅ Interceptor configurado com AxiosHeaders
    */
   private configurarInterceptor(): void {
     axios.interceptors.request.use((config) => {
       const token = this.getToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+
+      const isPublic = this.rotasPublicas.some((rotaPublica) =>
+        config.url?.includes(rotaPublica)
+      );
+
+      if (!isPublic && token && this.isAuthenticated()) {
+        // Garante que headers seja instância de AxiosHeaders
+        if (!(config.headers instanceof AxiosHeaders)) {
+          config.headers = new AxiosHeaders(config.headers || {});
+        }
+
+        config.headers.set('Authorization', `Bearer ${token}`);
       }
+
       return config;
     });
   }
 
   /**
-   * ✅ Login via API real
+   * ✅ Login do usuário
    */
   async login(loginData: Login): Promise<void> {
-    const url = `${this.baseUrl}/auth/login`;  // URL para o login na API real
+    const url = `${this.baseUrl}/auth/login`;
 
     try {
-      const response = await axios.post(url, loginData);  // Envia as credenciais para a API
+      const response = await axios.post(url, loginData);
 
-      // Verifica se o token foi recebido
-      if (response.data && response.data.token) {
-        this.salvarDados(response.data);  // Armazena os dados (token e informações do usuário)
-        this.router.navigate(['/home']);  // Redireciona para a tela inicial
+      if (response.data?.token) {
+        this.salvarDados(response.data);
+        this.router.navigate(['/home']);
       } else {
         throw new Error('Token JWT não recebido.');
       }
     } catch (error) {
-      this.handleError(error);  // Lida com possíveis erros
+      this.handleError(error);
     }
   }
 
   /**
-   * ✅ Encerra a sessão e volta para o login
+   * ✅ Logout
    */
   logout(): void {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     this.userRole = null;
-    this.router.navigate(['/login']);  // Redireciona para a tela de login
+    this.router.navigate(['/login']);
   }
 
   /**
-   * ✅ Armazena token e dados do usuário localmente
+   * ✅ Armazena token e dados do usuário
    */
   private salvarDados(data: any): void {
-    localStorage.setItem('user', JSON.stringify(data));  // Armazena os dados do usuário
-    localStorage.setItem('token', data.token);  // Armazena o token JWT
-    this.userRole = data.usuario.perfil;  // Define o perfil do usuário (ADMIN, JOGADOR, etc)
+    localStorage.setItem('user', JSON.stringify(data));
+    localStorage.setItem('token', data.token);
+    this.userRole = data.usuario.perfil;
   }
 
   /**
-   * ✅ Retorna o token salvo
+   * ✅ Retorna o token JWT, se válido
    */
   getToken(): string | null {
     const token = localStorage.getItem('token');
@@ -81,8 +103,7 @@ export class AuthService {
       try {
         const decoded = this.decodeJwt(token);
         if (decoded?.exp && decoded.exp < Date.now() / 1000) {
-          // Apenas retorna null, não faz logout
-          return null;
+          return null; // Token expirado
         }
         return token;
       } catch (e) {
@@ -92,48 +113,39 @@ export class AuthService {
     }
     return null;
   }
-  
 
   /**
-   * ✅ Retorna se o usuário está autenticado
+   * ✅ Verifica se usuário está autenticado
    */
   isAuthenticated(): boolean {
-    return this.getToken() !== null;  // Verifica se o token está presente e válido
+    return this.getToken() !== null;
   }
 
   /**
-   * ✅ Retorna o perfil (ADMIN, JOGADOR, etc)
+   * ✅ Perfil do usuário (admin, user, etc.)
    */
   getRole(): string | null {
-    return this.userRole;  // Retorna o perfil do usuário
+    return this.userRole;
   }
 
   /**
-   * ✅ Retorna objeto completo do usuário
+   * ✅ Objeto do usuário autenticado
    */
   getUser(): any {
     const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;  // Retorna o objeto do usuário completo
+    return user ? JSON.parse(user) : null;
   }
 
-  /**
-   * ✅ Retorna apenas o nome do usuário
-   */
   getUserName(): string | null {
-    const user = this.getUser();
-    return user ? user.usuario.nome : null;  // Retorna o nome do usuário
+    return this.getUser()?.usuario?.nome ?? null;
   }
 
-  /**
-   * ✅ Retorna o ID do usuário
-   */
   getUserId(): string | null {
-    const user = this.getUser();
-    return user ? user.usuario.id : null;  // Retorna o ID do usuário, se existir
+    return this.getUser()?.usuario?.id ?? null;
   }
 
   /**
-   * ⚠️ Exibe erro amigável
+   * ⚠️ Tratamento de erros padrão
    */
   private handleError(error: unknown): void {
     let errorMessage = 'Ocorreu um erro desconhecido';
@@ -153,20 +165,20 @@ export class AuthService {
       } else if (error.request) {
         errorMessage = 'Servidor não respondeu.';
       } else {
-        errorMessage = error.message || 'Erro desconhecido';
+        errorMessage = error.message;
       }
     }
 
     console.error('Erro:', errorMessage);
-    alert(errorMessage);  // Exibe mensagem de erro
-    throw new Error(errorMessage);  // Lança o erro para tratamento adicional
+    alert(errorMessage);
+    throw new Error(errorMessage);
   }
 
   /**
-   * Decode o token JWT
+   * ✅ Decodifica o JWT
    */
   private decodeJwt(token: string): any {
-    const payload = token.split('.')[1];  // Extrai a parte do payload do JWT
-    return JSON.parse(atob(payload));  // Decodifica o payload do JWT
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
   }
 }

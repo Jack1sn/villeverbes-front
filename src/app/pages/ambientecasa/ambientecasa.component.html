@@ -29,24 +29,28 @@
   </div>
 
   <!-- Frase e campo de resposta -->
-  <div class="frase-box" *ngIf="fraseSelecionada">
-    <p>{{ fraseSelecionada }}</p>
+ <div class="frase-box" *ngIf="fraseSelecionada">
+  <p>{{ fraseSelecionada }}</p>
 
+  <!-- Campo de resposta e botão aparecem somente se ainda não acertou -->
+  <div *ngIf="resultado !== 'Félicitations! 🎉'">
     <input
-  #respostaInput
-  type="text"
-  [ngModel]="respostaDigitada | transLetras"
-  (ngModelChange)="respostaDigitada = $event"
-  placeholder="Conjuguez ici..."
-  (keyup.enter)="verificarResposta()"
-/>
+      #respostaInput
+      type="text"
+      [ngModel]="respostaDigitada | transLetras"
+      (ngModelChange)="respostaDigitada = $event"
+      placeholder="Conjuguez ici..."
+      (keyup.enter)="verificarResposta()"
+    />
 
     <button (click)="verificarResposta()">Réponse</button>
-
-    <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations!' ? 'green' : 'red' }">
-      {{ resultado }}
-    </p>
   </div>
+
+  <!-- Mensagem de resultado -->
+  <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations! 🎉' ? 'green' : 'red' }">
+    {{ resultado }}
+  </p>
+</div>
 
   <!-- Botões de navegação -->
   <div class="absolute bottom-28 right-16 flex gap-x-4" *ngIf="fraseSelecionada">
