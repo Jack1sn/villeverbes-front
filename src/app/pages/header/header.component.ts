@@ -89,7 +89,7 @@ export class HeaderComponent implements OnInit {
     if (this.userRole === 'ADMIN') {
       return '/crudAmbiente'; // Admin
     } else if (this.userRole === 'JOGADOR') {
-      return '/config-jogador'; // Jogador
+      return '/redefinir-senha'; // Jogador
     }
     return '/';
   }

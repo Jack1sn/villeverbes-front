@@ -6,13 +6,12 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { HeaderComponent } from '../header/header.component';
 import { Frase } from './../../models/frase';
-import { firstValueFrom } from 'rxjs';
 
 interface Ambiente {
   id?: number;
   nome: string;
   tempo: string;
-  texto:string;
+  texto: string;
   fundoImagem?: string;
   frases: Frase[];
 }
@@ -53,33 +52,36 @@ export class CrudAmbienteComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       const [pronomes, verbos, tempos] = await Promise.all([
-        firstValueFrom(this.crudService.getPronomes()),
-        firstValueFrom(this.crudService.getVerbos()),
-        firstValueFrom(this.crudService.getTemposVerbais())
+        this.crudService.getPronomes(),
+        this.crudService.getVerbos(),
+        this.crudService.getTemposVerbais()
       ]);
 
       this.pronomes = pronomes;
       this.verbos = verbos;
       this.tempos = tempos;
 
-      this.carregarFrases();
+      await this.carregarFrases();
     } catch (error) {
       console.error('Erro ao carregar dados iniciais:', error);
     }
   }
 
-  carregarFrases(): void {
-    this.crudService.getFrases().subscribe(frasesDto => {
+  async carregarFrases(): Promise<void> {
+    try {
+      const frasesDto = await this.crudService.getFrases();
       const frasesConvertidas = frasesDto.map(f => this.convertDtoToFrase(f));
 
       this.ambientes = [{
         id: 1,
-        nome: 'Casa',
+        nome: 'Maison',
         tempo: 'Présent',
-        texto:'',
+        texto: '',
         frases: frasesConvertidas
       }];
-    });
+    } catch (error) {
+      console.error('Erro ao carregar frases:', error);
+    }
   }
 
   convertDtoToFrase(dto: any): Frase {
@@ -93,20 +95,21 @@ export class CrudAmbienteComponent implements OnInit {
     };
   }
 
-  convertFraseToDto(frase: Frase): any {
-    if (!frase.pronome || !frase.verbo || !frase.tempo|| !frase.complemento?.trim()) {
-      throw new Error('Todos os campos devem ser preenchidos corretamente.');
-    }
+ convertFraseToDto(frase: Frase): any {
+  if (!frase.pronome || !frase.verbo || !frase.tempo || !frase.complemento?.trim()) {
+    throw new Error('Todos os campos devem ser preenchidos corretamente.');
+  }
 
-    return {
-      id: frase.id,
+  return {
+    id: frase.id,
     pronomeTexto: frase.pronome.trim(),
     verboTexto: frase.verbo.trim(),
     tempoVerbalTexto: frase.tempo.trim(),
     complementoDescricao: frase.complemento.trim(),
     respostaCorreta: frase.resposta.trim()
-    };
-  }
+  };
+}
+
 
   openModalAdicionarFrase(ambienteIndex: number): void {
     this.ambienteSelecionadoIndex = ambienteIndex;
@@ -129,7 +132,7 @@ export class CrudAmbienteComponent implements OnInit {
     this.isFraseModalOpen = true;
   }
 
-  saveFrase(): void {
+  async saveFrase(): Promise<void> {
     if (this.ambienteSelecionadoIndex === -1) return;
     const ambiente = this.ambientes[this.ambienteSelecionadoIndex];
 
@@ -137,17 +140,14 @@ export class CrudAmbienteComponent implements OnInit {
       const dto = this.convertFraseToDto(this.novaFrase);
 
       if (this.isEditingFrase && this.fraseEditandoIndex >= 0) {
-        this.crudService.updateFrase(dto).subscribe(() => {
-          ambiente.frases[this.fraseEditandoIndex] = { ...this.novaFrase };
-          this.closeModal();
-        });
+        await this.crudService.updateFrase(dto);
+        ambiente.frases[this.fraseEditandoIndex] = { ...this.novaFrase };
       } else {
-        this.crudService.addFrase(dto).subscribe(novoDto => {
-          const novaFraseUI = this.convertDtoToFrase(novoDto);
-          ambiente.frases.push(novaFraseUI);
-          this.closeModal();
-        });
+        const novoDto = await this.crudService.addFrase(dto);
+        const novaFraseUI = this.convertDtoToFrase(novoDto);
+        ambiente.frases.push(novaFraseUI);
       }
+      this.closeModal();
     } catch (error: any) {
       alert('Erro: ' + (error?.message || 'Desconhecido'));
     }
@@ -167,16 +167,19 @@ export class CrudAmbienteComponent implements OnInit {
     };
   }
 
-  deleteFrase(ambienteIndex: number, fraseIndex: number): void {
+  async deleteFrase(ambienteIndex: number, fraseIndex: number): Promise<void> {
     const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
     if (!frase.id) return;
 
-    this.crudService.deleteFrase(frase.id).subscribe(() => {
+    try {
+      await this.crudService.deleteFrase(frase.id);
       this.ambientes[ambienteIndex].frases.splice(fraseIndex, 1);
-    });
+    } catch (error) {
+      console.error('Erro ao deletar frase:', error);
+    }
   }
 
   trackById(index: number, item: any): number {
-    return item.id;
+    return item.id!;
   }
 }

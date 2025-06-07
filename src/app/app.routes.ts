@@ -23,6 +23,7 @@ import { AjudaComponent } from './pages/ajuda/ajuda.component';
 import { HomeComponent } from './pages/home/home.component';
 import { CrudColaboradorComponent } from './pages/crud-colaborador/crud-colaborador.component';
 import { VisualisarColaboradorComponent } from './pages/visualisar-colaborador/visualisar-colaborador.component';
+import { RedefinirSenhaComponent } from './pages/redefinir-senha/redefinir-senha.component';
 export const routes: Routes = [
 
   { path: 'tela-inicial', component: TelaInicialComponent },
@@ -73,6 +74,13 @@ export const routes: Routes = [
   {
     path: 'trophee/:id',
     component: TropheeComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['JOGADOR'] },
+  },
+
+   {
+    path: 'redefinir-senha',
+    component: RedefinirSenhaComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },

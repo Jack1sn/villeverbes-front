@@ -1,71 +1,76 @@
-
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import axios, { AxiosInstance } from 'axios';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CrudAmbienteService {
   private readonly apiUrl = 'http://localhost:8080/api';
+  private axiosInstance: AxiosInstance;
 
-  constructor(private http: HttpClient) {}
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: this.apiUrl,
+      withCredentials: true,
+    });
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+    // Interceptor para adicionar o token no header Authorization
+    this.axiosInstance.interceptors.request.use(config => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
     });
   }
 
-  getFrases(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/frases-casa`, {
-      headers: this.getAuthHeaders(),
-      withCredentials: true
-    });
+  // -------- Frases --------
+
+  async getFrases(): Promise<any[]> {
+    const response = await this.axiosInstance.get('/frases-casa');
+    return response.data;
   }
 
-  deleteFrase(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/frases-casa/${id}`, {
-      headers: this.getAuthHeaders(),
-      withCredentials: true
-    });
+  async getFrasePorId(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/frases-casa/${id}`);
+    return response.data;
   }
 
-  // Buscar frase específica por ID
-  getFrasePorId(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/frases-casa/${id}`);
+  async addFrase(frase: any): Promise<any> {
+    const response = await this.axiosInstance.post('/frases-casa', frase);
+    return response.data;
   }
 
-  // Adicionar nova frase
-  addFrase(frase: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/frases-casa`, frase);
+  async updateFrase(frase: any): Promise<any> {
+    const response = await this.axiosInstance.put(`/frases-casa/${frase.id}`, frase);
+    return response.data;
   }
 
-  // Atualizar frase existente
-  updateFrase(frase: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/frases-casa/${frase.id}`, frase);
+  async deleteFrase(id: number): Promise<any> {
+    const response = await this.axiosInstance.delete(`/frases-casa/${id}`);
+    return response.data;
   }
 
- 
+  // -------- Itens de suporte --------
 
-  
-
-  // ========== ITENS DE SUPORTE (PRONOMES, VERBOS, ETC) ==========
-
-  getPronomes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/pronomes`);
+  async getPronomes(): Promise<any[]> {
+    const response = await this.axiosInstance.get('/pronomes');
+    return response.data;
   }
 
-  getVerbos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/verbos`);
+  async getVerbos(): Promise<any[]> {
+    const response = await this.axiosInstance.get('/verbos');
+    return response.data;
   }
 
-  getComplementos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/complementos`);
+  async getComplementos(): Promise<any[]> {
+    const response = await this.axiosInstance.get('/complementos');
+    return response.data;
   }
 
-  getTemposVerbais(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/tempos`);
+  async getTemposVerbais(): Promise<any[]> {
+    const response = await this.axiosInstance.get('/tempos');
+    return response.data;
   }
 }

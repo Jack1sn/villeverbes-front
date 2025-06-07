@@ -1,46 +1,53 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import axios from 'axios';
 import { Colaborador } from '../models/colaborador.model';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ColaboradorService {
-  private apiUrl = 'http://localhost:8080/usuario/colaboradores';
+  private apiUrl = `${environment.apiUrl}/usuario/colaboradores`;
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
-  listar(): Observable<Colaborador[]> {
-    return this.http.get<Colaborador[]>(this.apiUrl).pipe(
-      catchError(this.handleError)
-    );
+  async listar(): Promise<Colaborador[]> {
+    try {
+      const response = await axios.get<Colaborador[]>(this.apiUrl);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  excluir(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+  async excluir(id: number): Promise<void> {
+    try {
+      await axios.delete(`${this.apiUrl}/${id}`);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  salvar(colaborador: Colaborador): Observable<{ message: string, usuario: Colaborador }> {
-    return this.http.post<{ message: string, usuario: Colaborador }>(
-      'http://localhost:8080/usuario/colaborador',
-      colaborador
-    ).pipe(
-      catchError(this.handleError)
-    );
+  async salvar(colaborador: Colaborador): Promise<{ message: string, usuario: Colaborador }> {
+    try {
+      const response = await axios.post(`${environment.apiUrl}/usuario/colaborador`, colaborador);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  atualizar(id: number, colaborador: Colaborador): Observable<Colaborador> {
-    return this.http.put<Colaborador>(`${this.apiUrl}/${id}`, colaborador).pipe(
-      catchError(this.handleError)
-    );
+  async atualizar(id: number, colaborador: Colaborador): Promise<Colaborador> {
+    try {
+      const response = await axios.put(`${this.apiUrl}/${id}`, colaborador);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  private handleError(error: any): Observable<never> {
-    console.error('Erro inesperado:', error);
+  private handleError(error: any): never {
+    console.error('Erro no ColaboradorService:', error);
     throw error;
   }
 }

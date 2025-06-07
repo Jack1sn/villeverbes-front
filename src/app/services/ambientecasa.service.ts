@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import axios from 'axios';
 
 export interface FraseApi {
   id: number;
@@ -17,23 +16,23 @@ export interface Frase {
   providedIn: 'root'
 })
 export class AmbienteCasaService {
-
   private readonly apiUrl = 'http://localhost:8080/api/frases-casa';
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   /**
-   * Busca frases da API e remove a resposta correta da descrição exibida, para não mostrar a resposta ao jogador.
+   * Busca frases da API com Axios e remove a resposta correta da descrição.
    */
-  getFrasesCasa(): Observable<Frase[]> {
-    return this.http.get<FraseApi[]>(this.apiUrl).pipe(
-      map(frases => frases.map(f => {
-        let descricao = f.descricaoMontada || '';
+  async getFrasesCasa(): Promise<Frase[]> {
+    try {
+      const response = await axios.get<FraseApi[]>(this.apiUrl);
+      const frasesApi = response.data;
 
-        // Remove a resposta correta da frase montada para esconder do jogador (se estiver embutida)
+      return frasesApi.map(f => {
+        let descricao = f.descricaoMontada || '';
         const resposta = f.respostaCorreta.trim();
+
         if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
-          // Substitui apenas a primeira ocorrência da resposta correta (caso esteja no texto)
           const regex = new RegExp(resposta, 'i');
           descricao = descricao.replace(regex, '').trim();
         }
@@ -42,13 +41,15 @@ export class AmbienteCasaService {
           frase: descricao,
           respostaCorreta: resposta
         };
-      }))
-    );
+      });
+    } catch (error) {
+      console.error('Erro ao buscar frases da casa:', error);
+      throw new Error('Não foi possível carregar as frases do ambiente casa.');
+    }
   }
 
   /**
-   * Verifica se a resposta digitada está correta.
-   * Compara ignorando maiúsculas, minúsculas e espaços em branco no início/fim.
+   * Verifica se a resposta digitada está correta (ignora maiúsculas e espaços).
    */
   verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;

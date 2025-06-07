@@ -4,7 +4,7 @@ import { ColaboradorService } from '../../services/colaborador.service';
 import { Colaborador } from '../../models/colaborador.model';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HeaderComponent } from "../header/header.component";
+import { HeaderComponent } from '../header/header.component';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -12,10 +12,10 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   templateUrl: './crud-colaborador.component.html',
   styleUrls: ['./crud-colaborador.component.css'],
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink ]
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink]
 })
 export class CrudColaboradorComponent implements OnInit {
-  colaboradores: Colaborador[] = []; // Inicia com um array vazio (sem colaboradores cadastrados)
+  colaboradores: Colaborador[] = [];
   colaboradorForm!: FormGroup;
   editando: boolean = false;
   colaboradorSelecionadoId!: number;
@@ -30,6 +30,7 @@ export class CrudColaboradorComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.carregarColaboradores(); // ✅ carregar ao iniciar
   }
 
   initForm(): void {
@@ -41,7 +42,7 @@ export class CrudColaboradorComponent implements OnInit {
     });
   }
 
-  salvar(): void {
+  async salvar(): Promise<void> {
     this.mensagemSucesso = '';
     this.mensagemErro = '';
 
@@ -50,26 +51,19 @@ export class CrudColaboradorComponent implements OnInit {
       return;
     }
 
-    if (this.editando) {
-      this.colaboradorService.atualizar(this.colaboradorSelecionadoId, this.colaboradorForm.value)
-        .subscribe({
-          next: () => {
-            this.mensagemSucesso = 'Colaborador atualizado com sucesso!';
-            this.limparAutomaticamente();
-            this.carregarColaboradores();
-          },
-          error: (err) => this.tratarErro(err)
-        });
-    } else {
-      this.colaboradorService.salvar(this.colaboradorForm.value)
-        .subscribe({
-          next: (res: any) => {
-            this.mensagemSucesso = res.message || 'Colaborador cadastrado com sucesso!';
-            this.limparAutomaticamente();
-            this.carregarColaboradores();
-          },
-          error: (err) => this.tratarErro(err)
-        });
+    try {
+      if (this.editando) {
+        await this.colaboradorService.atualizar(this.colaboradorSelecionadoId, this.colaboradorForm.value);
+        this.mensagemSucesso = 'Colaborador atualizado com sucesso!';
+      } else {
+        const res = await this.colaboradorService.salvar(this.colaboradorForm.value);
+        this.mensagemSucesso = res.message || 'Colaborador cadastrado com sucesso!';
+      }
+
+      this.limparAutomaticamente();
+      this.carregarColaboradores();
+    } catch (err) {
+      this.tratarErro(err);
     }
   }
 
@@ -81,17 +75,17 @@ export class CrudColaboradorComponent implements OnInit {
     this.mensagemErro = '';
   }
 
-  excluir(id: number): void {
+  async excluir(id: number): Promise<void> {
     this.mensagemSucesso = '';
     this.mensagemErro = '';
 
-    this.colaboradorService.excluir(id).subscribe({
-      next: () => {
-        this.mensagemSucesso = 'Colaborador excluído com sucesso!';
-        this.carregarColaboradores();
-      },
-      error: (err) => this.tratarErro(err)
-    });
+    try {
+      await this.colaboradorService.excluir(id);
+      this.mensagemSucesso = 'Colaborador excluído com sucesso!';
+      this.carregarColaboradores();
+    } catch (err) {
+      this.tratarErro(err);
+    }
   }
 
   resetar(): void {
@@ -105,25 +99,28 @@ export class CrudColaboradorComponent implements OnInit {
   limparAutomaticamente(): void {
     setTimeout(() => {
       this.resetar();
-    }, 3000); // Limpa o formulário e mensagens após 3 segundos
+    }, 3000);
   }
 
-  carregarColaboradores(): void {
-    this.colaboradorService.listar().subscribe({
-      next: (res) => this.colaboradores = res, // Atualiza a lista de colaboradores
-      error: (err) => this.tratarErro(err)
-    });
+  async carregarColaboradores(): Promise<void> {
+    try {
+      this.colaboradores = await this.colaboradorService.listar();
+    } catch (err) {
+      this.tratarErro(err);
+    }
   }
 
   private tratarErro(err: any): void {
-    if (err.error && err.error.error) {
-      this.mensagemErro = err.error.error;
-    } else if (err.error && typeof err.error === 'string') {
-      this.mensagemErro = err.error;
+    if (err?.response?.data?.error) {
+      this.mensagemErro = err.response.data.error;
+    } else if (typeof err?.response?.data === 'string') {
+      this.mensagemErro = err.response.data;
     } else if (err.message) {
       this.mensagemErro = err.message;
     } else {
       this.mensagemErro = 'Ocorreu um erro inesperado.';
     }
+
+    console.error('Erro:', err);
   }
 }

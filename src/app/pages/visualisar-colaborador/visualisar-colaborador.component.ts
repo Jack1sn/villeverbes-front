@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ColaboradorService } from './../../services/colaborador.service';
 import { Colaborador } from '../../models/colaborador.model';
-import { HttpHeaders } from '@angular/common/http';
-import { AuthService } from './../../auth.service';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
+import axios, { AxiosError } from 'axios';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-visualisar-colaborador',
@@ -21,15 +20,14 @@ export class VisualisarColaboradorComponent implements OnInit {
   mensagemErro: string | null = null;
   colaboradorEditando: Colaborador | null = null;
 
+  private apiUrl = `${environment.apiUrl}/usuario/colaboradores`;
+
   constructor(
-    private colaboradorService: ColaboradorService,
-    private authService: AuthService,
     private router: Router,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
-    // Inicializa o formulário de edição de colaborador
     this.colaboradorForm = this.fb.group({
       nome: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -37,79 +35,83 @@ export class VisualisarColaboradorComponent implements OnInit {
       senha: ['', Validators.required],
     });
 
-    // Carrega os dados dos colaboradores ao iniciar
     this.carregarColaboradores();
   }
 
-  // Função para carregar todos os colaboradores
-  carregarColaboradores(): void {
-    this.colaboradorService.listar().subscribe({
-      next: (dados) => (this.colaboradores = dados),
-      error: (err) => {
-        this.mensagemErro = 'Erro ao carregar: ' + err.message;
-        if (err.status === 401) {
-          this.router.navigate(['/login']);  // Redireciona para o login se o erro for 401
-        }
-      },
-    });
+  async carregarColaboradores(): Promise<void> {
+    this.mensagemErro = null;
+
+    try {
+      const response = await axios.get<Colaborador[]>(this.apiUrl);
+      this.colaboradores = response.data;
+    } catch (err) {
+      this.tratarErro(err, 'carregar');
+    }
   }
 
-  // Função para excluir um colaborador
-  excluir(id?: number): void {
-    if (id === undefined) {
+  async excluir(id?: number): Promise<void> {
+    if (!id) {
       this.mensagemErro = 'ID do colaborador inválido.';
       return;
     }
 
     if (!confirm('Deseja realmente excluir este colaborador?')) return;
 
-    // Chama o serviço para excluir o colaborador
-    this.colaboradorService.excluir(id).subscribe({
-      next: () => {
-        this.carregarColaboradores();  // Recarrega a lista de colaboradores após a exclusão
-      },
-      error: (err) => {
-        this.mensagemErro = 'Erro ao excluir: ' + err.message;
-      },
-    });
+    try {
+      await axios.delete(`${this.apiUrl}/${id}`);
+      await this.carregarColaboradores();
+    } catch (err) {
+      this.tratarErro(err, 'excluir');
+    }
   }
 
-  // Função para editar um colaborador
   editar(colaborador: Colaborador): void {
-    // Preenche o formulário de edição com os dados do colaborador
     this.colaboradorEditando = { ...colaborador };
     this.colaboradorForm.patchValue(colaborador);
 
-    // Exibe o modal para editar
     const modal = document.getElementById('modalEditar') as HTMLDialogElement;
     modal?.showModal();
   }
 
-  // Função para salvar a edição do colaborador
-  salvarEdicao(): void {
-    if (this.colaboradorEditando && this.colaboradorForm.valid) {
-      const atualizado = {
-        ...this.colaboradorEditando,
-        ...this.colaboradorForm.value,
-      };
+  async salvarEdicao(): Promise<void> {
+    if (!this.colaboradorEditando || this.colaboradorForm.invalid) return;
 
-      // Chama o serviço para atualizar o colaborador
-      this.colaboradorService.atualizar(atualizado.id, atualizado).subscribe({
-        next: () => {
-          this.carregarColaboradores();  // Recarrega a lista de colaboradores após a atualização
-          this.fecharModal();  // Fecha o modal após salvar
-        },
-        error: (err) => {
-          this.mensagemErro = 'Erro ao atualizar: ' + err.message;
-        },
-      });
+    const atualizado: Colaborador = {
+      ...this.colaboradorEditando,
+      ...this.colaboradorForm.value,
+    };
+
+    try {
+      await axios.put(`${this.apiUrl}/${atualizado.id}`, atualizado);
+      await this.carregarColaboradores();
+      this.fecharModal();
+    } catch (err) {
+      this.tratarErro(err, 'atualizar');
     }
   }
 
-  // Função para fechar o modal de edição
   fecharModal(): void {
     this.colaboradorEditando = null;
     const modal = document.getElementById('modalEditar') as HTMLDialogElement;
-    modal?.close();  // Fecha o modal
+    modal?.close();
+  }
+
+  private tratarErro(error: unknown, acao: string): void {
+    let mensagem = `Erro ao ${acao}.`;
+
+    if (axios.isAxiosError(error)) {
+      const err = error as AxiosError<any>;
+      if (err.response?.status === 401) {
+        this.router.navigate(['/login']);
+      } else if (typeof err.response?.data === 'string') {
+        mensagem += ' ' + err.response.data;
+      } else if (err.response?.data?.message) {
+        mensagem += ' ' + err.response.data.message;
+      } else if (err.message) {
+        mensagem += ' ' + err.message;
+      }
+    }
+
+    this.mensagemErro = mensagem;
   }
 }
