@@ -21,6 +21,7 @@ export class AmbientecasaComponent implements OnInit {
   tempoVerbal: string = 'Présent';
   fundoImagem: string = 'assets/vvimagens/fundo-casa.png';
   mensagemFinalVisivel: boolean = false;
+    tentativas: { [key: number]: number } = {}; 
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -115,8 +116,10 @@ export class AmbientecasaComponent implements OnInit {
     });
   }
 
-  verificarResposta(): void {
+verificarResposta(): void {
     if (this.perguntaAtual === null || !this.fraseAtual) return;
+
+    const numero = this.perguntaAtual;
 
     const estaCorreta = this.ambientecasaService.verificarRespostaDigitada(
       this.respostaDigitada,
@@ -133,13 +136,13 @@ export class AmbientecasaComponent implements OnInit {
       // Salva progresso no serviço
       this.progressoService.setProgresso('casa', this.progresso);
 
-      this.bolinhasEstado[this.perguntaAtual] = 'correta';
+      this.bolinhasEstado[numero] = 'correta';
+      this.tentativas[numero] = 0; // reseta tentativas ao acertar
 
-      if (this.perguntaAtual === this.totalPerguntas) {
+      if (numero === this.totalPerguntas) {
         if (this.acertos / this.totalPerguntas >= 0.6) {
           this.mensagemFinalVisivel = true;
 
-          // (futuramente) salvar no banco antes de redirecionar
           this.enviarResultadoParaBanco();
 
           setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
@@ -148,12 +151,38 @@ export class AmbientecasaComponent implements OnInit {
         }
       } else {
         setTimeout(() => {
-          this.selecionarFrase(this.perguntaAtual! + 1);
+          this.selecionarFrase(numero + 1);
         }, 600);
       }
     } else {
-      this.resultado = 'Désolé, vous pouvez essayer de nouveau.';
-      this.bolinhasEstado[this.perguntaAtual] = 'incorreta';
+      this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
+
+      if (this.tentativas[numero] < 2) {
+        this.resultado = `Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
+        this.bolinhasEstado[numero] = 'incorreta';
+      } else {
+        // Após 3 tentativas, avança para próxima pergunta
+        this.resultado = `Désolé, la réponse correcte est: ${this.fraseAtual.respostaCorreta}. Avançando para a próxima.`;
+        this.bolinhasEstado[numero] = 'incorreta';
+        this.tentativas[numero] = 0; // reset para evitar problemas
+
+        if (numero === this.totalPerguntas) {
+          // Se for última pergunta, não vai avançar mais, só mostra mensagem
+          setTimeout(() => {
+            if (this.acertos / this.totalPerguntas >= 0.6) {
+              this.mensagemFinalVisivel = true;
+              this.enviarResultadoParaBanco();
+              setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+            } else {
+              this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
+            }
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            this.selecionarFrase(numero + 1);
+          }, 2000);
+        }
+      }
     }
   }
 

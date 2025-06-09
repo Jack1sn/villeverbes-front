@@ -9,6 +9,7 @@ export interface MensagemAjuda {
   remetente: string;
   mensagem: string;
   dataEnvio?: Date;
+  quantidadeMensagensNaoRespondidas: number;
 }
 
 @Injectable({
@@ -43,4 +44,16 @@ export class AjudaService {
       })
     );
   }
+
+  contarMensagensNaoRespondidas(): Observable<number> {
+  return this.http.get<MensagemAjuda[]>(this.apiUrl).pipe(
+    map((mensagens: MensagemAjuda[]) => mensagens.filter(m => !m.mensagem || m.mensagem.trim() === '').length),
+    catchError(err => {
+      console.error('Erro ao contar mensagens não respondidas:', err);
+      return of(0);
+    })
+  );
+}
+
+
 }

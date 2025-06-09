@@ -1,9 +1,11 @@
-import { Component, NgModule, OnInit } from '@angular/core';
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { AuthService } from '../../auth.service';
+import { AjudaService } from '../../services/ajuda.service';
 
 @Component({
   selector: 'app-header',
@@ -12,23 +14,39 @@ import { AuthService } from '../../auth.service';
   styleUrls: ['./header.component.css'],
   imports: [RouterModule, CommonModule]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   userName: string | null = null;
   userRole: string | null = null;
   isAuthenticated: boolean = false;
   temNovaMensagem: boolean = false;
+  quantidadeMensagensNaoRespondidas: number = 0;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  private mensagemSubscription?: Subscription;
+
+  constructor(
+    private authService: AuthService,
+    private ajudaService: AjudaService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.checkAuthenticationStatus();
 
     if (this.isAuthenticated && this.isAdmin()) {
       this.verificarNovasMensagens();
+      this.carregarQuantidadeMensagensNaoRespondidas();
+      
 
-      // Verifica a cada 60 segundos
-      interval(60000).subscribe(() => this.verificarNovasMensagens());
+      // Atualiza a cada 60 segundos
+      this.mensagemSubscription = interval(60000).subscribe(() => {
+        this.verificarNovasMensagens();
+        this.carregarQuantidadeMensagensNaoRespondidas();
+      });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.mensagemSubscription?.unsubscribe();
   }
 
   checkAuthenticationStatus(): void {
@@ -77,12 +95,6 @@ export class HeaderComponent implements OnInit {
     return null;
   }
 
-  //getColaboradorLink(): string | null {
-  //  if (this.userRole === 'ADMIN') return '/crud-colaborador';
-    //if (this.userRole === 'COLABORADOR') return '/home-admin';
-  //  return null;
- // }
-
   getJogadorLink(): string | null {
     if (this.userRole === 'ADMIN') return '/visualizar-jogadores';
     if (this.userRole === 'COLABORADOR') return '/home-admin';
@@ -93,15 +105,23 @@ export class HeaderComponent implements OnInit {
     return this.userRole === 'ADMIN';
   }
 
-  /**
-   * Verifica se há novas mensagens no backend e ativa badge de notificação.
-   */
- verificarNovasMensagens(): void {
-  this.authService.temNovaMensagem().then((tem) => {
-    this.temNovaMensagem = tem;
-  }).catch((err) => {
-    console.error('Erro ao verificar novas mensagens:', err);
-    this.temNovaMensagem = false;
+  verificarNovasMensagens(): void {
+    this.authService.temNovaMensagem().then((tem) => {
+      this.temNovaMensagem = tem;
+    }).catch((err) => {
+      console.error('Erro ao verificar novas mensagens:', err);
+      this.temNovaMensagem = false;
+    });
+  }
+carregarQuantidadeMensagensNaoRespondidas(): void {
+  this.ajudaService.contarMensagensNaoRespondidas().subscribe({
+    next: (qtd) => {
+      this.quantidadeMensagensNaoRespondidas = qtd;
+    },
+    error: (err) => {
+      console.error('Erro ao buscar quantidade de mensagens não respondidas:', err);
+      this.quantidadeMensagensNaoRespondidas = 0;
+    }
   });
 }
 

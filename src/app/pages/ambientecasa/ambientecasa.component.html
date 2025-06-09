@@ -50,9 +50,22 @@
   </div>
 
   <!-- Mensagem de resultado -->
-  <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations! 🎉' ? 'green' : 'red' }">
-    {{ resultado }}
-  </p>
+<p 
+  *ngIf="resultado" 
+  [class.text-green-600]="resultado.includes('Félicitations')"
+  [class.text-red-600]="!resultado.includes('Félicitations')"
+  class="text-xl font-bold mt-4 transition-colors duration-500"
+>
+  {{ resultado }}
+
+  <ng-container *ngIf="resultado.includes('Félicitations')">
+    <span class="inline-block animate-bounce text-yellow-400 text-4xl ml-2">🎊</span>
+    <i class="fas fa-hands-clapping text-yellow-500 text-3xl animate-bounce ml-2"></i>
+  </ng-container>
+</p>
+
+
+
 </div>
 
   <!-- Botões de navegação -->

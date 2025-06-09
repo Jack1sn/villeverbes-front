@@ -15,6 +15,7 @@ export class AjudaComponent implements OnInit {
   erro = false;
   carregando = true;
   sucesso = false;
+  quantidadeMensagensNaoRespondidas: number = 0;
 
   constructor(private ajudaService: AjudaService) {}
 
