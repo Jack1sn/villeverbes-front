@@ -77,49 +77,57 @@ export class AutoCadastroComponent {
     this.modalService.open(content, { centered: true });
   }
 
+async cadastrar(content: any) {
+  if (this.cadastroForm.valid) {
+    const Jogador: Usuario = {
+      nome: this.cadastroForm.get('nome')?.value,
+      cpf: this.cadastroForm.get('cpf')?.value,
+      telefone: this.cadastroForm.get('telefone')?.value,
+      cep: this.cadastroForm.get('endereco.cep')?.value,
+      endereco: this.cadastroForm.get('endereco.logradouro')?.value,
+      numero: '',
+      email: this.cadastroForm.get('email')?.value,
+      perfil: "JOGADOR",
+      complemento: this.cadastroForm.get('endereco.complemento')?.value,
+      bairro: this.cadastroForm.get('endereco.bairro')?.value,
+      cidade: this.cadastroForm.get('endereco.localidade')?.value,
+      estado: this.cadastroForm.get('endereco.uf')?.value,
+      ativo:true
+    };
 
-  async cadastrar(content: any) {
-    if (this.cadastroForm.valid) {
-      const Jogador: Usuario = {
-        nome: this.cadastroForm.get('nome')?.value,
-        cpf: this.cadastroForm.get('cpf')?.value,
-        telefone: this.cadastroForm.get('telefone')?.value,
-        cep: this.cadastroForm.get('endereco.cep')?.value,
-        endereco: this.cadastroForm.get('endereco.logradouro')?.value,
-        numero: '',
-        email: this.cadastroForm.get('email')?.value,
-        perfil: "JOGADOR",
-        complemento: this.cadastroForm.get('endereco.complemento')?.value,
-        bairro: this.cadastroForm.get('endereco.bairro')?.value,
-        cidade: this.cadastroForm.get('endereco.localidade')?.value,
-        estado: this.cadastroForm.get('endereco.uf')?.value,
-      };
+    try {
+      localStorage.setItem('usuarioNome', Jogador.nome); // guarda o nome no localStorage
 
-      try {
+      const response = await this.jogadorService.autoCadastro(Jogador);
+      this.successMessage = 'Cadastro realizado com sucesso!';
+      this.errorMessage = '';
+      this.modalService.open(content);
 
-        localStorage.setItem('usuarioNome', Jogador.nome); // guarda no nome do usuario no localstorage
-        
-        const response = await this.jogadorService.autoCadastro(Jogador);
-        this.successMessage = 'Cadastro realizado com sucesso!';
-        this.errorMessage = '';
-        this.modalService.open(content);
-        setTimeout(() => {
-          this.modalService.dismissAll();
-          this.router.navigate(['/login']); 
-        }, 2000);
-      } catch (error) {
+      setTimeout(() => {
+        this.modalService.dismissAll();
+        this.router.navigate(['/login']);
+      }, 2000);
+
+    } catch (error: any) {
+      // Aqui a mágica acontece para capturar a mensagem do backend
+      if (error.response && error.response.status === 409) {
+        // Se o backend retornou 409, pega a mensagem
+        this.errorMessage = error.response.data?.message || 'Email já cadastrado.';
+      } else if (error.message) {
+        // Outras mensagens de erro genéricas
+        this.errorMessage = error.message;
+      } else {
         this.errorMessage = 'Erro ao realizar o cadastro. Tente novamente.';
-        this.successMessage = '';
-        this.modalService.open(content);
       }
-    } else {
-      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+
       this.successMessage = '';
       this.modalService.open(content);
     }
+  } else {
+    this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+    this.successMessage = '';
+    this.modalService.open(content);
   }
-
-  
-
+}
 
 }

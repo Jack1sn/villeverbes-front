@@ -3,7 +3,8 @@
 <br>
 <br>
 
-<div class="p-4">
+<div class="min-h-screen w-screen bg-gray-50 flex justify-center pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-3xl">
     <h2 class="text-2xl font-bold text-gray-800 mb-4">Mensagens de Ajuda Recebidas</h2>
   
     <div *ngIf="carregando" class="text-blue-600">Carregando mensagens...</div>
@@ -12,8 +13,22 @@
   
     <div *ngFor="let msg of mensagens" class="bg-white rounded shadow p-4 mb-4 border border-gray-200">
       <div class="text-sm text-gray-500 mb-1">Data: {{ msg.dataEnvio | date:'dd/MM/yy' }}</div>
-      <div class="text-sm font-semibold text-blue-600 mb-1">Email: {{ msg.remetente }}</div>
+      <div class="text-sm font-semibold text-blue-600 mb-1"> <a [href]="'mailto:' + msg.remetente" class="underline hover:text-blue-800">
+        {{ msg.remetente }}
+      </a></div>
       <p class="text-gray-700 whitespace-pre-line">{{ msg.mensagem }}</p>
     </div>
   </div>
   
+<!-- Spinner durante envio -->
+<div *ngIf="carregando" class="text-center my-4">
+  <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+  <p class="text-blue-600 mt-2">Enviando sua mensagem...</p>
+</div>
+
+
+<!-- Mensagem de erro -->
+<div *ngIf="erro" class="text-red-600 mt-4">
+  Ocorreu um erro ao enviar sua mensagem. Tente novamente.
+</div>
+</div>

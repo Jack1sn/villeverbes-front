@@ -1,0 +1,58 @@
+<app-header></app-header>
+
+<!-- Main content container -->
+<div class="min-h-screen w-screen bg-gray-50 flex justify-center pt-8 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-6xl">
+    <h2 class="text-2xl font-bold mb-10 text-gray-800">Lista de Jogadores</h2>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-blue-500 font-medium animate-pulse">
+      Carregando...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="text-red-500 font-semibold bg-red-100 p-3 rounded mb-4">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Tabela de jogadores -->
+    <div *ngIf="!loading && jogadores.length > 0" class="overflow-x-auto">
+      <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-sm font-semibold">Nome</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold">Email</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold">Status</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let jogador of jogadores" class="border-b hover:bg-gray-50 transition duration-150 ease-in-out">
+            <td class="px-6 py-3 text-gray-800">{{ jogador.nome }}</td>
+            <td class="px-6 py-3 text-gray-600">{{ jogador.email }}</td>
+            <td class="px-6 py-3">
+              <span [ngClass]="jogador.ativo ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'">
+                {{ jogador.ativo ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td class="px-6 py-3">
+              <button
+                (click)="alternarStatus(jogador)"
+                [ngClass]="jogador.ativo 
+                  ? 'bg-red-500 hover:bg-red-600' 
+                  : 'bg-green-500 hover:bg-green-600'"
+                class="text-white px-4 py-1 rounded text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition">
+                {{ jogador.ativo ? 'Bloquear' : 'Desbloquear' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sem jogadores -->
+    <div *ngIf="!loading && jogadores.length === 0" class="text-gray-600 mt-4">
+      Nenhum jogador encontrado.
+    </div>
+  </div>
+</div>

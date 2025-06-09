@@ -1,58 +1,67 @@
-<header class="header">
-  <div class="header-left">
-    <img src="../../assets/vvimagens/vvsbg.png" alt="Logo" class="logo" />
-    <p> Ville de Verbes</p>
+<header class="bg-blue-300 shadow-md px-6 py-4 fixed top-0 w-full z-50 flex justify-between items-center">
+  <!-- Logo e título -->
+  <div class="flex items-center space-x-4">
+    <img src="../../assets/vvimagens/vvsbg.png" alt="Logo" class="h-10 w-auto" />
+    <p class="text-xl font-semibold text-gray-800">Ville de Verbes</p>
   </div>
-  <nav class="nav-links flex space-x-6 items-center">
-    <!-- Home link -->
-    <a [routerLink]="getHomeLink()" class="flex items-center text-gray-700 hover:text-blue-500">
+
+  <!-- Navegação -->
+  <nav class="flex space-x-6 items-center text-sm font-medium">
+    <a [routerLink]="getHomeLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
       <i class="fas fa-home mr-2"></i> Home
     </a>
 
-    <!-- Ranking link -->
-    <a [routerLink]="getRankingLink()" class="flex items-center text-gray-700 hover:text-blue-500">
+    <a [routerLink]="getRankingLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
       <i class="fas fa-trophy mr-2"></i> Ranking
     </a>
 
-    <!-- Troféu link -->
-    <a [routerLink]="getTropheeLink()" class="flex items-center text-gray-700 hover:text-blue-500">
+    <a [routerLink]="getTropheeLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
       <i class="fas fa-medal mr-2"></i> Médails
     </a>
-    <a
-    *ngIf="getAjudaLink()"
-    [routerLink]="getAjudaLink()"
-    class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-2 rounded-md hover:bg-blue-100 transition"
-  >
-    <i class="fas fa-question-circle"></i>
-    Ajuda
-  </a>
-  
-
-  <a
-  *ngIf="getColaboradorLink()"
-  [routerLink]="getColaboradorLink()"
-  class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+<!-- Ajuda com badge -->
+<a
+  *ngIf="getAjudaLink()"
+  [routerLink]="getAjudaLink()"
+  class="relative flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition"
 >
-  <i class="fas fa-users text-white-500"></i>
-  <span>Colaboradores</span>
+  <i class="fas fa-question-circle mr-2"></i> Ajuda
+
+  <!-- Badge de notificação -->
+  <span
+    *ngIf="temNovaMensagem"
+    class="absolute top-0 right-0 mt-0.5 mr-1 bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center animate-ping-slow"
+    title="Nova mensagem"
+  ></span>
 </a>
 
 
-    
-    <a [routerLink]="getConfigurationLink()" class="flex items-center text-gray-700 hover:text-blue-500">
+    <!-- Usuários Dropdown -->
+    <div *ngIf="isAdmin()" class="relative group">
+      <button class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
+        <i class="fas fa-users mr-2"></i> Utilisateurs
+        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+        <a routerLink="/visualizar-jogadores" class="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-blue-100 transition">Jogadores</a>
+        <a routerLink="/crud-colaborador" class="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 hover:bg-blue-100 transition">Colaboradores</a>
+      </div>
+    </div>
+
+    <a [routerLink]="getConfigurationLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
       <i class="fas fa-cogs mr-2"></i> Config.
     </a>
-   
 
-  
+    <!-- Logout/Login -->
     <ng-container *ngIf="isAuthenticated; else showLogin">
-      <a (click)="logout()" class="flex items-center text-gray-700 hover:text-blue-500">
+      <a (click)="logout()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition cursor-pointer">
         <i class="fas fa-sign-out-alt mr-2"></i> Logout
       </a>
     </ng-container>
 
     <ng-template #showLogin>
-      <a [routerLink]="'/login'" class="flex items-center text-gray-700 hover:text-blue-500">
+      <a [routerLink]="'/login'" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
         <i class="fas fa-sign-in-alt mr-2"></i> Login
       </a>
     </ng-template>

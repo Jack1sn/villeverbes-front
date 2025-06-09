@@ -1,31 +1,36 @@
 import { Component, NgModule, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../auth.service';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+import { RouterModule } from '@angular/router';
+import { interval } from 'rxjs';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-header',
-  standalone:true,
+  standalone: true,
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
-  imports:[ RouterModule, CommonModule]
+  imports: [RouterModule, CommonModule]
 })
 export class HeaderComponent implements OnInit {
   userName: string | null = null;
   userRole: string | null = null;
   isAuthenticated: boolean = false;
+  temNovaMensagem: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.checkAuthenticationStatus();
+
+    if (this.isAuthenticated && this.isAdmin()) {
+      this.verificarNovasMensagens();
+
+      // Verifica a cada 60 segundos
+      interval(60000).subscribe(() => this.verificarNovasMensagens());
+    }
   }
 
-  /**
-   * Verifica se o usuário está autenticado e atualiza o nome e o perfil.
-   */
   checkAuthenticationStatus(): void {
     this.isAuthenticated = this.authService.isAuthenticated();
     if (this.isAuthenticated) {
@@ -37,80 +42,67 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  /**
-   * Método para o logout do usuário.
-   */
   logout(): void {
-    this.authService.logout(); // Chama o logout no AuthService
-    this.checkAuthenticationStatus(); // Atualiza o status de autenticação
-    this.router.navigate(['/login']); // Redireciona para a página de login
+    this.authService.logout();
+    this.checkAuthenticationStatus();
+    this.router.navigate(['/login']);
   }
 
-  /**
-   * Obtém o link correto para o Home dependendo do perfil do usuário.
-   */
   getHomeLink(): string {
-    if (this.userRole === 'ADMIN') {
-      return '/home-admin'; // Admin
-    } else if (this.userRole === 'JOGADOR') {
-      return '/home'; // Jogador
-    }
-    return '/'; // Caso não tenha perfil ou não esteja autenticado
+    if (this.userRole === 'ADMIN') return '/home-admin';
+    if (this.userRole === 'JOGADOR') return '/home';
+    return '/';
   }
 
-  /**
-   * Obtém o link do Ranking dependendo do perfil do usuário.
-   */
   getRankingLink(): string {
-    if (this.userRole === 'ADMIN') {
-      return '/visualizar-ranking'; // Admin
-    } else if (this.userRole === 'JOGADOR') {
-      return `/ranking/${this.authService.getUserId()}`; // Jogador
-    }
+    if (this.userRole === 'ADMIN') return '/visualizar-ranking';
+    if (this.userRole === 'JOGADOR') return `/ranking/${this.authService.getUserId()}`;
     return '/';
   }
 
-  /**
-   * Obtém o link para os Troféus dependendo do perfil do usuário.
-   */
   getTropheeLink(): string {
-    if (this.userRole === 'ADMIN') {
-      return '/trophee'; // Admin
-    } else if (this.userRole === 'JOGADOR') {
-      return `/trophee/${this.authService.getUserId()}`; // Jogador
-    }
+    if (this.userRole === 'ADMIN') return '/trophee';
+    if (this.userRole === 'JOGADOR') return `/trophee/${this.authService.getUserId()}`;
     return '/';
   }
 
-  /**
-   * Obtém o link para as configurações dependendo do perfil do usuário.
-   */
   getConfigurationLink(): string {
-    if (this.userRole === 'ADMIN') {
-      return '/crudAmbiente'; // Admin
-    } else if (this.userRole === 'JOGADOR') {
-      return '/redefinir-senha'; // Jogador
-    }
+    if (this.userRole === 'ADMIN') return '/crudAmbiente';
+    if (this.userRole === 'JOGADOR') return '/redefinir-senha';
     return '/';
   }
 
   getAjudaLink(): string | null {
-    if (this.userRole === 'ADMIN') {
-      return '/ajuda';
-    }
+    if (this.userRole === 'ADMIN') return '/ajuda';
     return null;
   }
-  
 
-  getColaboradorLink(): string | null {
-    if (this.userRole === 'ADMIN') {
-      return '/crud-colaborador'; // Admin vê CRUD
-    } else if (this.userRole === 'COLABORADOR') {
-      return '/home-admin'; // Colaborador vê uma home diferente
-    }
-    return null; // Oculta para outros papéis (ex: JOGADOR)
+  //getColaboradorLink(): string | null {
+  //  if (this.userRole === 'ADMIN') return '/crud-colaborador';
+    //if (this.userRole === 'COLABORADOR') return '/home-admin';
+  //  return null;
+ // }
+
+  getJogadorLink(): string | null {
+    if (this.userRole === 'ADMIN') return '/visualizar-jogadores';
+    if (this.userRole === 'COLABORADOR') return '/home-admin';
+    return null;
   }
-  
 
+  isAdmin(): boolean {
+    return this.userRole === 'ADMIN';
+  }
+
+  /**
+   * Verifica se há novas mensagens no backend e ativa badge de notificação.
+   */
+ verificarNovasMensagens(): void {
+  this.authService.temNovaMensagem().then((tem) => {
+    this.temNovaMensagem = tem;
+  }).catch((err) => {
+    console.error('Erro ao verificar novas mensagens:', err);
+    this.temNovaMensagem = false;
+  });
+}
 
 }

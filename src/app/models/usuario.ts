@@ -14,4 +14,5 @@ export interface Usuario {
   estado: string;
   perfil: Perfil;
   email: string;
+  ativo:boolean;
 }

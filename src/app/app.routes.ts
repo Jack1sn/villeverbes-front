@@ -24,6 +24,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { CrudColaboradorComponent } from './pages/crud-colaborador/crud-colaborador.component';
 import { VisualisarColaboradorComponent } from './pages/visualisar-colaborador/visualisar-colaborador.component';
 import { RedefinirSenhaComponent } from './pages/redefinir-senha/redefinir-senha.component';
+import { VisualizarJogadoresComponent } from './pages/visulizar-jogadores/visualizar-jogadores.component';
 export const routes: Routes = [
 
   { path: 'tela-inicial', component: TelaInicialComponent },
@@ -111,8 +112,14 @@ export const routes: Routes = [
     data: { expectedRoles: ['ADMIN'] },
   },
   {
-    path: 'visualisar-colaborador',
+    path: 'visualizar-colaborador',
     component: VisualisarColaboradorComponent,
+    canActivate: [authGuard],
+    data: { expectedRoles: ['ADMIN'] },
+  },
+   {
+    path: 'visualizar-jogadores',
+    component:VisualizarJogadoresComponent ,
     canActivate: [authGuard],
     data: { expectedRoles: ['ADMIN'] },
   },

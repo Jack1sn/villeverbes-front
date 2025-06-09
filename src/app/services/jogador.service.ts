@@ -8,15 +8,18 @@ import { Usuario } from '../models/usuario';
 export class JogadorService {
   private baseUrl = 'http://localhost:8080';
 
-  constructor() {}
+  async listarJogadores(): Promise<Usuario[]> {
+    const response = await axios.get(`${this.baseUrl}/usuario/jogadores`);
+    return response.data;
+  }
+
+  async alterarStatusJogador(id: number, ativo: boolean): Promise<void> {
+    await axios.put(`${this.baseUrl}/usuario/jogadores/${id}/status`, { ativo });
+  }
 
   async autoCadastro(Jogador: Usuario): Promise<any> {
     const url = `${this.baseUrl}/jogador/autocadastro`;
-    try {
-      const response = await axios.post(url, Jogador);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.post(url, Jogador);
+    return response.data;
   }
 }

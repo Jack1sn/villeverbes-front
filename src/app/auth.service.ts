@@ -181,4 +181,19 @@ export class AuthService {
     const payload = token.split('.')[1];
     return JSON.parse(atob(payload));
   }
+  /**
+ * ✅ Verifica com o backend se há novas mensagens de ajuda
+ */
+async temNovaMensagem(): Promise<boolean> {
+  try {
+    const response = await axios.get(`${this.baseUrl}/ajuda/tem-nova-mensagem`);
+    return response.data === true;
+  } catch (error) {
+    console.error('Erro ao verificar novas mensagens:', error);
+    return false;
+  }
+}
+
+
+
 }

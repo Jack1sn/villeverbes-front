@@ -41,24 +41,29 @@
       <form #ajudaForm="ngForm" (ngSubmit)="enviarAjuda(ajudaForm)" novalidate>
 
 
-        <!-- Email -->
-        <label for="email" class="block text-sm font-medium text-gray-700">Votre e-mail</label>
+        <!-- Campo de e-mail -->
+<div class="mb-4">
+  <label for="email" class="block text-sm font-medium text-gray-700">Votre e-mail</label>
 
-        <input 
-          type="email" 
-          id="email" 
-          name="email" 
-          required 
-          [(ngModel)]="emailRemetente"
-          #emailInput="ngModel"
-          class="border p-2 rounded w-full"
-          [class.border-red-500]="emailInput.invalid && emailInput.touched"
-        />
-        
-        <!-- Mensagem de erro se o e-mail for inválido -->
-        <div *ngIf="emailInput.invalid && emailInput.touched" class="text-red-600 text-sm mt-1">
-          Por favor, insira um e-mail válido.
-        </div>
+  <input
+    type="email"
+    id="email"
+    name="email"
+    required
+    email
+    [(ngModel)]="emailRemetente"
+    #emailInput="ngModel"
+    class="border p-2 rounded w-full"
+    [class.border-red-500]="emailInput.invalid && emailInput.touched"
+  />
+
+  <!-- Mensagem de erro se inválido -->
+  <div *ngIf="emailInput.touched && emailInput.errors" class="text-red-600 text-sm mt-1">
+    <div *ngIf="emailInput.errors['required']">Le champ e-mail est requis.</div>
+    <div *ngIf="emailInput.errors['email']">Veuillez entrer un e-mail valide.</div>
+  </div>
+</div>
+
         
         <!-- Mensagem -->
         <div class="mb-4">
@@ -76,16 +81,19 @@
 
         <!-- Botões -->
         <div class="flex justify-end space-x-2 pt-2">
-          <button type="submit" [disabled]="ajudaForm.invalid"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-semibold shadow">
-            Envoyer
-          </button>
+         <button type="submit" [disabled]="enviandoMensagem || ajudaForm.invalid"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-semibold shadow flex items-center gap-2">
+  <span *ngIf="!enviandoMensagem">Envoyer</span>
+  <svg *ngIf="enviandoMensagem" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+  </svg>
+</button>
           <button type="button" (click)="mostrarAjuda = false"
                   class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md font-medium shadow">
             Annuler
           </button>
         </div>
-
         <!-- Feedback -->
         <div *ngIf="sucesso" class="text-green-600 font-semibold mt-4">
           Message envoyé avec succès !
@@ -167,6 +175,12 @@
         <p class="font-semibold text-blue-700">Colaboradores:</p>
          <h4 class="font-semibold text-blue-700 mt-4">Orientadores</h4>
         <ul class="list-disc list-inside ml-4 space-y-1 text-sm">
+           <li>
+            <strong>Profª. Drª. Caroline Mazetto Mendes </strong> 
+            <a href="mailto:neves@ufpr.br" class="text-blue-600 hover:underline">
+                     carol.mazetto&#64;gmail.com
+            </a>
+          </li>
           <li>
             <strong>Prof. Dr. Luiz Antonio Pereira Neves </strong> <br>
             <a href="mailto:neves@ufpr.br" class="text-blue-600 hover:underline">
@@ -174,12 +188,7 @@
             </a>
           </li>
 
-          <li>
-            <strong>Profª .Drª. Caroline Mazetto Mendes </strong> 
-            <a href="mailto:neves@ufpr.br" class="text-blue-600 hover:underline">
-                     carol.mazetto&#64;gmail.com
-            </a>
-          </li>
+         
         </ul>
 
         <h4 class="font-semibold text-blue-700 mt-2">Alunos</h4>
