@@ -21,7 +21,7 @@ export class AmbientecasaComponent implements OnInit {
   tempoVerbal: string = 'Présent';
   fundoImagem: string = 'assets/vvimagens/fundo-casa.png';
   mensagemFinalVisivel: boolean = false;
-    tentativas: { [key: number]: number } = {}; 
+  tentativas: { [key: number]: number } = {}; 
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -40,6 +40,10 @@ export class AmbientecasaComponent implements OnInit {
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
   acertos: number = 0;
 
+  usuarioNome: string = 'Utilisateur';
+  personagemImagem: string = 'assets/vvimagens/usuario2.png';
+  
+
   constructor(
     private router: Router,
     private personagemService: PersonagemService,
@@ -50,7 +54,17 @@ export class AmbientecasaComponent implements OnInit {
 
   ngOnInit(): void {
     this.personagemSelecionado = this.personagemService.getPersonagem();
+    const nomeSalvo = localStorage.getItem('usuarioNome');
+    const imagemSalva = localStorage.getItem('usuarioImagem');
 
+    if (nomeSalvo) {
+      this.usuarioNome = nomeSalvo;
+    }
+
+    if (imagemSalva) {
+      this.personagemImagem = imagemSalva;
+    }
+    
     for (let i = 1; i <= this.totalPerguntas; i++) {
       this.bolinhasEstado[i] = 'naoClicada';
     }
@@ -84,7 +98,6 @@ export class AmbientecasaComponent implements OnInit {
       })
       .catch(error => {
         console.error('Erro ao carregar frases:', error);
-        // Você pode aqui definir frases padrão para o caso de erro
       });
   }
 
@@ -116,10 +129,15 @@ export class AmbientecasaComponent implements OnInit {
     });
   }
 
-verificarResposta(): void {
+  verificarResposta(): void {
     if (this.perguntaAtual === null || !this.fraseAtual) return;
 
     const numero = this.perguntaAtual;
+
+    // Verificar se a bolinha já foi marcada como correta ou incorreta
+    if (this.bolinhasEstado[numero] === 'correta' || this.bolinhasEstado[numero] === 'incorreta') {
+      return;  // Se a bolinha já estiver bloqueada, não faz nada
+    }
 
     const estaCorreta = this.ambientecasaService.verificarRespostaDigitada(
       this.respostaDigitada,
@@ -136,8 +154,8 @@ verificarResposta(): void {
       // Salva progresso no serviço
       this.progressoService.setProgresso('casa', this.progresso);
 
-      this.bolinhasEstado[numero] = 'correta';
-      this.tentativas[numero] = 0; // reseta tentativas ao acertar
+      this.bolinhasEstado[numero] = 'correta';  // Marca a bolinha como "correta"
+      this.tentativas[numero] = 0;  // reseta tentativas ao acertar
 
       if (numero === this.totalPerguntas) {
         if (this.acertos / this.totalPerguntas >= 0.6) {
@@ -159,11 +177,11 @@ verificarResposta(): void {
 
       if (this.tentativas[numero] < 2) {
         this.resultado = `Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
-        this.bolinhasEstado[numero] = 'incorreta';
+        this.bolinhasEstado[numero] = 'incorreta';  // Marca como incorreta
       } else {
         // Após 3 tentativas, avança para próxima pergunta
         this.resultado = `Désolé, la réponse correcte est: ${this.fraseAtual.respostaCorreta}. Avançando para a próxima.`;
-        this.bolinhasEstado[numero] = 'incorreta';
+        this.bolinhasEstado[numero] = 'incorreta';  // Marca como incorreta
         this.tentativas[numero] = 0; // reset para evitar problemas
 
         if (numero === this.totalPerguntas) {
@@ -188,6 +206,11 @@ verificarResposta(): void {
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
+
+    // Se a bolinha está correta ou incorreta, ela deve estar travada
+    if (estado === 'correta' || estado === 'incorreta') {
+      return estado;  // Retorna apenas "correta" ou "incorreta"
+    }
     return numero === this.perguntaAtual ? `${estado} respondendo` : estado;
   }
 
@@ -211,8 +234,5 @@ verificarResposta(): void {
 
     // Futuro: envie isso com HttpClient ou axios para seu back-end
     console.log('📤 Enviando dados do jogo:', jogoData);
-
-    // Exemplo futuro:
-    // this.jogoService.salvarResultado(jogoData).subscribe(...)
   }
 }

@@ -1,6 +1,6 @@
 /* header.component.css */
 .header-background {
-    background-image: url('/assets/vvimagens/telaini.png');  /* Caminho absoluto da imagem */
+    background-image: url('/assets/vvimagens/telaInicial.jpg');  /* Caminho absoluto da imagem */
     background-size: cover;  /* Garante que a imagem cubra toda a tela */
     background-position: center center;  /* Centraliza a imagem */
     background-repeat: no-repeat;  /* Não repete a imagem */

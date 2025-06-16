@@ -6,10 +6,12 @@
 <div class="background">
   <!-- Barra superior -->
   <div class="top-bar">
-    <div class="user-profile">
-      <img class="user-icon" src="assets/vvimagens/usuario2.png" alt="Usuário" />
-      <span class="user-name">{{ personagemSelecionado || 'Utilisateur' }}</span>
-    </div>
+    <!-- Ícone e nome do usuário -->
+<div class="user-profile">
+  <img class="user-icon" [src]="personagemImagem" alt="Usuário" />
+  <span class="user-name">{{ usuarioNome }}</span>
+</div>
+
     <h2 class="titulos">
       Bienvenue {{ personagemSelecionado }}, Choisissez un Numero!<br />
       <strong>Tempo:</strong> {{ tempoVerbal }}

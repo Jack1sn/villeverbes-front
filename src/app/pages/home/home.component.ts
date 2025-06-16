@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PersonagemService } from '../../services/personagem.service'; // Importe o serviço de personagem
+import { PersonagemService } from '../../services/personagem.service';
 import { HeaderComponent } from '../header/header.component';
 import { CommonModule } from '@angular/common';
 import { ProgressoService } from '../../services/progresso.service';
@@ -8,82 +8,82 @@ import { ProgressoService } from '../../services/progresso.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [HeaderComponent,CommonModule],
+  imports: [HeaderComponent, CommonModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-
-
 export class HomeComponent {
-  // Variáveis para armazenar o personagem selecionado, a resposta do usuário e a frase a ser conjugada
   personagemSelecionado: string | null = null;
+  personagemImagem: string = 'assets/vvimagens/usuario2.png'; // imagem padrão
+
   respostaDigitada: string = '';
-  fraseSelecionada: string = 'Conjuguez le verbe "être" au présent'; // Exemplo de frase para conjugar
+  fraseSelecionada: string = 'Conjuguez le verbe "être" au présent';
   resultado: string | null = null;
-  progressoCasa: number = 0;
+
+  progressoCasa: number = 0.00;
   progressoParque: number = 0;
   progressoUniversidade: number = 0;
-  usuarioNome: string = 'Utilisateur'; // Valor padrão
 
+  usuarioNome: string = 'Utilisateur';
 
+  showModal: boolean = false;
 
   constructor(
     private router: Router,
-    private personagemService: PersonagemService, // Injete o serviço de personagem
+    private personagemService: PersonagemService,
     private progressoService: ProgressoService,
   ) {}
 
   ngOnInit(): void {
-    // Atualiza os valores de progresso ao carregar
     this.progressoCasa = this.progressoService.getProgresso('casa');
     this.progressoParque = this.progressoService.getProgresso('parque');
     this.progressoUniversidade = this.progressoService.getProgresso('universidade');
 
     const nomeSalvo = localStorage.getItem('usuarioNome');
+    const imagemSalva = localStorage.getItem('usuarioImagem');
+
     if (nomeSalvo) {
       this.usuarioNome = nomeSalvo;
+      this.personagemSelecionado = nomeSalvo;
+    }
+
+    if (imagemSalva) {
+      this.personagemImagem = imagemSalva;
     }
   }
-  
 
-  // Método de navegação para outras páginas
   navigate(destino: string): void {
     this.router.navigate(['/' + destino]);
+  }
+
+  abrirModal(): void {
+    this.showModal = true;
   }
 
   fecharModal(): void {
     this.showModal = false;
   }
-  
-  // Método para selecionar o personagem
+
   selecionarPersonagem(personagem: string): void {
     this.personagemSelecionado = personagem;
+    this.usuarioNome = personagem;
+    this.personagemImagem = `assets/vvimagens/${personagem.toLowerCase()}.jpg`;
+
+    // Salvar nos serviços e localStorage
     this.personagemService.setPersonagem(personagem);
-  this.fecharModal();
+    localStorage.setItem('usuarioNome', personagem);
+    localStorage.setItem('usuarioImagem', this.personagemImagem);
+
+    this.fecharModal();
+
     console.log('Personagem selecionado:', personagem);
-    
-    // Atualiza o nome do personagem no serviço para ser compartilhado com outros componentes
-    this.personagemService.setPersonagem(personagem);
   }
 
-  // Método para verificar a resposta do usuário (exemplo de conjugação)
   verificarResposta(): void {
-    // Aqui, substitua pela lógica para verificar se a resposta está correta
     if (this.respostaDigitada.toLowerCase() === 'suis') {
       this.resultado = 'OK';
     } else {
       this.resultado = 'Uuuff! Essayez encore';
     }
   }
-
-  showModal: boolean = false;
-
-abrirModal(): void {
-  this.showModal = true;
-}
-
-//---------------
-
-
-
 }

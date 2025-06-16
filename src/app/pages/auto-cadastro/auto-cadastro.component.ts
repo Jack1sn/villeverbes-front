@@ -99,14 +99,14 @@ async cadastrar(content: any) {
       localStorage.setItem('usuarioNome', Jogador.nome); // guarda o nome no localStorage
 
       const response = await this.jogadorService.autoCadastro(Jogador);
-      this.successMessage = 'Cadastro realizado com sucesso!';
+      this.successMessage = 'Cadastro realizado com sucesso! Por favor verifica seu e-mail.';
       this.errorMessage = '';
       this.modalService.open(content);
 
       setTimeout(() => {
         this.modalService.dismissAll();
         this.router.navigate(['/login']);
-      }, 2000);
+      }, 7000);
 
     } catch (error: any) {
       // Aqui a mágica acontece para capturar a mensagem do backend
