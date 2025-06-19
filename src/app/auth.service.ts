@@ -21,6 +21,11 @@ export class AuthService {
     '/api/verbos',
     '/api/tempos',
     '/api/complementos',
+    '/api/jogo/',
+    '/api/jogo/{usuarioId}',
+    '/api/jogo/{usuarioId}/{id}',
+    '/usuario/jogadores',
+
   ];
 
   constructor(private router: Router) {
