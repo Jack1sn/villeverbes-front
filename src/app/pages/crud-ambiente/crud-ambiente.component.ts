@@ -3,9 +3,11 @@ import { CrudAmbienteService } from '../../services/crudAmbiente.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEdit, faPlus, faEye } from '@fortawesome/free-solid-svg-icons';
 import { HeaderComponent } from '../header/header.component';
 import { Frase } from './../../models/frase';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 interface Ambiente {
   id?: number;
@@ -21,15 +23,17 @@ interface Ambiente {
   selector: 'app-crud-ambiente',
   templateUrl: './crud-ambiente.component.html',
   styleUrls: ['./crud-ambiente.component.css'],
-  imports: [FormsModule, CommonModule, FontAwesomeModule, HeaderComponent]
+  imports: [FormsModule, CommonModule, FontAwesomeModule, 
+    HeaderComponent, NgxPaginationModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA] 
 })
 export class CrudAmbienteComponent implements OnInit {
   faTrash = faTrash;
   faEdit = faEdit;
   faPlus = faPlus;
+  faEye = faEye;  // Ícone para visualizar a frase completa
 
   ambientes: Ambiente[] = [];
-
   pronomes: { id: number; texto: string }[] = [];
   verbos: { id: number; verbo: string }[] = [];
   tempos: { id: number; tempo: string }[] = [];
@@ -42,10 +46,23 @@ export class CrudAmbienteComponent implements OnInit {
     resposta: ''
   };
 
+  // Variáveis para controle de paginação
+  page: number = 1;
+  itemsPerPage: number = 11;
+  totalItems: number = 22;
+  
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
   isFraseModalOpen = false;
   isEditingFrase = false;
   ambienteSelecionadoIndex = -1;
   fraseEditandoIndex = -1;
+
+  // Variáveis para controlar o modal de frase completa
+  isFraseModalCompleteOpen = false;
+  fraseCompleta: Frase | null = null;
 
   constructor(private crudService: CrudAmbienteService) {}
 
@@ -72,6 +89,9 @@ export class CrudAmbienteComponent implements OnInit {
       const frasesDto = await this.crudService.getFrases();
       const frasesConvertidas = frasesDto.map(f => this.convertDtoToFrase(f));
 
+      // Atualize o total de itens
+      this.totalItems = frasesConvertidas.length;
+
       this.ambientes = [{
         id: 1,
         nome: 'Maison',
@@ -95,21 +115,20 @@ export class CrudAmbienteComponent implements OnInit {
     };
   }
 
- convertFraseToDto(frase: Frase): any {
-  if (!frase.pronome || !frase.verbo || !frase.tempo || !frase.complemento?.trim()) {
-    throw new Error('Todos os campos devem ser preenchidos corretamente.');
+  convertFraseToDto(frase: Frase): any {
+    if (!frase.pronomeId || !frase.verboId || !frase.tempoId || !frase.complemento?.trim()) {
+      throw new Error('Todos os campos devem ser preenchidos corretamente.');
+    }
+
+    return {
+      id: frase.id,
+      pronomeTexto: frase.pronomeId,
+      verboTexto: frase.verboId,
+      tempoVerbalTexto: frase.tempoId,
+      complementoDescricao: frase.complemento.trim(),
+      respostaCorreta: frase.resposta.trim()
+    };
   }
-
-  return {
-    id: frase.id,
-    pronomeTexto: frase.pronome.trim(),
-    verboTexto: frase.verbo.trim(),
-    tempoVerbalTexto: frase.tempo.trim(),
-    complementoDescricao: frase.complemento.trim(),
-    respostaCorreta: frase.resposta.trim()
-  };
-}
-
 
   openModalAdicionarFrase(ambienteIndex: number): void {
     this.ambienteSelecionadoIndex = ambienteIndex;
@@ -130,6 +149,16 @@ export class CrudAmbienteComponent implements OnInit {
     this.novaFrase = { ...this.ambientes[ambienteIndex].frases[fraseIndex] };
     this.isEditingFrase = true;
     this.isFraseModalOpen = true;
+  }
+
+  openModalMostrarFrase(frase: Frase): void {
+    this.fraseCompleta = frase;
+    this.isFraseModalCompleteOpen = true;
+  }
+
+  closeModalComplete(): void {
+    this.isFraseModalCompleteOpen = false;
+    this.fraseCompleta = null;
   }
 
   async saveFrase(): Promise<void> {
@@ -182,4 +211,8 @@ export class CrudAmbienteComponent implements OnInit {
   trackById(index: number, item: any): number {
     return item.id!;
   }
+
+  numeros: number[] = Array.from({ length: 11 }, (_, i) => i + 1);
+
+
 }

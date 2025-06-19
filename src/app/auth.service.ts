@@ -31,9 +31,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * ✅ Interceptor configurado com AxiosHeaders
-   */
   private configurarInterceptor(): void {
     axios.interceptors.request.use((config) => {
       const token = this.getToken();
@@ -43,11 +40,9 @@ export class AuthService {
       );
 
       if (!isPublic && token && this.isAuthenticated()) {
-        // Garante que headers seja instância de AxiosHeaders
         if (!(config.headers instanceof AxiosHeaders)) {
           config.headers = new AxiosHeaders(config.headers || {});
         }
-
         config.headers.set('Authorization', `Bearer ${token}`);
       }
 
@@ -55,9 +50,6 @@ export class AuthService {
     });
   }
 
-  /**
-   * ✅ Login do usuário
-   */
   async login(loginData: Login): Promise<void> {
     const url = `${this.baseUrl}/auth/login`;
 
@@ -75,9 +67,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * ✅ Logout
-   */
   logout(): void {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -85,52 +74,40 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * ✅ Armazena token e dados do usuário
-   */
   private salvarDados(data: any): void {
-    localStorage.setItem('user', JSON.stringify(data));
-    localStorage.setItem('token', data.token);
+    // Salvando no localStorage
+    localStorage.setItem('user', JSON.stringify(data));  // Salvando os dados do usuário
+    localStorage.setItem('token', data.token);  // Salvando o token
+
+    // Salvando o perfil do usuário
     this.userRole = data.usuario.perfil;
+
+    // Salvando o id do usuário, se necessário
+    if (data.usuario && data.usuario.id) {
+      localStorage.setItem('usuarioId', data.usuario.id.toString());
+    }
   }
 
-  /**
-   * ✅ Retorna o token JWT, se válido
-   */
   getToken(): string | null {
     const token = localStorage.getItem('token');
     if (token) {
-      try {
-        const decoded = this.decodeJwt(token);
-        if (decoded?.exp && decoded.exp < Date.now() / 1000) {
-          return null; // Token expirado
-        }
-        return token;
-      } catch (e) {
-        console.error('Token inválido:', e);
-        return null;
+      const decoded = this.decodeJwt(token);
+      if (decoded?.exp && decoded.exp < Date.now() / 1000) {
+        return null; // Token expirado
       }
+      return token;
     }
     return null;
   }
 
-  /**
-   * ✅ Verifica se usuário está autenticado
-   */
   isAuthenticated(): boolean {
     return this.getToken() !== null;
   }
 
-  /**
-   * ✅ Perfil do usuário (admin, user, etc.)
-   */
   getRole(): string | null {
     return this.userRole;
   }
 
-  /**
-   * ✅ Objeto do usuário autenticado
-   */
   getUser(): any {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
@@ -144,12 +121,8 @@ export class AuthService {
     return this.getUser()?.usuario?.id ?? null;
   }
 
-  /**
-   * ⚠️ Tratamento de erros padrão
-   */
   private handleError(error: unknown): void {
     let errorMessage = 'Ocorreu um erro desconhecido';
-
     if (axios.isAxiosError(error)) {
       if (error.response) {
         switch (error.response.status) {
@@ -168,32 +141,28 @@ export class AuthService {
         errorMessage = error.message;
       }
     }
-
     console.error('Erro:', errorMessage);
     alert(errorMessage);
     throw new Error(errorMessage);
   }
 
-  /**
-   * ✅ Decodifica o JWT
-   */
-  private decodeJwt(token: string): any {
-    const payload = token.split('.')[1];
-    return JSON.parse(atob(payload));
+  private decodeJwt(token: string): any | null {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch (error) {
+      console.error('Erro ao decodificar JWT:', error);
+      return null;
+    }
   }
-  /**
- * ✅ Verifica com o backend se há novas mensagens de ajuda
- */
-async temNovaMensagem(): Promise<boolean> {
-  try {
-    const response = await axios.get(`${this.baseUrl}/ajuda/tem-nova-mensagem`);
-    return response.data === true;
-  } catch (error) {
-    console.error('Erro ao verificar novas mensagens:', error);
-    return false;
+
+  async temNovaMensagem(): Promise<boolean> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/ajuda/tem-nova-mensagem`);
+      return response.data === true;
+    } catch (error) {
+      console.error('Erro ao verificar novas mensagens:', error);
+      return false;
+    }
   }
-}
-
-
-
 }

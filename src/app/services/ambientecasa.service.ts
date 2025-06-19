@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
+// Interfaces para as frases
 export interface FraseApi {
   id: number;
   descricaoMontada: string;
@@ -12,20 +13,28 @@ export interface Frase {
   respostaCorreta: string;
 }
 
+// Interface para os dados do jogo
+export interface JogoData {
+  personagem: string;
+  ambiente: string;
+  acertos: number;
+  total: number;
+  porcentagem: number;
+  data: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AmbienteCasaService {
-  private readonly apiUrl = 'http://localhost:8080/api/frases-casa';
+  private readonly apiUrlFrases = 'http://localhost:8080/api/frases-casa';
+  private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
 
   constructor() {}
 
-  /**
-   * Busca frases da API com Axios e remove a resposta correta da descrição.
-   */
   async getFrasesCasa(): Promise<Frase[]> {
     try {
-      const response = await axios.get<FraseApi[]>(this.apiUrl);
+      const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
       const frasesApi = response.data;
 
       return frasesApi.map(f => {
@@ -38,22 +47,37 @@ export class AmbienteCasaService {
         }
 
         return {
-          frase: descricao,
+          frase: descricao || 'Frase indisponível',
           respostaCorreta: resposta
         };
       });
     } catch (error) {
-      console.error('Erro ao buscar frases da casa:', error);
-      throw new Error('Não foi possível carregar as frases do ambiente casa.');
+      if (error instanceof AxiosError) {
+        console.error('Erro ao buscar frases da casa:', error.response?.data || error.message);
+      } else {
+        console.error('Erro desconhecido:', error);
+      }
+      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente casa.');
     }
   }
 
-  /**
-   * Verifica se a resposta digitada está correta (ignora maiúsculas e espaços).
-   */
   verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;
 
     return respostaDigitada.trim().toLowerCase() === respostaCorreta.trim().toLowerCase();
+  }
+
+  async salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<void> {
+    try {
+      const response = await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
+      console.log('Resultado do jogo salvo com sucesso:', response.data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error('Erro ao salvar o resultado do jogo:', error.response?.data || error.message);
+      } else {
+        console.error('Erro desconhecido:', error);
+      }
+      throw new Error('Não foi possível salvar o resultado do jogo.');
+    }
   }
 }

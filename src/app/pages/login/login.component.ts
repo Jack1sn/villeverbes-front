@@ -34,9 +34,25 @@ export class LoginComponent {
     };
   
     try {
+      // Chama o login e aguarda a resposta
       await this.authService.login(loginData);
+      
+      // Obtendo o papel do usuário
       const userRole = this.authService.getRole();
-  
+
+      // Obter os dados do usuário, incluindo o ID
+      const usuario = this.authService.getUser();
+      if (usuario) {
+        // Salvar o ID do usuário no localStorage
+        localStorage.setItem('usuarioId', usuario.usuario.id?.toString() || '');
+        localStorage.setItem('usuario', JSON.stringify(usuario));  // Salva o objeto completo do usuário (em JSON)
+        console.log('Usuário salvo no localStorage:', usuario);
+         // Verifique se os dados estão salvos
+     console.log('ID salvo no localStorage:', localStorage.getItem('usuarioId'));
+     console.log('Usuário completo salvo no localStorage:', localStorage.getItem('usuario'));
+    
+      }
+
       this.successMessage = 'Login realizado com sucesso!';
       this.errorMessage = '';
   
@@ -45,7 +61,7 @@ export class LoginComponent {
         this.successMessage = '';
         this.mostrarLogin = false;
   
-        // 🔀 Redireciona depois que a mensagem sumir
+        // Redireciona de acordo com o papel do usuário
         if (userRole === 'COLABORADOR' || userRole === 'ADMIN') {
           this.router.navigate(['/home-admin']);
         } else if (userRole === 'JOGADOR') {
@@ -56,17 +72,17 @@ export class LoginComponent {
       }, 3000);
   
     } catch (error) {
+      // Caso o login falhe, exibe mensagem de erro
       this.errorMessage = 'E-mail ou senha incorretos';
       this.successMessage = '';
   
       setTimeout(() => {
-        this.errorMessage = '';
+        this.errorMessage = '';  // Limpa a mensagem de erro após 3 segundos
       }, 3000);
     }
   }
   
-  
-
+  // Função para fechar o login
   fecharLogin() {
     this.mostrarLogin = false;
   }

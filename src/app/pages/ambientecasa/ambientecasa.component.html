@@ -23,14 +23,16 @@
   </div>
 
   <!-- Bolinhas numeradas -->
-  <div 
-    *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
-    class="circle casa{{i}}" 
-    [ngClass]="getCorClasse(i)"
-    (click)="selecionarFrase(i)">
-    <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
-    <span>{{ i }}</span>
-  </div>
+ <div 
+  *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
+  class="circle casa{{i}}" 
+  [ngClass]="getCorClasse(i)"
+ (click)="(bolinhasEstado[i] !== 'correta' && bolinhasEstado[i] !== 'incorreta') && selecionarFrase(i)"
+
+  [class.cursor-not-allowed]="bolinhasEstado[i] === 'correta'">
+  <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
+  <span>{{ i }}</span>
+</div>
 
   <!-- Frase e campo de resposta -->
  <div class="frase-box" *ngIf="fraseSelecionada">
@@ -48,7 +50,7 @@
       (keyup.enter)="verificarResposta()"
     />
 
-    <button (click)="verificarResposta()">Réponse</button>
+    <button (click)="verificarResposta()">Entrer </button>
   </div>
 
   <!-- Mensagem de resultado -->
@@ -57,7 +59,7 @@
   [class.text-green-600]="resultado.includes('Félicitations')"
   [class.text-red-600]="!resultado.includes('Félicitations')"
   class="text-xl font-bold mt-4 transition-colors duration-500"
->
+>{{ fraseSelecionada}}
   {{ resultado }}
 
   <ng-container *ngIf="resultado.includes('Félicitations')">

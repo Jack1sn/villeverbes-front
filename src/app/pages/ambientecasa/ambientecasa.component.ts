@@ -7,6 +7,8 @@ import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
 import { ProgressoService } from '../../services/progresso.service';
 import { AmbienteCasaService, Frase } from '../../services/ambientecasa.service';
+import { JogoData } from '../../models/jogo-data.model'; // Importando o modelo JogoData
+import axios from 'axios'; // Importando o Axios
 
 @Component({
   selector: 'app-ambientecasa',
@@ -21,35 +23,31 @@ export class AmbientecasaComponent implements OnInit {
   tempoVerbal: string = 'Présent';
   fundoImagem: string = 'assets/vvimagens/fundo-casa.png';
   mensagemFinalVisivel: boolean = false;
-  tentativas: { [key: number]: number } = {}; 
-
-  @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
-
+  tentativas: { [key: number]: number } = {};
   respostaDigitada: string = '';
   resultado: string | null = null;
   progresso: number = 0;
   progressoCasa: number = 0;
   totalPerguntas = 11;
   perguntaAtual: number | null = null;
-
   frasesAleatorias: { [key: number]: Frase[] } = {};
   fraseAtual: Frase | null = null;
   fraseSelecionada: string | null = null;
-
   fraseExibida: { [key: number]: boolean } = {};
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
   acertos: number = 0;
-
   usuarioNome: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
-  
+  voices: SpeechSynthesisVoice[] = [];
+
+  @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
   constructor(
     private router: Router,
     private personagemService: PersonagemService,
     private transLetrasPipe: TransLetrasPipe,
     private progressoService: ProgressoService,
-    private ambientecasaService: AmbienteCasaService,
+    private ambientecasaService: AmbienteCasaService
   ) {}
 
   ngOnInit(): void {
@@ -57,18 +55,14 @@ export class AmbientecasaComponent implements OnInit {
     const nomeSalvo = localStorage.getItem('usuarioNome');
     const imagemSalva = localStorage.getItem('usuarioImagem');
 
-    if (nomeSalvo) {
-      this.usuarioNome = nomeSalvo;
-    }
+    if (nomeSalvo) this.usuarioNome = nomeSalvo;
+    if (imagemSalva) this.personagemImagem = imagemSalva;
 
-    if (imagemSalva) {
-      this.personagemImagem = imagemSalva;
-    }
-    
     for (let i = 1; i <= this.totalPerguntas; i++) {
       this.bolinhasEstado[i] = 'naoClicada';
     }
 
+    this.voices = speechSynthesis.getVoices();
     this.carregarFrases();
     this.progressoCasa = this.progressoService.getProgresso('casa');
   }
@@ -76,12 +70,6 @@ export class AmbientecasaComponent implements OnInit {
   carregarFrases(): void {
     this.ambientecasaService.getFrasesCasa()
       .then((frases: Frase[]) => {
-        console.log('📥 Frases recebidas:', frases);
-
-        if (frases.length < this.totalPerguntas * 2) {
-          console.warn('⚠️ Frases insuficientes para todas as perguntas, completando com padrão.');
-        }
-
         for (let i = 1; i <= this.totalPerguntas; i++) {
           const index = (i - 1) * 2;
           this.frasesAleatorias[i] = [
@@ -93,12 +81,9 @@ export class AmbientecasaComponent implements OnInit {
         this.fraseAtual = this.frasesAleatorias[1][0];
         this.fraseSelecionada = this.fraseAtual.frase;
         this.fraseExibida[1] = true;
-
         this.selecionarFrase(1);
       })
-      .catch(error => {
-        console.error('Erro ao carregar frases:', error);
-      });
+      .catch(error => console.error('Erro ao carregar frases:', error));
   }
 
   selecionarFrase(numero: number): void {
@@ -108,18 +93,8 @@ export class AmbientecasaComponent implements OnInit {
     this.bolinhasEstado[numero] = 'clicada';
 
     const alternativas = this.frasesAleatorias[numero];
-
-    if (!alternativas || alternativas.length < 2) {
-      console.error(`❌ Erro: Frases não carregadas corretamente para a pergunta ${numero}`);
-      this.fraseAtual = {
-        frase: `Frase padrão ${numero}`,
-        respostaCorreta: '???'
-      };
-      this.fraseSelecionada = this.fraseAtual.frase;
-      return;
-    }
-
     const exibidaAnteriormente = this.fraseExibida[numero] ?? false;
+
     this.fraseAtual = exibidaAnteriormente ? alternativas[1] : alternativas[0];
     this.fraseSelecionada = this.fraseAtual.frase;
     this.fraseExibida[numero] = !exibidaAnteriormente;
@@ -133,11 +108,7 @@ export class AmbientecasaComponent implements OnInit {
     if (this.perguntaAtual === null || !this.fraseAtual) return;
 
     const numero = this.perguntaAtual;
-
-    // Verificar se a bolinha já foi marcada como correta ou incorreta
-    if (this.bolinhasEstado[numero] === 'correta' || this.bolinhasEstado[numero] === 'incorreta') {
-      return;  // Se a bolinha já estiver bloqueada, não faz nada
-    }
+    if (this.bolinhasEstado[numero] === 'correta' || this.bolinhasEstado[numero] === 'incorreta') return;
 
     const estaCorreta = this.ambientecasaService.verificarRespostaDigitada(
       this.respostaDigitada,
@@ -145,48 +116,38 @@ export class AmbientecasaComponent implements OnInit {
     );
 
     if (estaCorreta) {
-      this.resultado = 'Félicitations!';
+      this.bolinhasEstado[numero] = 'correta';
       this.acertos += 1;
-
-      // Atualiza progresso visual
       this.progresso = Math.min((this.acertos / this.totalPerguntas) * 100, 100);
-
-      // Salva progresso no serviço
       this.progressoService.setProgresso('casa', this.progresso);
+      this.tentativas[numero] = 0;
 
-      this.bolinhasEstado[numero] = 'correta';  // Marca a bolinha como "correta"
-      this.tentativas[numero] = 0;  // reseta tentativas ao acertar
+      setTimeout(() => {
+        this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
 
-      if (numero === this.totalPerguntas) {
-        if (this.acertos / this.totalPerguntas >= 0.6) {
-          this.mensagemFinalVisivel = true;
-
-          this.enviarResultadoParaBanco();
-
-          setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+        if (numero === this.totalPerguntas) {
+          if (this.acertos / this.totalPerguntas >= 0.6) {
+            this.mensagemFinalVisivel = true;
+            this.enviarResultadoParaBanco();
+            setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+          } else {
+            this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
+          }
         } else {
-          this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
+          setTimeout(() => this.selecionarFrase(numero + 1), 8000);
         }
-      } else {
-        setTimeout(() => {
-          this.selecionarFrase(numero + 1);
-        }, 600);
-      }
+      }, 1000);
     } else {
       this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
 
       if (this.tentativas[numero] < 2) {
-        this.resultado = `Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
-        this.bolinhasEstado[numero] = 'incorreta';  // Marca como incorreta
+        this.resultado = `❌ Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
       } else {
-        // Após 3 tentativas, avança para próxima pergunta
-        this.resultado = `Désolé, la réponse correcte est: ${this.fraseAtual.respostaCorreta}. Avançando para a próxima.`;
-        this.bolinhasEstado[numero] = 'incorreta';  // Marca como incorreta
-        this.tentativas[numero] = 0; // reset para evitar problemas
+        this.bolinhasEstado[numero] = 'incorreta';
+        this.resultado = `❌ La réponse correcte est : "${this.fraseAtual.respostaCorreta}".`;
 
-        if (numero === this.totalPerguntas) {
-          // Se for última pergunta, não vai avançar mais, só mostra mensagem
-          setTimeout(() => {
+        setTimeout(() => {
+          if (numero === this.totalPerguntas) {
             if (this.acertos / this.totalPerguntas >= 0.6) {
               this.mensagemFinalVisivel = true;
               this.enviarResultadoParaBanco();
@@ -194,24 +155,21 @@ export class AmbientecasaComponent implements OnInit {
             } else {
               this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
             }
-          }, 2000);
-        } else {
-          setTimeout(() => {
+          } else {
             this.selecionarFrase(numero + 1);
-          }, 2000);
-        }
+          }
+        }, 3000);
+
+        this.tentativas[numero] = 0;
       }
     }
   }
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
-
-    // Se a bolinha está correta ou incorreta, ela deve estar travada
-    if (estado === 'correta' || estado === 'incorreta') {
-      return estado;  // Retorna apenas "correta" ou "incorreta"
-    }
-    return numero === this.perguntaAtual ? `${estado} respondendo` : estado;
+    return (estado === 'correta' || estado === 'incorreta')
+      ? estado
+      : numero === this.perguntaAtual ? `${estado} respondendo` : estado;
   }
 
   atualizarResposta(valor: string): void {
@@ -222,17 +180,42 @@ export class AmbientecasaComponent implements OnInit {
     this.router.navigate(['/' + destino]);
   }
 
-  enviarResultadoParaBanco(): void {
+  async enviarResultadoParaBanco(): Promise<void> {
+    const usuarioId = localStorage.getItem('usuarioId'); // Recuperando ID do usuário
+
+    if (!usuarioId) {
+      console.error('Erro: Usuario ID não encontrado');
+      return;
+    }
+
     const jogoData = {
       personagem: this.personagemSelecionado,
       ambiente: 'casa',
       acertos: this.acertos,
       total: this.totalPerguntas,
-      porcentagem: Math.round((this.acertos / this.totalPerguntas) * 100),
-      data: new Date().toISOString()
+      acertoPorAmbiente: `${this.acertos} de ${this.totalPerguntas}`,
+      data: new Date().toISOString(),
+      nomeUsuario: this.usuarioNome,
     };
 
-    // Futuro: envie isso com HttpClient ou axios para seu back-end
-    console.log('📤 Enviando dados do jogo:', jogoData);
+    try {
+      console.log('📤 Enviando dados do jogo:', jogoData);
+
+      // Envio dos dados para a API
+      const response = await axios.post(
+        `http://localhost:8080/api/jogo/${usuarioId}`, jogoData
+      );
+
+      console.log('Resultado do jogo salvo com sucesso:', response.data);
+    } catch (error: any) {
+      console.error('Erro ao salvar o resultado do jogo:', error);
+      if (error.response) {
+        console.error('Erro na resposta da API:', error.response.data);
+      } else if (error.request) {
+        console.error('Erro na requisição:', error.request);
+      } else {
+        console.error('Erro desconhecido:', error.message);
+      }
+    }
   }
 }
