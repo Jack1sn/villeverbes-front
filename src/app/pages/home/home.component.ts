@@ -5,6 +5,8 @@ import { HeaderComponent } from '../header/header.component';
 import { CommonModule } from '@angular/common';
 import { ProgressoService } from '../../services/progresso.service';
 
+import { JogadorService } from '../../services/jogador.service'; // ✅ IMPORTADO
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -15,7 +17,7 @@ import { ProgressoService } from '../../services/progresso.service';
 export class HomeComponent {
   personagemSelecionado: string | null = null;
   personagemImagem: string = 'assets/vvimagens/usuario2.png'; // imagem padrão
-
+  
   respostaDigitada: string = '';
   fraseSelecionada: string = 'Conjuguez le verbe "être" au présent';
   resultado: string | null = null;
@@ -32,6 +34,7 @@ export class HomeComponent {
     private router: Router,
     private personagemService: PersonagemService,
     private progressoService: ProgressoService,
+   private jogadorService: JogadorService 
   ) {}
 
   ngOnInit(): void {

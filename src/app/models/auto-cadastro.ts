@@ -1,4 +1,4 @@
-import { Usuario } from "./usuario";
+import { Usuario } from "./usuario.model";
 
 export interface Autocadastro extends Usuario { 
     email: string;

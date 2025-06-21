@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import axios, { AxiosHeaders } from 'axios';
-import { Login } from './models/login';
+import { Login } from './models/login.model';
 import { environment } from '../../src/environments/environment';
 
 @Injectable({
@@ -24,8 +24,6 @@ export class AuthService {
     '/api/jogo/',
     '/api/jogo/{usuarioId}',
     '/api/jogo/{usuarioId}/{id}',
-    '/usuario/jogadores',
-
   ];
 
   constructor(private router: Router) {

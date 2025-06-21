@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Usuario } from '../../models/usuario';
+import { Usuario } from '../../models/usuario.model';
 import { JogadorService } from 'src/app/services/jogador.service';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from "../header/header.component";

@@ -7,8 +7,10 @@ import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
 import { ProgressoService } from '../../services/progresso.service';
 import { AmbienteCasaService, Frase } from '../../services/ambientecasa.service';
-import { JogoData } from '../../models/jogo-data.model'; // Importando o modelo JogoData
-import axios from 'axios'; // Importando o Axios
+import { JogoService } from '../../services/jogo.service'; // ✅ Novo service importado
+import { JogoData } from '../../models/jogo-data.model';
+import { JogadorService } from 'src/app/services/jogador.service';
+
 
 @Component({
   selector: 'app-ambientecasa',
@@ -44,10 +46,12 @@ export class AmbientecasaComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private jogadorService: JogadorService ,
     private personagemService: PersonagemService,
     private transLetrasPipe: TransLetrasPipe,
     private progressoService: ProgressoService,
-    private ambientecasaService: AmbienteCasaService
+    private ambientecasaService: AmbienteCasaService,
+    private jogoService: JogoService // ✅ Injetando o novo serviço
   ) {}
 
   ngOnInit(): void {
@@ -126,15 +130,9 @@ export class AmbientecasaComponent implements OnInit {
         this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
 
         if (numero === this.totalPerguntas) {
-          if (this.acertos / this.totalPerguntas >= 0.6) {
-            this.mensagemFinalVisivel = true;
-            this.enviarResultadoParaBanco();
-            setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
-          } else {
-            this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
-          }
+          this.finalizarJogo();
         } else {
-          setTimeout(() => this.selecionarFrase(numero + 1), 8000);
+          setTimeout(() => this.selecionarFrase(numero + 1), 1000);
         }
       }, 1000);
     } else {
@@ -148,13 +146,7 @@ export class AmbientecasaComponent implements OnInit {
 
         setTimeout(() => {
           if (numero === this.totalPerguntas) {
-            if (this.acertos / this.totalPerguntas >= 0.6) {
-              this.mensagemFinalVisivel = true;
-              this.enviarResultadoParaBanco();
-              setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
-            } else {
-              this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
-            }
+            this.finalizarJogo();
           } else {
             this.selecionarFrase(numero + 1);
           }
@@ -162,6 +154,16 @@ export class AmbientecasaComponent implements OnInit {
 
         this.tentativas[numero] = 0;
       }
+    }
+  }
+
+  finalizarJogo(): void {
+    if (this.acertos / this.totalPerguntas >= 0.6) {
+      this.mensagemFinalVisivel = true;
+      this.enviarResultadoParaBanco();
+      setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+    } else {
+      this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
     }
   }
 
@@ -181,41 +183,26 @@ export class AmbientecasaComponent implements OnInit {
   }
 
   async enviarResultadoParaBanco(): Promise<void> {
-    const usuarioId = localStorage.getItem('usuarioId'); // Recuperando ID do usuário
+    const usuarioId = localStorage.getItem('usuarioId');
 
     if (!usuarioId) {
       console.error('Erro: Usuario ID não encontrado');
       return;
     }
 
-    const jogoData = {
+    const jogoData: JogoData = {
       personagem: this.personagemSelecionado,
       ambiente: 'casa',
       acertos: this.acertos,
       total: this.totalPerguntas,
       acertoPorAmbiente: `${this.acertos} de ${this.totalPerguntas}`,
-      data: new Date().toISOString(),
       nomeUsuario: this.usuarioNome,
     };
 
     try {
-      console.log('📤 Enviando dados do jogo:', jogoData);
-
-      // Envio dos dados para a API
-      const response = await axios.post(
-        `http://localhost:8080/api/jogo/${usuarioId}`, jogoData
-      );
-
-      console.log('Resultado do jogo salvo com sucesso:', response.data);
-    } catch (error: any) {
-      console.error('Erro ao salvar o resultado do jogo:', error);
-      if (error.response) {
-        console.error('Erro na resposta da API:', error.response.data);
-      } else if (error.request) {
-        console.error('Erro na requisição:', error.request);
-      } else {
-        console.error('Erro desconhecido:', error.message);
-      }
+      await this.jogoService.salvarResultadoJogo(+usuarioId, jogoData);
+    } catch (error) {
+      console.error('❌ Falha ao enviar o resultado para o backend.');
     }
   }
 }

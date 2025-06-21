@@ -6,5 +6,6 @@ export interface JogoData {
   acertos: number;
   total: number;
   acertoPorAmbiente: string;
-  data: string;
+  nomeUsuario: string;
+  //data?: string;
 }

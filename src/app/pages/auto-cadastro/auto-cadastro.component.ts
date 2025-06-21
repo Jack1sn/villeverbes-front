@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Component, TemplateRef } from '@angular/core';
 import { JogadorService } from '../../services/jogador.service';
-import { Usuario } from '../../models/usuario';
+import { Usuario } from '../../models/usuario.model';
 import { HeaderComponent } from "../header/header.component";
 
 
