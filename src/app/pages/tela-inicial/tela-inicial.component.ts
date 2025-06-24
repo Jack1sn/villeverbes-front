@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'; 
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpParams, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http'; 
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tela-inicial',
   standalone: true,
   templateUrl: './tela-inicial.component.html',
   styleUrls: ['./tela-inicial.component.css'],
-  imports: [HeaderComponent, FormsModule, CommonModule]
+  imports: [HeaderComponent, FormsModule, CommonModule] 
 })
 export class TelaInicialComponent {
   mostrarAjuda = false;
@@ -38,44 +40,60 @@ export class TelaInicialComponent {
     window.open('https://gepta.weebly.com/', '_blank');
   }
 
- enviarAjuda(form: NgForm): void {
-  if (form.invalid) return;
+  enviarAjuda(form: NgForm): void {
+    if (form.invalid) return;
 
-  this.sucesso = false;
-  this.erro = false;
-  this.enviandoMensagem = true;
+    this.sucesso = false;
+    this.erro = false;
+    this.enviandoMensagem = true;
 
-  const params = new HttpParams()
-    .set('para', 'villedesverbes@gmail.com')
-    .set('assunto', 'Pedido de ajuda.')
-    .set('texto', `Email do remetente: ${this.emailRemetente}\n\nMensagem:\n${this.mensagemAjuda}`);
+    const ajudaPayload = {
+      remetente: this.emailRemetente.trim(),
+      mensagem: this.mensagemAjuda.trim()
+    };
 
-  this.http.post('http://localhost:8080/email/simples', null, {
-    params,
-    responseType: 'text'
-  }).subscribe({
-    next: () => {
+    const params = new HttpParams()
+      .set('para', 'villedesverbes@gmail.com')
+      .set('assunto', 'Pedido de ajuda.')
+      .set('texto', `Email do remetente: ${this.emailRemetente}\n\nMensagem:\n${this.mensagemAjuda}`);
+
+    const reqSimples = this.http.post('http://localhost:8080/email/simples', null, {
+      params,
+      responseType: 'text'
+    }).pipe(
+      catchError(err => {
+        console.error('[email/simples] erro:', err);
+        return of(null);
+      })
+    );
+
+    const reqAjuda = this.http.post('http://localhost:8080/ajuda', ajudaPayload, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      catchError(err => {
+        console.error('[ajuda] erro:', err);
+        return of(null);
+      })
+    );
+
+    forkJoin([reqSimples, reqAjuda]).subscribe(([resSimples, resAjuda]) => {
       this.enviandoMensagem = false;
-      this.sucesso = true;
-      this.erro = false;
 
-      // Não reseta logo, para não apagar o conteúdo antes da mensagem ser vista
-      setTimeout(() => {
-        this.emailRemetente = '';
-        this.mensagemAjuda = '';
-        form.resetForm();
+      if (resSimples !== null || resAjuda !== null) {
+        this.sucesso = true;
+        this.erro = false;
 
+        setTimeout(() => {
+          this.emailRemetente = '';
+          this.mensagemAjuda = '';
+          form.resetForm();
+          this.sucesso = false;
+          this.mostrarAjuda = false;
+        }, 2500);
+      } else {
         this.sucesso = false;
-        this.mostrarAjuda = false;
-      }, 2500); // tempo suficiente para o usuário ver a mensagem
-    },
-    error: (err) => {
-      console.error('Erro ao enviar mensagem:', err);
-      this.erro = true;
-      this.sucesso = false;
-      this.enviandoMensagem = false;
-    }
-  });
-}
-
+        this.erro = true;
+      }
+    });
+  }
 }

@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -35,7 +34,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.isAuthenticated && this.isAdmin()) {
       this.verificarNovasMensagens();
       this.carregarQuantidadeMensagensNaoRespondidas();
-      
 
       // Atualiza a cada 60 segundos
       this.mensagemSubscription = interval(60000).subscribe(() => {
@@ -106,23 +104,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   verificarNovasMensagens(): void {
-    this.authService.temNovaMensagem().then((tem) => {
+    this.authService.temNovaMensagem().then((tem: boolean) => {
       this.temNovaMensagem = tem;
-    }).catch((err) => {
+    }).catch((err: any) => {
       console.error('Erro ao verificar novas mensagens:', err);
       this.temNovaMensagem = false;
     });
   }
-carregarQuantidadeMensagensNaoRespondidas(): void {
-  this.ajudaService.contarMensagensNaoRespondidas().subscribe({
-    next: (qtd) => {
-      this.quantidadeMensagensNaoRespondidas = qtd;
-    },
-    error: (err) => {
-      console.error('Erro ao buscar quantidade de mensagens não respondidas:', err);
-      this.quantidadeMensagensNaoRespondidas = 0;
-    }
-  });
-}
 
+  carregarQuantidadeMensagensNaoRespondidas(): void {
+    this.ajudaService.contarNaoRespondidas().subscribe({
+      next: (qtd: number) => {
+        this.quantidadeMensagensNaoRespondidas = qtd;
+      },
+      error: (err: any) => {
+        console.error('Erro ao buscar quantidade de mensagens não respondidas:', err);
+        this.quantidadeMensagensNaoRespondidas = 0;
+      }
+    });
+  }
 }
