@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from "../header/header.component";
-
+import { HeaderComponent } from '../header/header.component';
+import { RedefinirSenhaService, RedefinirSenhaPayload } from '../../services/redefinir-senha.service';
 
 @Component({
   selector: 'app-redefinir-senha',
   templateUrl: './redefinir-senha.component.html',
-  standalone:true,
+  standalone: true,
   imports: [CommonModule, FormsModule, HeaderComponent]
 })
 export class RedefinirSenhaComponent {
@@ -19,7 +18,10 @@ export class RedefinirSenhaComponent {
   confirmarSenha: string = '';
   erro: string = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private redefinirSenhaService: RedefinirSenhaService,
+    private router: Router
+  ) {}
 
   redefinirSenha(): void {
     if (this.novaSenha !== this.confirmarSenha) {
@@ -27,13 +29,13 @@ export class RedefinirSenhaComponent {
       return;
     }
 
-    const payload = {
+    const payload: RedefinirSenhaPayload = {
       email: this.email,
       senhaAtual: this.senhaAtual,
       novaSenha: this.novaSenha
     };
 
-    this.http.post('http://localhost:8080/api/auth/redefinir-senha', payload).subscribe({
+    this.redefinirSenhaService.redefinirSenha(payload).subscribe({
       next: () => {
         alert('Senha redefinida com sucesso!');
         this.router.navigate(['/login']);
