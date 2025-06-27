@@ -1,45 +1,109 @@
-<app-header></app-header>
+<div class="min-h-screen flex flex-col"> 
+  <app-header></app-header>
 
-<div class="background">
-  <!-- Barra superior -->
-  <div class="top-bar">
-    <div class="user-profile">
-      <img class="user-icon" src="assets/vvimagens/usuario2.png" alt="Usuário" />
-      <span class="user-name">{{ personagemSelecionado || 'Utilisateur' }}</span>
+  <div class="background">
+    <!-- Barra superior -->
+    <div class="top-bar">
+      <!-- Ícone e nome do usuário -->
+      <div class="user-profile">
+        <img class="user-icon" [src]="personagemImagem" alt="Usuário" />
+        <span class="user-name">{{ usuarioNome }}</span>
+      </div>
+
+      <h2 class="titulos">
+        Bienvenue {{ personagemSelecionado }}, Choisissez un Numero!<br />
+        <strong>Tempo:</strong> {{ tempoVerbal }}
+      </h2>
     </div>
-    <h2 class="titulos"> Bienvenue {{personagemSelecionado}}, Choisissez un Numero!</h2>
-  </div>
 
-  <!-- Bolinhas -->
-  <div class="direction-line">
+    <!-- Imagem de fundo -->
+    <div class="ambiente" [ngStyle]="{'background-image': 'url(' + fundoImagem + ')'}"></div>
+
+    <!-- Bolinhas numeradas -->
     <div 
-      *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
+      *ngFor="let i of perguntasArray()" 
       class="circle casa{{i}}" 
-      [ngClass]="{'clicada': isBolaClicada(i)}"
-      (click)="selecionarFrase(i)">
+      [ngClass]="getCorClasse(i)"
+      (click)="(bolinhasEstado[i] !== 'correta' && bolinhasEstado[i] !== 'incorreta') && selecionarFrase(i)"
+      [class.cursor-not-allowed]="bolinhasEstado[i] === 'correta'">
       <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
-      <span>{{i}}</span>
+      <span>{{ i }}</span>
     </div>
-  </div>
 
-  <!-- Frase -->
-  <div class="frase-box" *ngIf="fraseSelecionada">
-    <p>{{ fraseSelecionada }}</p>
-    <input type="text" [(ngModel)]="respostaDigitada" placeholder="Conjuguez ici..." (keyup.enter)="verificarResposta()" />
-    <button (click)="verificarResposta()">Réponse</button>
-    <p *ngIf="resultado" [ngStyle]="{ color: resultado === 'Félicitations!' ? 'green' : 'red' }">
-      {{ resultado }}
-    </p>
-  </div>
+    <!-- Frase e campo de resposta -->
+    <div class="frase-box" *ngIf="fraseSelecionada">
+      <p class="whitespace-pre-line">{{ fraseSelecionada }}</p>
 
-  <!-- Barra de progresso -->
-  <div class="progress-bar-container">
-    <div class="progress-bar" [style.width.%]="progresso"></div>
-  </div>
+      <!-- Campo de resposta e botão aparecem somente se ainda não acertou -->
+      <div *ngIf="resultado !== 'Félicitations! 🎉'">
+        <input
+          #respostaInput
+          type="text"
+          [ngModel]="respostaDigitada | transLetras"
+          (ngModelChange)="respostaDigitada = $event"
+          placeholder="Conjuguez ici..."
+          (keyup.enter)="verificarResposta()"
+        />
+        <button (click)="verificarResposta()">Entrer</button>
+      </div>
 
-  <!-- Logo -->
-  <div class="logo-container">
-    <img class="logo" src="assets/vvimagens/vvsbg.png" alt="Logo VV" />
-    <span class="logo-text">Ville des Verbes</span>
+      <!-- Mensagem de resultado -->
+      <p 
+        *ngIf="resultado" 
+        [class.text-green-600]="resultado.includes('Félicitations')"
+        [class.text-red-600]="!resultado.includes('Félicitations')"
+        class="text-xl font-bold mt-4 transition-colors duration-500"
+      >
+        {{ resultado }}
+        <ng-container *ngIf="resultado.includes('Félicitations')">
+          <span class="inline-block animate-bounce text-yellow-400 text-4xl ml-2">🎊</span>
+          <i class="fas fa-hands-clapping text-yellow-500 text-3xl animate-bounce ml-2"></i>
+        </ng-container>
+      </p>
+    </div>
+
+    <!-- Botões de navegação -->
+    <div class="absolute bottom-28 right-16 flex gap-x-4" *ngIf="fraseSelecionada">
+      <!-- Botão RETOUR -->
+      <button
+        (click)="navigate('home')"
+        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 21V3a1 1 0 011-1h9.5a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1zM13.5 12H10"/>
+        </svg>
+        RETOUR
+      </button>
+
+      <!-- Botão AVANCER -->
+      <button
+        (click)="navigate('ambienteuniversidade')"
+        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+      >
+        CHANGER MILEU
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="relative mt-96 mb-4 mx-auto w-full max-w-md text-center">
+      <!-- Barra de fundo -->
+      <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
+        <!-- Progresso preenchido -->
+        <div 
+          class="bg-green-500 h-full transition-all duration-500 ease-in-out"
+          [style.width.%]="(acertos / totalPerguntas) * 100"
+        ></div>
+      </div>
+
+      <!-- Bolinha azul com progresso total -->
+      <div 
+        class="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10"
+      >
+        {{ acertos }}/{{ totalPerguntas }}
+      </div>
+    </div>
   </div>
 </div>

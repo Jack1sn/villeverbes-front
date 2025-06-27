@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosError } from 'axios';
 
-// Interfaces para as frases
+// Interfaces para frases
 export interface FraseApi {
   id: number;
   descricaoMontada: string;
@@ -13,7 +13,7 @@ export interface Frase {
   respostaCorreta: string;
 }
 
-// Interface para os dados do jogo
+// Interface para dados do jogo
 export interface JogoData {
   personagem: string;
   ambiente: string;
@@ -26,44 +26,52 @@ export interface JogoData {
 @Injectable({
   providedIn: 'root'
 })
-export class AmbienteCasaService {
+export class AmbienteUniversidadeService {
   private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
   private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
 
   constructor() {}
 
-  async getFrasesCasa(): Promise<Frase[]> {
+  async getFrasesUniversidade(): Promise<Frase[]> {
     try {
       const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
       const frasesApi = response.data;
 
-      return frasesApi.map(f => {
-        let descricao = f.descricaoMontada || '';
-        const resposta = f.respostaCorreta.trim();
+      // Filtra as frases da universidade (IDs 45 a 66)
+      const frasesFiltradas = frasesApi
+        .filter(f => f.id >= 45 && f.id <= 66)
+        .map(f => {
+          let descricao = f.descricaoMontada || '';
+          const resposta = f.respostaCorreta.trim();
 
-        if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
-          const regex = new RegExp(resposta, 'i');
-          descricao = descricao.replace(regex, '').trim();
-        }
+          if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
+            const regex = new RegExp(resposta, 'i');
+            descricao = descricao.replace(regex, '').trim();
+          }
 
-        return {
-          frase: descricao || 'Frase indisponível',
-          respostaCorreta: resposta
-        };
-      });
+          return {
+            frase: descricao || 'Frase indisponível',
+            respostaCorreta: resposta
+          };
+        });
+
+      return frasesFiltradas;
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('Erro ao buscar frases da casa:', error.response?.data || error.message);
+        console.error('Erro ao buscar frases da universidade:', error.response?.data || error.message);
       } else {
         console.error('Erro desconhecido:', error);
       }
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente casa.');
+      throw new Error(
+        error instanceof AxiosError
+          ? error.response?.data?.message || 'Erro desconhecido'
+          : 'Não foi possível carregar as frases do ambiente universidade.'
+      );
     }
   }
 
   verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;
-
     return respostaDigitada.trim().toLowerCase() === respostaCorreta.trim().toLowerCase();
   }
 

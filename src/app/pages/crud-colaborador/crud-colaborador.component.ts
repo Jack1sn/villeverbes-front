@@ -114,7 +114,7 @@ export class CrudColaboradorComponent implements OnInit {
     if (err?.response?.data?.error) {
       this.mensagemErro = err.response.data.error;
     } else if (typeof err?.response?.data === 'string') {
-      this.mensagemErro = err.response.data;
+      this.mensagemErro = err.response.data;  
     } else if (err.message) {
       this.mensagemErro = err.message;
     } else {

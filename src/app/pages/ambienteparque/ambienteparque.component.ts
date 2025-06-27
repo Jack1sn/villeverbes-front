@@ -1,91 +1,203 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { PersonagemService } from '../../services/personagem.service';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
+import { PersonagemService } from '../../services/personagem.service';
+import { TransLetrasPipe } from '../../trans-letras.pipe';
+import { ProgressoService } from '../../services/progresso.service';
+import { AmbienteParqueService, Frase } from '../../services/ambiente-parque.service';
+import { JogoService } from '../../services/jogo.service';
+import { JogoData } from '../../models/jogo-data.model';
+import { JogadorService } from 'src/app/services/jogador.service';
 
 @Component({
   selector: 'app-ambienteparque',
   standalone: true,
-  imports: [FormsModule, CommonModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, TransLetrasPipe],
   templateUrl: './ambienteparque.component.html',
   styleUrls: ['./ambienteparque.component.css'],
+  providers: [TransLetrasPipe],
 })
 export class AmbienteparqueComponent implements OnInit {
   personagemSelecionado: string | null = null;
-  fraseSelecionada: string | null = null;
+  tempoVerbal: string = 'Présent';
+  fundoImagem: string = 'assets/vvimagens/fundo-parque.png';
+  mensagemFinalVisivel: boolean = false;
+  tentativas: { [key: number]: number } = {};
   respostaDigitada: string = '';
   resultado: string | null = null;
   progresso: number = 0;
   totalPerguntas = 11;
   perguntaAtual: number | null = null;
+  frasesAleatorias: { [key: number]: Frase[] } = {};
+  fraseAtual: Frase | null = null;
+  fraseSelecionada: string | null = null;
+  fraseExibida: { [key: number]: boolean } = {};
+  bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
+  acertos: number = 0;
+  usuarioNome: string = 'Utilisateur';
+  personagemImagem: string = 'assets/vvimagens/usuario2.png';
 
-  frases: { [key: number]: string[] } = {
-    1: ['Je (jouer) au ballon.', 'Je (marcher) dans le parc.'],
-    2: ['Tu (lancer) le frisbee.', 'Tu (regarder) les oiseaux.'],
-    3: ['Il (courir) sur l’herbe.', 'Il (jouer) avec son chien.'],
-    4: ['Nous (faire) du vélo.', 'Nous (manger) une glace.'],
-    5: ['Vous (lire) un livre.', 'Vous (écouter) de la musique.'],
-    6: ['Elles (chanter) sous un arbre.', 'Elles (jouer) à cache-cache.'],
-    7: ['Je (dessiner) les fleurs.', 'Je (observer) les nuages.'],
-    8: ['Tu (prendre) des photos.', 'Tu (arroser) les plantes.'],
-    9: ['Il (faire) du roller.', 'Il (monter) sur la balançoire.'],
-    10: ['Nous (jouer) au foot.', 'Nous (rire) ensemble.'],
-    11: ['Vous (attraper) la balle.', 'Vous (crier) de joie.'],
-  };
+  @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
-  respostasCorretas: { [key: number]: string } = {
-    1: 'joue',
-    2: 'lances',
-    3: 'court',
-    4: 'faisons',
-    5: 'lisez',
-    6: 'chantent',
-    7: 'dessine',
-    8: 'prends',
-    9: 'fait',
-    10: 'jouons',
-    11: 'attrapez',
-  };
-
-  bolinhasClicadas: Set<number> = new Set();
-
-  constructor(private router: Router, private personagemService: PersonagemService) {}
+  constructor(
+    private router: Router,
+    private jogadorService: JogadorService,
+    private personagemService: PersonagemService,
+    private transLetrasPipe: TransLetrasPipe,
+    private progressoService: ProgressoService,
+    private ambienteParqueService: AmbienteParqueService,
+    private jogoService: JogoService
+  ) {}
 
   ngOnInit(): void {
     this.personagemSelecionado = this.personagemService.getPersonagem();
+
+    const nomeSalvo = localStorage.getItem('usuarioNome');
+    const imagemSalva = localStorage.getItem('usuarioImagem');
+
+    if (nomeSalvo) this.usuarioNome = nomeSalvo;
+    if (imagemSalva) this.personagemImagem = imagemSalva;
+
+    for (let i = 1; i <= this.totalPerguntas; i++) {
+      this.bolinhasEstado[i] = 'naoClicada';
+    }
+
+    this.carregarFrases();
+    this.progresso = this.progressoService.getProgresso('parque');
+  }
+
+carregarFrases(): void {
+  this.ambienteParqueService.getFrasesParque()
+    .then((frases: Frase[]) => {
+      for (let i = 1; i <= this.totalPerguntas; i++) {
+        const index = 22 + (i - 1) * 2;  // Ajuste para pegar frases de 23 a 44
+        this.frasesAleatorias[i] = [
+          frases[index] || { frase: `Frase padrão ${i}-A`, respostaCorreta: '???' },
+          frases[index + 1] || { frase: `Frase padrão ${i}-B`, respostaCorreta: '???' }
+        ];
+      }
+
+      this.selecionarFrase(1);
+    })
+    .catch(error => console.error('Erro ao carregar frases do parque:', error));
+}
+
+
+  selecionarFrase(numero: number): void {
+    this.respostaDigitada = '';
+    this.resultado = null;
+    this.perguntaAtual = numero;
+    this.bolinhasEstado[numero] = 'clicada';
+
+    const alternativas = this.frasesAleatorias[numero];
+    const exibidaAnteriormente = this.fraseExibida[numero] ?? false;
+
+    this.fraseAtual = exibidaAnteriormente ? alternativas[1] : alternativas[0];
+    this.fraseSelecionada = this.fraseAtual.frase;
+    this.fraseExibida[numero] = !exibidaAnteriormente;
+
+    setTimeout(() => {
+      this.respostaInputRef?.nativeElement.focus();
+    });
+  }
+
+  verificarResposta(): void {
+    if (this.perguntaAtual === null || !this.fraseAtual) return;
+
+    const numero = this.perguntaAtual;
+    if (this.bolinhasEstado[numero] === 'correta' || this.bolinhasEstado[numero] === 'incorreta') return;
+
+    const estaCorreta = this.ambienteParqueService.verificarRespostaDigitada(
+      this.respostaDigitada,
+      this.fraseAtual.respostaCorreta
+    );
+
+    if (estaCorreta) {
+      this.bolinhasEstado[numero] = 'correta';
+      this.acertos += 1;
+      this.progresso = Math.min((this.acertos / this.totalPerguntas) * 100, 100);
+      this.progressoService.setProgresso('parque', this.progresso);
+      this.tentativas[numero] = 0;
+
+      setTimeout(() => {
+        this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
+
+        if (numero === this.totalPerguntas) {
+          this.finalizarJogo();
+        } else {
+          setTimeout(() => this.selecionarFrase(numero + 1), 1000);
+        }
+      }, 1000);
+    } else {
+      this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
+
+      if (this.tentativas[numero] < 2) {
+        this.resultado = `❌ Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
+      } else {
+        this.bolinhasEstado[numero] = 'incorreta';
+        this.resultado = `❌ La réponse correcte est : "${this.fraseAtual.respostaCorreta}".`;
+
+        setTimeout(() => {
+          if (numero === this.totalPerguntas) {
+            this.finalizarJogo();
+          } else {
+            this.selecionarFrase(numero + 1);
+          }
+        }, 3000);
+
+        this.tentativas[numero] = 0;
+      }
+    }
+  }
+
+  finalizarJogo(): void {
+    if (this.acertos / this.totalPerguntas >= 0.6) {
+      this.mensagemFinalVisivel = true;
+      this.enviarResultadoParaBanco();
+      setTimeout(() => this.router.navigate(['/outro-ambiente-ou-final']), 6000);
+    } else {
+      this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
+    }
+  }
+
+  getCorClasse(numero: number): string {
+    const estado = this.bolinhasEstado[numero] || 'naoClicada';
+    return (estado === 'correta' || estado === 'incorreta')
+      ? estado
+      : numero === this.perguntaAtual ? `${estado} respondendo` : estado;
   }
 
   navigate(destino: string): void {
     this.router.navigate(['/' + destino]);
   }
 
-  selecionarFrase(numero: number): void {
-    const opcoes = this.frases[numero];
-    if (opcoes) {
-      const aleatoria = opcoes[Math.floor(Math.random() * opcoes.length)];
-      this.fraseSelecionada = aleatoria;
-      this.respostaDigitada = '';
-      this.resultado = null;
-      this.perguntaAtual = numero;
-      this.bolinhasClicadas.add(numero);
+  async enviarResultadoParaBanco(): Promise<void> {
+    const usuarioId = localStorage.getItem('usuarioId');
+
+    if (!usuarioId) {
+      console.error('Erro: Usuario ID não encontrado');
+      return;
+    }
+
+    const jogoData: JogoData = {
+      personagem: this.personagemSelecionado,
+      ambiente: 'parque',
+      acertos: this.acertos,
+      total: this.totalPerguntas,
+      acertoPorAmbiente: `${this.acertos} de ${this.totalPerguntas}`,
+      nomeUsuario: this.usuarioNome,
+    };
+
+    try {
+      await this.jogoService.salvarResultadoJogo(+usuarioId, jogoData);
+    } catch (error) {
+      console.error('❌ Falha ao enviar o resultado para o backend.', error);
     }
   }
+  perguntasArray(): number[] {
+  return Array.from({ length: this.totalPerguntas }, (_, i) => i + 1);
+}
 
-  verificarResposta(): void {
-    if (this.perguntaAtual === null) return;
-
-    const respostaCorreta = this.respostasCorretas[this.perguntaAtual];
-    if (this.respostaDigitada.trim().toLowerCase() === respostaCorreta) {
-      this.resultado = 'Félicitations!';
-      this.progresso = Math.min(this.progresso + (100 / this.totalPerguntas), 100);
-    } else {
-      this.resultado = 'Mauvaise Réponse.';
-    }
-  }
-
-  isBolaClicada(numero: number): boolean {
-    return this.bolinhasClicadas.has(numero);
-  }
 }

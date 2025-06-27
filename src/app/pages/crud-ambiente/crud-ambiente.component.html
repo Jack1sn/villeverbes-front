@@ -20,40 +20,64 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let ambiente of ambientes  let i = index" class="bg-white border-b">
+            <tr *ngFor="let ambiente of ambientes; let i = index" class="bg-white border-b">
               <td class="px-4 py-2">{{ ambiente.nome }}</td>
               <td class="px-4 py-2">{{ ambiente.tempo }}</td>
               <td class="px-4 py-2">
                 <ul class="space-y-1">
-                  <li *ngFor="let frase of ambiente.frases | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let j = index" class="flex justify-between items-center bg-gray-50 px-2 py-1 rounded shadow-sm">
+                  <li *ngFor="let frase of ambiente.frases | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let j = index; trackBy: trackById" 
+                      class="flex justify-between items-center bg-gray-50 px-2 py-1 rounded shadow-sm">
                     <span class="text-sm text-gray-700">
-                      {{ j + 1 }}. {{ frase.pronomeId }} --- <strong>({{ frase.verboId }})</strong> {{ frase.complemento }}
+                      {{ j + 1 }}. {{ frase.pronome }} --- <strong>({{ frase.verbo }})</strong> {{ frase.complemento }}
                       <span class="text-blue-600 underline italic">{{ frase.resposta }}</span>
                     </span>
                     <div class="flex space-x-2">
                       <button (click)="openModalEditarFrase(i, j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
                         <fa-icon [icon]="faEdit"></fa-icon>
                       </button>
-                      <button (click)="deleteFrase(i, j)" class="text-red-500 hover:text-red-700" title="Excluir frase">
-                        <fa-icon [icon]="faTrash"></fa-icon>
-                      </button>
+                     <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
+  <fa-icon [icon]="faTrash"></fa-icon>
+</button>
                     </div>
                   </li>
                 </ul>
               </td>
 
               <td class="px-4 py-4">
-                <div >
-                  <p *ngFor="let numero of numeros" class="text-gray-500 my-3">{{ numero }}.</p>
-                </div>
+              <div class="flex justify-between items-center mt-4">
+  <!-- Informações de paginação -->
+  <div class="flex items-center justify-center space-x-4 mt-1">
+    <!-- Botão Anterior -->
+    <button 
+      (click)="page = page > 1 ? page - 1 : page" 
+      class="bg-gray-300 text-gray-700 px-4 py-1 rounded"
+      [disabled]="page <= 1">
+      &lt;--
+    </button>
+
+    <!-- Exibição da Página Atual -->
+    <span class="text-sm text-gray-700">
+      Página {{ page }} de {{ totalPages }}
+    </span>
+
+    <!-- Botão Próximo -->
+    <button 
+      (click)="page = page < totalPages ? page + 1 : page" 
+      class="bg-gray-300 text-gray-700 px-4 py-1 rounded"
+      [disabled]="page >= totalPages">
+      --&gt;
+    </button>
+  </div>
+</div>
+
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
+      <!-- Paginação -->
       <div class="flex justify-between items-center mt-4">
-        <!-- Informações de paginação -->
         <div class="flex items-center justify-center space-x-4 mt-1">
           <!-- Botão Anterior -->
           <button 
@@ -82,56 +106,70 @@
           <span>Adicionar Frase</span>
         </button>
       </div>
+<!-- Modal Frase -->
+<div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
+    <h3 class="text-lg font-bold mb-4">
+      {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
+    </h3>
 
-      <!-- Modal Frase -->
-      <div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
-          <h3 class="text-lg font-bold mb-4">
-            {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
-          </h3>
+ <form #form="ngForm" (ngSubmit)="saveFrase()" novalidate>
+      <!-- Selecione Pronome -->
+      <ng-container *ngIf="pronomes.length > 0">
+        <label class="block mb-1 font-medium">Pronome:</label>
+        <select [(ngModel)]="novaFrase.pronome" name="pronome" class="w-full p-2 border rounded mb-4">
+          <option *ngFor="let p of pronomes" [value]="p.texto">{{ p.texto }}</option>
+        </select>
+      </ng-container>
 
-          <form (ngSubmit)="saveFrase()">
-            <ng-container *ngIf="pronomes.length > 0">
-              <label class="block mb-1 font-medium">Pronome:</label>
-              <select [(ngModel)]="novaFrase.pronome" name="pronome" required class="w-full p-2 border rounded mb-4">
-                <option *ngFor="let p of pronomes" [value]="p.texto">{{ p.texto }}</option>
-              </select>
-            </ng-container>
+      <!-- Selecione Verbo -->
+      <label class="block mb-1 font-medium">Verbo (Infinitivo):</label>
+      <select [(ngModel)]="novaFrase.verbo" name="verbo" class="w-full p-2 border rounded mb-4">
+        <option *ngFor="let v of verbos" [value]="v.verbo">{{ v.verbo }}</option>
+      </select>
 
-            <label class="block mb-1 font-medium">Verbo (Infinitivo):</label>
-            <select [(ngModel)]="novaFrase.verbo" name="verbo" required class="w-full p-2 border rounded mb-4">
-              <option *ngFor="let v of verbos" [value]="v.verbo">{{ v.verbo }}</option>
-            </select>
+      <!-- Complemento (opcional) -->
+      <label class="block mb-1 font-medium">Complemento:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="novaFrase.complemento" 
+        name="complemento" 
+        class="w-full p-2 border rounded mb-4" 
+        #complemento="ngModel"
+      />
 
-            <label class="block mb-1 font-medium">Complemento:</label>
-            <input type="text" [(ngModel)]="novaFrase.complemento" name="complemento" required class="w-full p-2 border rounded mb-4" />
+      <!-- Selecione Tempo Verbal -->
+      <label class="block mb-1 font-medium">Tempo Verbal:</label>
+      <select [(ngModel)]="novaFrase.tempo" name="tempoVerbalFrase" class="w-full p-2 border rounded mb-4">
+        <option *ngFor="let t of tempos" [value]="t.tempo">{{ t.tempo }}</option>
+      </select>
 
-            <label class="block mb-1 font-medium">Tempo Verbal:</label>
-            <select [(ngModel)]="novaFrase.tempo" name="tempoVerbalFrase" required class="w-full p-2 border rounded mb-4">
-              <option *ngFor="let t of tempos" [value]="t.tempo">{{ t.tempo }}</option>
-            </select>
-
-            <label class="block mb-1 font-medium">Resposta (Verbo Conjugado):</label>
-            <input type="text" [(ngModel)]="novaFrase.resposta" name="resposta" required class="w-full p-2 border rounded mb-4" />
-
-            <div class="flex justify-end gap-2 mt-4">
-              <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
-                Cancelar
-              </button>
-              <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                {{ isEditingFrase ? 'Atualizar' : 'Salvar Frase' }}
-              </button>
-            </div>
-          </form>
-        </div>
+      <!-- Resposta (Verbo Conjugado) -->
+      <label class="block mb-1 font-medium">Resposta (Verbo Conjugado):</label>
+      <input 
+        type="text" 
+        [(ngModel)]="novaFrase.resposta" 
+        name="resposta" 
+        class="w-full p-2 border rounded mb-4" 
+        required 
+        #resposta="ngModel"
+        [ngClass]="{'border-red-500': resposta.invalid && resposta.touched}"
+      />
+      <div *ngIf="resposta.invalid && resposta.touched" class="text-red-500 text-sm">
+        A resposta é obrigatória.
       </div>
 
-    </div>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+          [disabled]="form.invalid">
+          {{ isEditingFrase ? 'Atualizar' : 'Salvar Frase' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>
-
-<pagination-controls 
-  (pageChange)="page = $event"
-  [pageSize]="itemsPerPage"
-  [totalItems]="totalItems">
-</pagination-controls>

@@ -26,38 +26,43 @@ export interface JogoData {
 @Injectable({
   providedIn: 'root'
 })
-export class AmbienteCasaService {
+export class AmbienteParqueService {
   private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
   private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
 
   constructor() {}
 
-  async getFrasesCasa(): Promise<Frase[]> {
+  async getFrasesParque(): Promise<Frase[]> {
     try {
       const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
       const frasesApi = response.data;
 
-      return frasesApi.map(f => {
-        let descricao = f.descricaoMontada || '';
-        const resposta = f.respostaCorreta.trim();
+      // Filtrar apenas frases com IDs entre 23 e 44 (ambiente parque)
+      const frasesFiltradas = frasesApi
+        .filter(f => f.id >= 23 && f.id <= 44)
+        .map(f => {
+          let descricao = f.descricaoMontada || '';
+          const resposta = f.respostaCorreta.trim();
 
-        if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
-          const regex = new RegExp(resposta, 'i');
-          descricao = descricao.replace(regex, '').trim();
-        }
+          if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
+            const regex = new RegExp(resposta, 'i');
+            descricao = descricao.replace(regex, '').trim();
+          }
 
-        return {
-          frase: descricao || 'Frase indisponível',
-          respostaCorreta: resposta
-        };
-      });
+          return {
+            frase: descricao || 'Frase indisponível',
+            respostaCorreta: resposta
+          };
+        });
+
+      return frasesFiltradas;
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('Erro ao buscar frases da casa:', error.response?.data || error.message);
+        console.error('Erro ao buscar frases do parque:', error.response?.data || error.message);
       } else {
         console.error('Erro desconhecido:', error);
       }
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente casa.');
+      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente parque.');
     }
   }
 

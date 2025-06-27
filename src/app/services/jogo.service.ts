@@ -1,20 +1,23 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { JogoData } from '../models/jogo-data.model';
-// import { format } from 'date-fns'; // Use se for necessário formatar a data
+
+export interface Frase {
+  frase: string;
+  respostaCorreta: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class JogoService {
-  private apiUrl = 'http://localhost:8080/api/jogo'; // URL base da API
+  private apiUrl = 'http://localhost:8080/api/jogo';     // Para salvar resultados
+  private frasesUrl = 'http://localhost:8080/api/frases'; // Para buscar todas as frases
 
   constructor() {}
 
   /**
    * Salva o resultado do jogo no backend
-   * @param usuarioId ID do usuário
-   * @param jogoData Objeto com dados do jogo
    */
   salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<any> {
     const token = localStorage.getItem('token');
@@ -24,10 +27,6 @@ export class JogoService {
       return Promise.reject('Token ausente');
     }
 
-    // ✅ Se precisar de data formatada, descomente:
-    // jogoData.data = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
-    // ✅ Salvar temporariamente no localStorage (opcional para recuperação futura)
     localStorage.setItem('ultimoResultadoJogo', JSON.stringify(jogoData));
 
     return axios
@@ -51,5 +50,53 @@ export class JogoService {
         }
         throw error;
       });
+  }
+
+  /**
+   * Busca todas as frases do backend (compartilhadas entre ambientes)
+   */
+  async getTodasFrases(): Promise<Frase[]> {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token não encontrado');
+    }
+
+    try {
+      const response = await axios.get<Frase[]>(this.frasesUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar frases do backend:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Retorna as frases específicas de um ambiente (casa, parque, universidade)
+   */
+  async getFrasesPorAmbiente(ambiente: 'casa' | 'parque' | 'universidade'): Promise<Frase[]> {
+    const todasFrases = await this.getTodasFrases();
+
+    switch (ambiente) {
+      case 'casa':
+        return todasFrases.slice(0, 22);     // 11 perguntas * 2 frases
+      case 'parque':
+        return todasFrases.slice(22, 44);
+      case 'universidade':
+        return todasFrases.slice(44, 66);
+      default:
+        throw new Error(`Ambiente inválido: ${ambiente}`);
+    }
+  }
+
+  /**
+   * Verifica se a resposta do usuário está correta
+   */
+  verificarRespostaDigitada(resposta: string, correta: string): boolean {
+    return resposta.trim().toLowerCase() === correta.trim().toLowerCase();
   }
 }

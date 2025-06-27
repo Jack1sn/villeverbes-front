@@ -11,44 +11,36 @@ export class CrudAmbienteService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: this.apiUrl,
-      withCredentials: true,
+      withCredentials: true, // Se você usa cookies de sessão no backend
     });
 
-    // Interceptor para adicionar o token no header Authorization
-    this.axiosInstance.interceptors.request.use(config => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers = config.headers || {};
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-      return config;
-    });
+    // Interceptor removido (não mais adiciona o token no header)
   }
 
   // -------- Frases --------
 
   async getFrases(): Promise<any[]> {
-    const response = await this.axiosInstance.get('/frases-casa');
+    const response = await this.axiosInstance.get('/frases');
     return response.data;
   }
 
   async getFrasePorId(id: number): Promise<any> {
-    const response = await this.axiosInstance.get(`/frases-casa/${id}`);
+    const response = await this.axiosInstance.get(`/frases/${id}`);
     return response.data;
   }
 
   async addFrase(frase: any): Promise<any> {
-    const response = await this.axiosInstance.post('/frases-casa', frase);
+    const response = await this.axiosInstance.post('/frases', frase);
     return response.data;
   }
 
   async updateFrase(frase: any): Promise<any> {
-    const response = await this.axiosInstance.put(`/frases-casa/${frase.id}`, frase);
+    const response = await this.axiosInstance.put(`/frases/${frase.id}`, frase);
     return response.data;
   }
 
   async deleteFrase(id: number): Promise<any> {
-    const response = await this.axiosInstance.delete(`/frases-casa/${id}`);
+    const response = await this.axiosInstance.delete(`/frases/${id}`);
     return response.data;
   }
 
