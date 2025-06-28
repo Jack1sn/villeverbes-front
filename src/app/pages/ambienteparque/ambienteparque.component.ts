@@ -53,37 +53,30 @@ export class AmbienteparqueComponent implements OnInit {
 
   ngOnInit(): void {
     this.personagemSelecionado = this.personagemService.getPersonagem();
+    this.usuarioNome = localStorage.getItem('usuarioNome') || this.usuarioNome;
+    this.personagemImagem = localStorage.getItem('usuarioImagem') || this.personagemImagem;
 
-    const nomeSalvo = localStorage.getItem('usuarioNome');
-    const imagemSalva = localStorage.getItem('usuarioImagem');
-
-    if (nomeSalvo) this.usuarioNome = nomeSalvo;
-    if (imagemSalva) this.personagemImagem = imagemSalva;
-
-    for (let i = 1; i <= this.totalPerguntas; i++) {
-      this.bolinhasEstado[i] = 'naoClicada';
-    }
+    this.bolinhasEstado = Array.from({ length: this.totalPerguntas }, (_, i) => 'naoClicada');
 
     this.carregarFrases();
     this.progresso = this.progressoService.getProgresso('parque');
   }
 
-carregarFrases(): void {
-  this.ambienteParqueService.getFrasesParque()
-    .then((frases: Frase[]) => {
+  async carregarFrases(): Promise<void> {
+    try {
+      const frases = await this.ambienteParqueService.getFrasesParque();
       for (let i = 1; i <= this.totalPerguntas; i++) {
-        const index = 22 + (i - 1) * 2;  // Ajuste para pegar frases de 23 a 44
+        const index = 22 + (i - 1) * 2;
         this.frasesAleatorias[i] = [
           frases[index] || { frase: `Frase padrão ${i}-A`, respostaCorreta: '???' },
           frases[index + 1] || { frase: `Frase padrão ${i}-B`, respostaCorreta: '???' }
         ];
       }
-
       this.selecionarFrase(1);
-    })
-    .catch(error => console.error('Erro ao carregar frases do parque:', error));
-}
-
+    } catch (error) {
+      console.error('Erro ao carregar frases:', error);
+    }
+  }
 
   selecionarFrase(numero: number): void {
     this.respostaDigitada = '';
@@ -98,43 +91,39 @@ carregarFrases(): void {
     this.fraseSelecionada = this.fraseAtual.frase;
     this.fraseExibida[numero] = !exibidaAnteriormente;
 
-    setTimeout(() => {
-      this.respostaInputRef?.nativeElement.focus();
-    });
+    setTimeout(() => this.respostaInputRef?.nativeElement.focus(), 0);
   }
 
-  verificarResposta(): void {
-    if (this.perguntaAtual === null || !this.fraseAtual) return;
+  async verificarResposta(): Promise<void> {
+    if (!this.perguntaAtual || !this.fraseAtual) return;
 
     const numero = this.perguntaAtual;
     if (this.bolinhasEstado[numero] === 'correta' || this.bolinhasEstado[numero] === 'incorreta') return;
 
-    const estaCorreta = this.ambienteParqueService.verificarRespostaDigitada(
+    const estaCorreta = await this.ambienteParqueService.verificarRespostaDigitada(
       this.respostaDigitada,
       this.fraseAtual.respostaCorreta
     );
 
     if (estaCorreta) {
       this.bolinhasEstado[numero] = 'correta';
-      this.acertos += 1;
+      this.acertos++;
       this.progresso = Math.min((this.acertos / this.totalPerguntas) * 100, 100);
       this.progressoService.setProgresso('parque', this.progresso);
       this.tentativas[numero] = 0;
 
-      setTimeout(() => {
-        this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
+      this.resultado = `🎉 Félicitations, ${this.usuarioNome}! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
 
-        if (numero === this.totalPerguntas) {
-          this.finalizarJogo();
-        } else {
-          setTimeout(() => this.selecionarFrase(numero + 1), 1000);
-        }
-      }, 1000);
+      if (numero === this.totalPerguntas) {
+        this.finalizarJogo();
+      } else {
+        setTimeout(() => this.selecionarFrase(numero + 1), 1000);
+      }
     } else {
       this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
 
       if (this.tentativas[numero] < 2) {
-        this.resultado = `❌ Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
+        this.resultado = `❌ Désolé, vous pouvez essayer de nouveau. Tentativa ${this.tentativas[numero]} de 2.`;
       } else {
         this.bolinhasEstado[numero] = 'incorreta';
         this.resultado = `❌ La réponse correcte est : "${this.fraseAtual.respostaCorreta}".`;
@@ -146,7 +135,6 @@ carregarFrases(): void {
             this.selecionarFrase(numero + 1);
           }
         }, 3000);
-
         this.tentativas[numero] = 0;
       }
     }
@@ -175,14 +163,13 @@ carregarFrases(): void {
 
   async enviarResultadoParaBanco(): Promise<void> {
     const usuarioId = localStorage.getItem('usuarioId');
-
     if (!usuarioId) {
       console.error('Erro: Usuario ID não encontrado');
       return;
     }
 
     const jogoData: JogoData = {
-      personagem: this.personagemSelecionado,
+      personagem: this.personagemSelecionado!,
       ambiente: 'parque',
       acertos: this.acertos,
       total: this.totalPerguntas,
@@ -196,8 +183,8 @@ carregarFrases(): void {
       console.error('❌ Falha ao enviar o resultado para o backend.', error);
     }
   }
-  perguntasArray(): number[] {
-  return Array.from({ length: this.totalPerguntas }, (_, i) => i + 1);
-}
 
+  perguntasArray(): number[] {
+    return Array.from({ length: this.totalPerguntas }, (_, i) => i + 1);
+  }
 }

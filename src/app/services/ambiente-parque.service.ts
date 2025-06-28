@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosError } from 'axios';
 
-// Interfaces para as frases
 export interface FraseApi {
   id: number;
   descricaoMontada: string;
@@ -13,7 +12,6 @@ export interface Frase {
   respostaCorreta: string;
 }
 
-// Interface para os dados do jogo
 export interface JogoData {
   personagem: string;
   ambiente: string;
@@ -32,57 +30,57 @@ export class AmbienteParqueService {
 
   constructor() {}
 
-  async getFrasesParque(): Promise<Frase[]> {
-    try {
-      const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
-      const frasesApi = response.data;
+async getFrasesParque(): Promise<Frase[]> {
+  try {
+    const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
+    console.log('Resposta da API recebida:', response.data);  // Verifique o que a API está retornando
 
-      // Filtrar apenas frases com IDs entre 23 e 44 (ambiente parque)
-      const frasesFiltradas = frasesApi
-        .filter(f => f.id >= 23 && f.id <= 44)
-        .map(f => {
-          let descricao = f.descricaoMontada || '';
-          const resposta = f.respostaCorreta.trim();
-
-          if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
-            const regex = new RegExp(resposta, 'i');
-            descricao = descricao.replace(regex, '').trim();
-          }
-
-          return {
-            frase: descricao || 'Frase indisponível',
-            respostaCorreta: resposta
-          };
-        });
-
-      return frasesFiltradas;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error('Erro ao buscar frases do parque:', error.response?.data || error.message);
-      } else {
-        console.error('Erro desconhecido:', error);
-      }
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente parque.');
+    if (!Array.isArray(response.data)) {
+      throw new Error('Formato inesperado da resposta da API.');
     }
+
+    // Não há filtro, agora vamos pegar todas as frases
+    const frases = response.data
+      .map(f => {
+        let descricao = f.descricaoMontada?.trim() || 'Frase indisponível';
+        const resposta = (f.respostaCorreta || '').trim();
+
+        if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
+          const regex = new RegExp(resposta, 'i');
+          descricao = descricao.replace(regex, '').trim();
+        }
+
+        return {
+          frase: descricao,
+          respostaCorreta: resposta || '???',  // Garantir resposta padrão se não existir
+        };
+      });
+
+    console.log('Frases carregadas:', frases);  // Verifique as frases carregadas
+
+    return frases;
+
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error('Erro ao buscar frases:', error.response?.data || error.message);
+    } else {
+      console.error('Erro ao carregar frases:', error);
+    }
+    throw new Error('Não foi possível carregar as frases do ambiente parque.');
   }
+}
 
-  verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
+  async verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): Promise<boolean> {
     if (!respostaDigitada || !respostaCorreta) return false;
-
     return respostaDigitada.trim().toLowerCase() === respostaCorreta.trim().toLowerCase();
   }
 
   async salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<void> {
     try {
-      const response = await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
-      console.log('Resultado do jogo salvo com sucesso:', response.data);
+      await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error('Erro ao salvar o resultado do jogo:', error.response?.data || error.message);
-      } else {
-        console.error('Erro desconhecido:', error);
-      }
-      throw new Error('Não foi possível salvar o resultado do jogo.');
+      console.error('Erro ao salvar resultado do jogo:', error);
+      throw new Error('Não foi possível salvar o resultado.');
     }
   }
 }
