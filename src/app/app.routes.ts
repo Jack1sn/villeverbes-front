@@ -6,7 +6,7 @@ import { RankingComponent } from './pages/ranking/ranking.component';
 import { authGuard } from './auth.guard';
 import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.component';
 import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
-import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
+import { AmbienteParqueComponent } from './pages/ambienteparque/ambienteparque.component';
 import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
 import { Fase1Component } from './pages/fase1/fase1.component';
 import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.component';
@@ -60,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: 'ambienteparque',
-    component: AmbienteparqueComponent,
+    component: AmbienteParqueComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },

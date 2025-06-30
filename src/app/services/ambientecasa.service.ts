@@ -28,7 +28,7 @@ export interface JogoData {
 })
 export class AmbienteCasaService {
   private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
-  private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
+  private readonly apiUrlJogo = 'http://localhost:8080/api/jogos';
 
   constructor() {}
 

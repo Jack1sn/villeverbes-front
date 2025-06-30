@@ -13,7 +13,7 @@ export interface Frase {
   respostaCorreta: string;
 }
 
-// Interface para dados do jogo
+// Interface para os dados do jogo
 export interface JogoData {
   personagem: string;
   ambiente: string;
@@ -28,7 +28,7 @@ export interface JogoData {
 })
 export class AmbienteUniversidadeService {
   private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
-  private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
+  private readonly apiUrlJogo = 'http://localhost:8080/api/jogos';
 
   constructor() {}
 
@@ -37,9 +37,9 @@ export class AmbienteUniversidadeService {
       const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
       const frasesApi = response.data;
 
-      // Filtra as frases da universidade (IDs 45 a 66)
+      // Filtra as frases da universidade (IDs entre 45 e 66, como exemplo)
       const frasesFiltradas = frasesApi
-        .filter(f => f.id >= 45 && f.id <= 66)
+        .filter(f => f.id >= 45 && f.id <= 66) // Definir intervalo de ID para frases da universidade
         .map(f => {
           let descricao = f.descricaoMontada || '';
           const resposta = f.respostaCorreta.trim();

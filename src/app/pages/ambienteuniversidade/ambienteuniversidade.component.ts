@@ -19,13 +19,13 @@ import { JogoData } from 'src/app/models/jogo-data.model';
 })
 export class AmbienteuniversidadeComponent implements OnInit {
   personagemSelecionado: string | null = null;
-   tempoVerbal: string = 'Présent';
+  tempoVerbal: string = 'Présent';
   usuarioNome: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
-  respostaDigitada = '';
+  respostaDigitada: string = '';
   resultado: string | null = null;
-  progresso = 0;
-  totalPerguntas = 11;
+  progresso: number = 0;
+  totalPerguntas: number = 11;
   perguntaAtual: number | null = null;
   frasesAleatorias: { [key: number]: Frase[] } = {};
   fraseAtual: Frase | null = null;
@@ -33,8 +33,8 @@ export class AmbienteuniversidadeComponent implements OnInit {
   fraseExibida: { [key: number]: boolean } = {};
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
   tentativas: { [key: number]: number } = {};
-  acertos = 0;
-  mensagemFinalVisivel = false;
+  acertos: number = 0;
+  mensagemFinalVisivel: boolean = false;
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 

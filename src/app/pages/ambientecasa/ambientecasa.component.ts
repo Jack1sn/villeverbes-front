@@ -7,10 +7,8 @@ import { PersonagemService } from '../../services/personagem.service';
 import { TransLetrasPipe } from '../../trans-letras.pipe';
 import { ProgressoService } from '../../services/progresso.service';
 import { AmbienteCasaService, Frase } from '../../services/ambientecasa.service';
-import { JogoService } from '../../services/jogo.service'; // ✅ Novo service importado
-import { JogoData } from '../../models/jogo-data.model';
+import { JogoService } from '../../services/jogo.service';
 import { JogadorService } from 'src/app/services/jogador.service';
-
 
 @Component({
   selector: 'app-ambientecasa',
@@ -46,12 +44,12 @@ export class AmbientecasaComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private jogadorService: JogadorService ,
+    private jogadorService: JogadorService,
     private personagemService: PersonagemService,
     private transLetrasPipe: TransLetrasPipe,
     private progressoService: ProgressoService,
     private ambientecasaService: AmbienteCasaService,
-    private jogoService: JogoService // ✅ Injetando o novo serviço
+    private jogoService: JogoService
   ) {}
 
   ngOnInit(): void {
@@ -77,14 +75,10 @@ export class AmbientecasaComponent implements OnInit {
         for (let i = 1; i <= this.totalPerguntas; i++) {
           const index = (i - 1) * 2;
           this.frasesAleatorias[i] = [
-            frases[index] || { frase: `Frase padrão ${i}-A`, respostaCorreta: '???' },
-            frases[index + 1] || { frase: `Frase padrão ${i}-B`, respostaCorreta: '???' }
+            frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+            frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
           ];
         }
-
-        this.fraseAtual = this.frasesAleatorias[1][0];
-        this.fraseSelecionada = this.fraseAtual.frase;
-        this.fraseExibida[1] = true;
         this.selecionarFrase(1);
       })
       .catch(error => console.error('Erro ao carregar frases:', error));
@@ -122,13 +116,13 @@ export class AmbientecasaComponent implements OnInit {
     if (estaCorreta) {
       this.bolinhasEstado[numero] = 'correta';
       this.acertos += 1;
+      console.log('Incrementou acertos:', this.acertos);
       this.progresso = Math.min((this.acertos / this.totalPerguntas) * 100, 100);
       this.progressoService.setProgresso('casa', this.progresso);
       this.tentativas[numero] = 0;
 
       setTimeout(() => {
         this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
-
         if (numero === this.totalPerguntas) {
           this.finalizarJogo();
         } else {
@@ -139,7 +133,7 @@ export class AmbientecasaComponent implements OnInit {
       this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
 
       if (this.tentativas[numero] < 2) {
-        this.resultado = `❌ Désolé, vous pouvez essayer de nouveau. Tentative ${this.tentativas[numero]} de 2.`;
+        this.resultado = `❌ Vous pouvez réessayer. Tentative ${this.tentativas[numero]} de 2.`;
       } else {
         this.bolinhasEstado[numero] = 'incorreta';
         this.resultado = `❌ La réponse correcte est : "${this.fraseAtual.respostaCorreta}".`;
@@ -151,21 +145,80 @@ export class AmbientecasaComponent implements OnInit {
             this.selecionarFrase(numero + 1);
           }
         }, 3000);
-
-        this.tentativas[numero] = 0;
       }
     }
   }
 
-  finalizarJogo(): void {
-    if (this.acertos / this.totalPerguntas >= 0.6) {
-      this.mensagemFinalVisivel = true;
-      this.enviarResultadoParaBanco();
-      setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
-    } else {
-      this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
-    }
+async finalizarJogo(): Promise<void> {
+  console.log('Finalizando jogo. Acertos:', this.acertos);
+
+  this.mensagemFinalVisivel = true;
+
+  // Obter a data atual no formato YYYY-MM-DD
+  const dataAtual = new Date().toISOString().split('T')[0];
+
+  // Definir o objeto de resultado final
+  const resultadoFinal = {
+    personagem: this.personagemSelecionado || 'Anonyme',
+    acertoCasa: this.acertos,
+    acertoParque: 0,
+    acertoUniversidade: 0,
+    totalAcertos: this.acertos,
+    data: dataAtual
+  };
+
+  console.log('Resultado final para armazenar:', resultadoFinal);
+
+  // Recuperar o usuarioId (exemplo: do localStorage ou de um serviço)
+  const usuarioId = localStorage.getItem('usuarioId');
+  if (!usuarioId) {
+    console.error('Usuário não encontrado. Não foi possível salvar o resultado.');
+    return;
   }
+
+  try {
+    // Verificar se os dados anteriores no localStorage são um array válido
+    let dadosAnteriores = localStorage.getItem('ultimoResultadoJogo');
+    let resultadosSalvos = [];
+    
+    // Se dadosAnteriores existir, tentar fazer o parse e garantir que seja um array
+    if (dadosAnteriores) {
+      try {
+        resultadosSalvos = JSON.parse(dadosAnteriores);
+        if (!Array.isArray(resultadosSalvos)) {
+          resultadosSalvos = []; // Se não for um array, reiniciar como array vazio
+        }
+      } catch (e) {
+        console.error('Erro ao ler os resultados anteriores do localStorage:', e);
+        resultadosSalvos = []; // Em caso de erro no parse, reiniciar como array vazio
+      }
+    }
+
+    // Adicionar o novo resultado
+    resultadosSalvos.push(resultadoFinal);
+
+    // Salvar novamente no localStorage
+    localStorage.setItem('ultimoResultadoJogo', JSON.stringify(resultadosSalvos));
+
+    console.log('Resultado salvo no localStorage:', localStorage.getItem('ultimoResultadoJogo'));
+
+    // Enviar para o banco de dados
+    await this.jogoService.salvarResultadoJogo(Number(usuarioId), resultadoFinal);
+    console.log('Resultado salvo no banco de dados com sucesso!');
+
+  } catch (error) {
+    console.error('Erro ao salvar no localStorage ou enviar para o banco:', error);
+  }
+
+  // Navegar para outra tela após 6 segundos
+  setTimeout(() => {
+    console.log('Navegando para /ambienteparque');
+    this.router.navigate(['/ambienteparque']);
+  }, 6000);
+}
+
+
+
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
@@ -182,27 +235,5 @@ export class AmbientecasaComponent implements OnInit {
     this.router.navigate(['/' + destino]);
   }
 
-  async enviarResultadoParaBanco(): Promise<void> {
-    const usuarioId = localStorage.getItem('usuarioId');
-
-    if (!usuarioId) {
-      console.error('Erro: Usuario ID não encontrado');
-      return;
-    }
-
-    const jogoData: JogoData = {
-      personagem: this.personagemSelecionado,
-      ambiente: 'casa',
-      acertos: this.acertos,
-      total: this.totalPerguntas,
-      acertoPorAmbiente: `${this.acertos} de ${this.totalPerguntas}`,
-      nomeUsuario: this.usuarioNome,
-    };
-
-    try {
-      await this.jogoService.salvarResultadoJogo(+usuarioId, jogoData);
-    } catch (error) {
-      console.error('❌ Falha ao enviar o resultado para o backend.');
-    }
-  }
+  
 }

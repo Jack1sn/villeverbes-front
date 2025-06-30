@@ -11,7 +11,7 @@ export interface Frase {
   providedIn: 'root',
 })
 export class JogoService {
-  private apiUrl = 'http://localhost:8080/api/jogo';     // Para salvar resultados
+  private apiUrl = 'http://localhost:8080/api/jogos';     // Para salvar resultados
   private frasesUrl = 'http://localhost:8080/api/frases'; // Para buscar todas as frases
 
   constructor() {}

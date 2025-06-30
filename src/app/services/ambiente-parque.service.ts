@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosError } from 'axios';
 
+// Interfaces para as frases
 export interface FraseApi {
   id: number;
   descricaoMontada: string;
@@ -12,6 +13,7 @@ export interface Frase {
   respostaCorreta: string;
 }
 
+// Interface para os dados do jogo
 export interface JogoData {
   personagem: string;
   ambiente: string;
@@ -26,24 +28,19 @@ export interface JogoData {
 })
 export class AmbienteParqueService {
   private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
-  private readonly apiUrlJogo = 'http://localhost:8080/api/jogo';
+  private readonly apiUrlJogo = 'http://localhost:8080/api/jogos';
 
   constructor() {}
 
-async getFrasesParque(): Promise<Frase[]> {
-  try {
-    const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
-    console.log('Resposta da API recebida:', response.data);  // Verifique o que a API está retornando
+  // Método para carregar as frases do parque
+  async getFrasesParque(): Promise<Frase[]> {
+    try {
+      const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
+      const frasesApi = response.data;
 
-    if (!Array.isArray(response.data)) {
-      throw new Error('Formato inesperado da resposta da API.');
-    }
-
-    // Não há filtro, agora vamos pegar todas as frases
-    const frases = response.data
-      .map(f => {
+      return frasesApi.map(f => {
         let descricao = f.descricaoMontada?.trim() || 'Frase indisponível';
-        const resposta = (f.respostaCorreta || '').trim();
+        const resposta = f.respostaCorreta?.trim() || '???';
 
         if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
           const regex = new RegExp(resposta, 'i');
@@ -52,35 +49,38 @@ async getFrasesParque(): Promise<Frase[]> {
 
         return {
           frase: descricao,
-          respostaCorreta: resposta || '???',  // Garantir resposta padrão se não existir
+          respostaCorreta: resposta,
         };
       });
-
-    console.log('Frases carregadas:', frases);  // Verifique as frases carregadas
-
-    return frases;
-
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      console.error('Erro ao buscar frases:', error.response?.data || error.message);
-    } else {
-      console.error('Erro ao carregar frases:', error);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error('Erro ao buscar frases do parque:', error.response?.data || error.message);
+      } else {
+        console.error('Erro desconhecido:', error);
+      }
+      throw new Error('Não foi possível carregar as frases do ambiente parque.');
     }
-    throw new Error('Não foi possível carregar as frases do ambiente parque.');
   }
-}
 
-  async verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): Promise<boolean> {
+  // Verifica se a resposta digitada é correta
+  verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;
+
     return respostaDigitada.trim().toLowerCase() === respostaCorreta.trim().toLowerCase();
   }
 
+  // Método para salvar o resultado do jogo
   async salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<void> {
     try {
-      await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
+      const response = await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
+      console.log('Resultado do jogo salvo com sucesso:', response.data);
     } catch (error) {
-      console.error('Erro ao salvar resultado do jogo:', error);
-      throw new Error('Não foi possível salvar o resultado.');
+      if (error instanceof AxiosError) {
+        console.error('Erro ao salvar o resultado do jogo:', error.response?.data || error.message);
+      } else {
+        console.error('Erro desconhecido:', error);
+      }
+      throw new Error('Não foi possível salvar o resultado do jogo.');
     }
   }
 }

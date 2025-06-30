@@ -1,11 +1,8 @@
-// src/app/models/jogo-data.model.ts
-
 export interface JogoData {
-  personagem: string | null;
-  ambiente: string;
-  acertos: number;
-  total: number;
-  acertoPorAmbiente: string;
-  nomeUsuario: string;
-  //data?: string;
+  personagem?: string | null;
+  ambiente?: 'casa' | 'parque' | 'universidade';
+  acertos?: number;
+  total?: number;
+  acertoPorAmbiente?: string;
+  nomeUsuario?: string;
 }
