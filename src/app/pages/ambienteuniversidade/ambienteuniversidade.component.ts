@@ -66,7 +66,7 @@ export class AmbienteuniversidadeComponent implements OnInit {
     this.ambienteUniversidadeService.getFrasesUniversidade()
       .then((frases: Frase[]) => {
         for (let i = 1; i <= this.totalPerguntas; i++) {
-          const index = 22 + (i - 1) * 2; // Pega frases de índice 22 a 43 => 23ª a 44ª
+          const index = 44 + (i - 1) * 2; // Pega frases de índice 44 a  => 23ª a 44ª
           this.frasesAleatorias[i] = [
             frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
             frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }

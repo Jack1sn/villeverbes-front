@@ -33,42 +33,35 @@ export class AmbienteUniversidadeService {
   constructor() {}
 
   async getFrasesUniversidade(): Promise<Frase[]> {
-    try {
-      const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
-      const frasesApi = response.data;
+  try {
+    const response = await axios.get<FraseApi[]>(this.apiUrlFrases);  // Supondo que o endpoint seja o mesmo, caso contrário, altere a URL.
+    const frasesApi = response.data;
 
-      // Filtra as frases da universidade (IDs entre 45 e 66, como exemplo)
-      const frasesFiltradas = frasesApi
-        .filter(f => f.id >= 45 && f.id <= 66) // Definir intervalo de ID para frases da universidade
-        .map(f => {
-          let descricao = f.descricaoMontada || '';
-          const resposta = f.respostaCorreta.trim();
+    return frasesApi.map(f => {
+      let descricao = f.descricaoMontada?.trim() || 'Frase indisponível';
+      const resposta = f.respostaCorreta?.trim() || '???';
 
-          if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
-            const regex = new RegExp(resposta, 'i');
-            descricao = descricao.replace(regex, '').trim();
-          }
-
-          return {
-            frase: descricao || 'Frase indisponível',
-            respostaCorreta: resposta
-          };
-        });
-
-      return frasesFiltradas;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error('Erro ao buscar frases da universidade:', error.response?.data || error.message);
-      } else {
-        console.error('Erro desconhecido:', error);
+      // Caso a resposta esteja dentro da descrição, removemos ela da frase
+      if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
+        const regex = new RegExp(resposta, 'i');
+        descricao = descricao.replace(regex, '').trim();
       }
-      throw new Error(
-        error instanceof AxiosError
-          ? error.response?.data?.message || 'Erro desconhecido'
-          : 'Não foi possível carregar as frases do ambiente universidade.'
-      );
+
+      return {
+        frase: descricao,
+        respostaCorreta: resposta,
+      };
+    });
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error('Erro ao buscar frases da universidade:', error.response?.data || error.message);
+    } else {
+      console.error('Erro desconhecido:', error);
     }
+    throw new Error('Não foi possível carregar as frases do ambiente universidade.');
   }
+}
+
 
   verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;
