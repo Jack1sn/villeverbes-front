@@ -29,8 +29,8 @@ export class TropheeComponent implements OnInit {
   carregarTrofeusPorUsuario(id: string) {
     // Simulação de dados por jogador
     this.trofeus = [
-      { selo: 'Casa', trofeu: 1 },
-      { selo: 'Parque', trofeu: 2 },
+      { selo: 'Casa', trofeu: 0 },
+      { selo: 'Parque', trofeu: 0 },
       { selo: 'Universidade', trofeu: 0 },
     ];
   }
@@ -38,10 +38,10 @@ export class TropheeComponent implements OnInit {
   carregarTodosTrofeus() {
     // Simulação de dados para admins
     this.trofeus = [
-      { usuario: 'João', selo: 'Casa', trofeu: 1 },
-      { usuario: 'João', selo: 'Parque', trofeu: 2 },
-      { usuario: 'Maria', selo: 'Universidade', trofeu: 3 },
-      { usuario: 'Maria', selo: 'Casa', trofeu: 1 },
+      { usuario: 'Ana', selo: 'Casa'},
+      { usuario: 'Ana', selo: 'Parque', trofeu: 1  },
+      { usuario: 'Ana', selo: 'Universidade' },
+    
     ];
   }
 }

@@ -1,15 +1,26 @@
 <app-header></app-header>
-<br>
-<div class="p-6">
-    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Ranking do Jogador</h2>
+
+<div class="p-4 ml-72">
+  <div class="bg-white shadow-lg rounded-lg p-4 max-w-xl mx-auto mt-2">
+  <h2 class="text-2xl font-semibold text-gray-800 text-center">Classement du Joueur</h2>
+ <ng-template #erroOuCarregando>
+  <div>
+    <div class="bg-white/50 backdrop-blur-sm shadow-md  p-4 max-w-md w-full text-center">
+      <p class="text-red-500 font-semibold" *ngIf="erro">{{ erro }}</p>
+      <p class="text-gray-800" *ngIf="!erro">Chargement du classement...</p>
+    </div>
+  </div>
+</ng-template>
+</div>
+
   
     <div *ngIf="jogador; else erroOuCarregando">
       <table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
         <thead class="bg-gray-100 text-gray-700">
           <tr>
-            <th class="px-4 py-2 text-left border-b">Nome Jogador</th>
-            <th class="px-4 py-2 text-left border-b">Posição</th>
-            <th class="px-4 py-2 text-left border-b">Selo Ambiente</th>
+            <th class="px-4 py-2 text-left border-b">Nom Joueur</th>
+            <th class="px-4 py-2 text-left border-b">Position</th>
+            <th class="px-4 py-2 text-left border-b">Sceaux Milieu </th>
           </tr>
         </thead>
         <tbody>
@@ -22,9 +33,6 @@
       </table>
     </div>
   
-    <ng-template #erroOuCarregando>
-      <p class="text-red-600" *ngIf="erro">{{ erro }}</p>
-      <p *ngIf="!erro">Carregando ranking...</p>
-    </ng-template>
+   
   </div>
   

@@ -10,6 +10,7 @@ import { AmbienteParqueService, Frase } from '../../services/ambiente-parque.ser
 import { JogoService } from '../../services/jogo.service';
 import { JogadorService } from 'src/app/services/jogador.service';
 
+
 @Component({
   selector: 'app-ambientecasa',
   standalone: true,
@@ -73,7 +74,7 @@ export class AmbienteParqueComponent implements OnInit {
     this.ambienteParqueService.getFrasesParque()
       .then((frases: Frase[]) => {
         for (let i = 1; i <= this.totalPerguntas; i++) {
-          const index = (i - 1) * 2;
+          const index = 22 + (i - 1) * 2;
           this.frasesAleatorias[i] = [
             frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
             frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
@@ -220,4 +221,6 @@ export class AmbienteParqueComponent implements OnInit {
   navigate(destino: string): void {
     this.router.navigate(['/' + destino]);
   }
+
+  
 }

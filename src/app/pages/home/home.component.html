@@ -20,17 +20,14 @@
       {{ progressoCasa | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">1</div>
-    <span>Maison</span>
+    <span>Milieu Maison</span>
 
-    <!-- Texto que aparece fora da bolinha, acima dela, quando o mouse passa sobre -->
-    <p class="hidden group-hover:block text-sm absolute top-2 transform -translate-x-1/2 mt-4 text-center">
+    <p class="hidden group-hover:block text-sm absolute top-2 text-white transform -translate-x-1/2 mt-4 text-center">
       Sua porcentagem de acerto no último jogo.
     </p>
 
-    <!-- Texto adicional quando o mouse passa sobre a bolinha maior -->
-    <div class="absolute left-1/2 transform -translate-x-1/2 bottom-4 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Você está no ambiente Maison
-    </div>
+  
+    
   </div>
 
   <div class="circle parque group relative" (click)="navigate('ambienteparque')">
@@ -38,17 +35,15 @@
       {{ progressoParque | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">2</div>
-    <span>Place</span>
+    <span>Milieu Place</span>
 
     <!-- Texto que aparece fora da bolinha, acima dela, quando o mouse passa sobre -->
-    <p class="hidden group-hover:block text-sm absolute top-2 transform -translate-x-1/2 mt-4 text-center">
+    <p class="hidden group-hover:block text-sm absolute text-white  top-2 transform -translate-x-1/2 mt-4 text-center">
       Sua porcentagem de acerto no último jogo.
     </p>
 
     <!-- Texto adicional quando o mouse passa sobre a bolinha maior -->
-    <div class="absolute left-1/2 transform -translate-x-1/2 bottom-4 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Você está no ambiente Parque
-    </div>
+    
   </div>
 
   <div class="circle universidade group relative" (click)="navigate('ambienteuniversidade')">
@@ -56,7 +51,7 @@
       {{ progressoUniversidade | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">3</div>
-    <span>Université</span>
+    <span>Milieu Université</span>
 
     <!-- Texto adicional quando o mouse passa sobre a bolinha maior -->
     <div class="absolute bottom-92 transform -translate-x-1/2 bottom-4 text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
