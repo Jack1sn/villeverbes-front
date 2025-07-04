@@ -40,6 +40,8 @@ export class AmbientecasaComponent implements OnInit {
   usuarioNome = 'Utilisateur';
   personagemImagem = 'assets/vvimagens/usuario2.png';
   voices: SpeechSynthesisVoice[] = [];
+  dest='ambienteparque';
+
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -134,7 +136,7 @@ export class AmbientecasaComponent implements OnInit {
 
       setTimeout(() => {
         this.resultado = `🎉 Félicitations, ${this.usuarioNome}! La bonne réponse: "${this.fraseAtual!.respostaCorreta}"`;
-        num === this.totalPerguntas ? this.finalizarJogo() : setTimeout(() => this.selecionarFrase(num + 1), 1000);
+        num === this.totalPerguntas ? this.finalizarJogoCasa() : setTimeout(() => this.selecionarFrase(num + 1), 1000);
       }, 1000);
     } else {
       this.tentativas[num] = (this.tentativas[num] || 0) + 1;
@@ -143,36 +145,43 @@ export class AmbientecasaComponent implements OnInit {
       } else {
         this.bolinhasEstado[num] = 'incorreta';
         this.resultado = `❌ La réponse correcte: "${this.fraseAtual.respostaCorreta}".`;
-        setTimeout(() => num === this.totalPerguntas ? this.finalizarJogo() : this.selecionarFrase(num + 1), 3000);
+        setTimeout(() => num === this.totalPerguntas ? this.finalizarJogoCasa() : this.selecionarFrase(num + 1), 3000);
         this.tentativas[num] = 0;
       }
     }
   }
 
-  async finalizarJogo(): Promise<void> {
-    this.mensagemFinalVisivel = true;
-    const dataAtual = new Date().toISOString().split('T')[0];
-    const resultadoFinal = {
-      personagem: this.personagemSelecionado || 'Anonyme',
-      acertoCasa: this.acertos, acertoParque: 0, acertoUniversidade: 0,
-      totalAcertos: this.acertos, data: dataAtual
-    };
+  async finalizarJogoCasa(): Promise<void> {
+  console.log('Valor de acertos na casa:', this.acertos);
 
-    const usuarioId = Number(localStorage.getItem('usuarioId') || 0);
-    if (!usuarioId) return console.error('Usuário não encontrado.');
+  // Exibir a mensagem final
+  this.mensagemFinalVisivel = true;
 
-    const prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
-    prev.push(resultadoFinal);
-    localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
+  // Obter a data atual
+  const dataAtual = new Date().toISOString().split('T')[0];
 
-    try {
-      await this.jogoService.salvarResultadoJogo(usuarioId, resultadoFinal);
-    } catch (err) {
-      console.error('Erro ao salvar no banco:', err);
-    }
+  // Criar o objeto de resultado para o ambiente Casa
+  const resultadoCasa = {
+    personagem: this.personagemSelecionado || 'Anonyme',
+    acertosCasa: this.acertos,
+    acertosParque: 0,  // Não há acertos no Parque ainda
+    acertosUniversidade: 0,  // Não há acertos na Universidade ainda
+    totalAcertos: this.acertos,  // Total de acertos só no ambiente Casa
+    data: dataAtual,
+    nomeUsuario: this.usuarioNome
+  };
 
-    setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
-  }
+  // Salvar o resultado no localStorage
+  let prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
+  prev.push(resultadoCasa);
+  localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
+
+  localStorage.setItem('acertos_casa', this.acertos.toString());
+
+  // Redirecionar para o próximo ambiente (Parque)
+  setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+}
+
 
   getCorClasse(i: number): string {
     const est = this.bolinhasEstado[i] || 'naoClicada';
@@ -184,6 +193,8 @@ export class AmbientecasaComponent implements OnInit {
   }
   
   navigate(dest: string): void {
-    this.router.navigate(['/' + dest]);
+    this.router.navigate(['/ambienteparque']);
   }
+  
+
 }

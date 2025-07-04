@@ -6,10 +6,10 @@ import { RankingComponent } from './pages/ranking/ranking.component';
 import { authGuard } from './auth.guard';
 import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.component';
 import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
-import { AmbienteParqueComponent } from './pages/ambienteparque/ambienteparque.component';
+import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
 import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
 import { Fase1Component } from './pages/fase1/fase1.component';
-import { CrudsentencasComponent } from './pages/crudsentencas/crudsentencas.component';
+
 import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
 import { Fase2Component } from './pages/fase2/fase2.component';
 import { Fase3Component } from './pages/fase3/fase3.component';
@@ -60,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: 'ambienteparque',
-    component: AmbienteParqueComponent,
+    component: AmbienteparqueComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },
@@ -166,12 +166,7 @@ export const routes: Routes = [
   },
 
   // CRUDs para admins
-  {
-    path: 'crudsentencas',
-    component: CrudsentencasComponent,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
-  },
+  
   {
     path: 'crudfases',
     component: CrudfasesComponent,

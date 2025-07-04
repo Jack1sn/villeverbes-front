@@ -19,7 +19,7 @@ import { JogadorService } from 'src/app/services/jogador.service';
   styleUrls: ['./ambienteparque.component.css'],
   providers: [TransLetrasPipe],
 })
-export class AmbienteParqueComponent implements OnInit {
+export class AmbienteparqueComponent implements OnInit {
   personagemSelecionado: string | null = null;
   tempoVerbal: string = 'Présent';
   fundoImagem: string = 'assets/vvimagens/fundo-parque.png';
@@ -40,6 +40,7 @@ export class AmbienteParqueComponent implements OnInit {
   usuarioNome: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
   voices: SpeechSynthesisVoice[] = [];
+  destino: string ='ambienteuniversidade'
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -125,7 +126,7 @@ export class AmbienteParqueComponent implements OnInit {
       setTimeout(() => {
         this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
         if (numero === this.totalPerguntas) {
-          this.finalizarJogo();
+          this.finalizarJogoParque();
         } else {
           setTimeout(() => this.selecionarFrase(numero + 1), 1000);
         }
@@ -141,7 +142,7 @@ export class AmbienteParqueComponent implements OnInit {
 
         setTimeout(() => {
           if (numero === this.totalPerguntas) {
-            this.finalizarJogo();
+            this.finalizarJogoParque();
           } else {
             this.selecionarFrase(numero + 1);
           }
@@ -150,62 +151,40 @@ export class AmbienteParqueComponent implements OnInit {
     }
   }
 
-  async finalizarJogo(): Promise<void> {
-    console.log('Finalizando jogo. Acertos:', this.acertos);
+async finalizarJogoParque(): Promise<void> {
+  console.log('Valor de acertos no parque:', this.acertos);
 
-    this.mensagemFinalVisivel = true;
+  // Exibir a mensagem final
+  this.mensagemFinalVisivel = true;
 
-    const dataAtual = new Date().toISOString().split('T')[0];
+  // Obter a data atual
+  const dataAtual = new Date().toISOString().split('T')[0];
 
-    const resultadoFinal = {
-      personagem: this.personagemSelecionado || 'Anonyme',
-      acertoCasa: 0,
-      acertoParque: this.acertos,
-      acertoUniversidade: 0,
-      totalAcertos: this.acertos,
-      data: dataAtual
-    };
+  // Obter os acertos do ambiente Casa
+  const acertosCasa = parseInt(localStorage.getItem('acertos_casa') || '0', 10);
+  
+  // Criar o objeto de resultado para o ambiente Parque
+  const resultadoParque = {
+    personagem: this.personagemSelecionado || 'Anonyme',
+    acertosCasa: acertosCasa,
+    acertosParque: this.acertos,  // Acertos no ambiente Parque
+    acertosUniversidade: 0,  // Não há acertos na Universidade ainda
+    totalAcertos: acertosCasa + this.acertos,  // Total de acertos no ambiente Casa + Parque
+    data: dataAtual,
+    nomeUsuario: this.usuarioNome
+  };
 
-    console.log('Resultado final para armazenar:', resultadoFinal);
+  // Salvar o resultado no localStorage
+  let prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
+  prev.push(resultadoParque);
+  localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
 
-    const usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) {
-      console.error('Usuário não encontrado. Não foi possível salvar o resultado.');
-      return;
-    }
+  localStorage.setItem('acertos_parque', this.acertos.toString());
 
-    try {
-      let dadosAnteriores = localStorage.getItem('ultimoResultadoJogo');
-      let resultadosSalvos = [];
-      if (dadosAnteriores) {
-        try {
-          resultadosSalvos = JSON.parse(dadosAnteriores);
-          if (!Array.isArray(resultadosSalvos)) {
-            resultadosSalvos = [];
-          }
-        } catch (e) {
-          console.error('Erro ao ler os resultados anteriores do localStorage:', e);
-          resultadosSalvos = [];
-        }
-      }
+  // Redirecionar para o próximo ambiente (Universidade)
+  setTimeout(() => this.router.navigate(['/ambienteuniversidade']), 6000);
+}
 
-      resultadosSalvos.push(resultadoFinal);
-      localStorage.setItem('ultimoResultadoJogo', JSON.stringify(resultadosSalvos));
-
-      console.log('Resultado salvo no localStorage:', localStorage.getItem('ultimoResultadoJogo'));
-
-      await this.jogoService.salvarResultadoJogo(Number(usuarioId), resultadoFinal);
-      console.log('Resultado salvo no banco de dados com sucesso!');
-
-    } catch (error) {
-      console.error('Erro ao salvar no localStorage ou enviar para o banco:', error);
-    }
-
-    setTimeout(() => {
-      console.log('Navegando para /ambienteuniversidade');
-      this.router.navigate(['/ambienteunversidade']);
-    }, 6000);
-  }
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
@@ -219,7 +198,8 @@ export class AmbienteParqueComponent implements OnInit {
   }
 
   navigate(destino: string): void {
-    this.router.navigate(['/' + destino]);
+ 
+    this.router.navigate(['/ambienteuniversidade']);
   }
 
   

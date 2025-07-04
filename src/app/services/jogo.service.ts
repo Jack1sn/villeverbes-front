@@ -99,4 +99,39 @@ export class JogoService {
   verificarRespostaDigitada(resposta: string, correta: string): boolean {
     return resposta.trim().toLowerCase() === correta.trim().toLowerCase();
   }
+
+    /**
+   * Salva todos os resultados acumulados de uma vez no backend
+   */
+  salvarResultadosDeTodosOsJogos(usuarioId: number, resultados: JogoData[]): Promise<any> {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('Token de autenticação não encontrado no localStorage.');
+      return Promise.reject('Token ausente');
+    }
+
+    return axios
+      .post(`${this.apiUrl}/${usuarioId}/todos`, resultados, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response: AxiosResponse) => {
+        console.log('✅ Todos os resultados salvos com sucesso:', response.data);
+        return response.data;
+      })
+      .catch((error: AxiosError) => {
+        if (error.response) {
+          console.error('❌ Erro da API ao salvar múltiplos jogos:', error.response.status, error.response.data);
+        } else if (error.request) {
+          console.error('❌ Erro na requisição de múltiplos jogos:', error.request);
+        } else {
+          console.error('❌ Erro desconhecido ao salvar múltiplos jogos:', error.message);
+        }
+        throw error;
+      });
+  }
+
 }

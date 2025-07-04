@@ -5,7 +5,7 @@ import { HeaderComponent } from '../header/header.component';
 import { CommonModule } from '@angular/common';
 import { ProgressoService } from '../../services/progresso.service';
 
-import { JogadorService } from '../../services/jogador.service'; // ✅ IMPORTADO
+import { JogadorService } from '../../services/jogador.service'; //
 
 @Component({
   selector: 'app-home',
@@ -37,23 +37,28 @@ export class HomeComponent {
    private jogadorService: JogadorService 
   ) {}
 
-  ngOnInit(): void {
-    this.progressoCasa = this.progressoService.getProgresso('casa');
-    this.progressoParque = this.progressoService.getProgresso('parque');
-    this.progressoUniversidade = this.progressoService.getProgresso('universidade');
+ngOnInit(): void {
+  this.progressoCasa = this.progressoService.getProgresso('casa');
+  this.progressoParque = this.progressoService.getProgresso('parque');
+  this.progressoUniversidade = this.progressoService.getProgresso('universidade');
 
-    const nomeSalvo = localStorage.getItem('usuarioNome');
-    const imagemSalva = localStorage.getItem('usuarioImagem');
+  const nomeUsuarioLogado = localStorage.getItem('usuarioLogado');
+  const personagemSalvo = localStorage.getItem('usuarioNome'); // personagem
+  const imagemSalva = localStorage.getItem('usuarioImagem');
 
-    if (nomeSalvo) {
-      this.usuarioNome = nomeSalvo;
-      this.personagemSelecionado = nomeSalvo;
-    }
-
-    if (imagemSalva) {
-      this.personagemImagem = imagemSalva;
-    }
+  // Se tiver personagem salvo, usa como nomeUsuario. Senão, usa nome do login.
+  if (personagemSalvo) {
+    this.personagemSelecionado = personagemSalvo;
+    this.usuarioNome = personagemSalvo;
+  } else if (nomeUsuarioLogado) {
+    this.usuarioNome = nomeUsuarioLogado;
   }
+
+  if (imagemSalva) {
+    this.personagemImagem = imagemSalva;
+  }
+}
+
 
   navigate(destino: string): void {
     this.router.navigate(['/' + destino]);

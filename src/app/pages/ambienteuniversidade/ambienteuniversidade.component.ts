@@ -20,7 +20,7 @@ import { JogoData } from 'src/app/models/jogo-data.model';
 export class AmbienteuniversidadeComponent implements OnInit {
   personagemSelecionado: string | null = null;
   tempoVerbal: string = 'Présent';
-  usuarioNome: string = 'Utilisateur';
+  usuarioNome ?: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
   respostaDigitada: string = '';
   resultado: string | null = null;
@@ -35,6 +35,7 @@ export class AmbienteuniversidadeComponent implements OnInit {
   tentativas: { [key: number]: number } = {};
   acertos: number = 0;
   mensagemFinalVisivel: boolean = false;
+  destino: string = 'ambientecasa';
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -66,7 +67,7 @@ export class AmbienteuniversidadeComponent implements OnInit {
     this.ambienteUniversidadeService.getFrasesUniversidade()
       .then((frases: Frase[]) => {
         for (let i = 1; i <= this.totalPerguntas; i++) {
-          const index = 44 + (i - 1) * 2; // Pega frases de índice 44 a  => 23ª a 44ª
+          const index = 44 + (i - 1) * 2;
           this.frasesAleatorias[i] = [
             frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
             frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
@@ -148,39 +149,58 @@ export class AmbienteuniversidadeComponent implements OnInit {
       }
     }
   }
+async finalizarJogo(): Promise<void> {
+  const acertosCasa = parseInt(localStorage.getItem('acertos_casa') || '0', 10);
+  const acertosParque = parseInt(localStorage.getItem('acertos_parque') || '0', 10);
+  const acertosUniversidade = this.acertos;
 
-  finalizarJogo(): void {
-    if (this.acertos / this.totalPerguntas >= 0.6) {
-      this.mensagemFinalVisivel = true;
-      this.enviarResultadoParaBanco();
-      setTimeout(() => this.router.navigate(['/outro-ambiente-ou-final']), 6000);
-    } else {
-      this.resultado = 'Você precisa de pelo menos 60% de acertos para avançar.';
-    }
+  const totalAcertos = acertosCasa + acertosParque + acertosUniversidade;
+  const dataAtual = new Date().toISOString().split('T')[0];
+
+  const resultadoFinal: JogoData = {
+    personagem: this.personagemSelecionado || 'Anonyme',
+    acertosCasa,
+    acertosParque,
+    acertosUniversidade,
+    totalAcertos,
+    data: dataAtual,
+    nomeUsuario: this.usuarioNome
+  };
+
+  console.log('Resultado final:', resultadoFinal);
+
+  // Recupera e atualiza o histórico local
+  const resultadosSalvos: JogoData[] = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
+  resultadosSalvos.push(resultadoFinal);
+  localStorage.setItem('ultimoResultadoJogo', JSON.stringify(resultadosSalvos));
+
+  // Envia todos os resultados salvos para o banco
+  const usuarioId = localStorage.getItem('usuarioId');
+  if (!usuarioId) {
+    console.error('Erro: Usuario ID não encontrado');
+    return;
   }
 
-  async enviarResultadoParaBanco(): Promise<void> {
-    const usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) {
-      console.error('Erro: Usuario ID não encontrado');
-      return;
-    }
-
-    const jogoData: JogoData = {
-      personagem: this.personagemSelecionado,
-      ambiente: 'universidade',
-      acertos: this.acertos,
-      total: this.totalPerguntas,
-      acertoPorAmbiente: `${this.acertos} de ${this.totalPerguntas}`,
-      nomeUsuario: this.usuarioNome,
-    };
-
-    try {
-      await this.jogoService.salvarResultadoJogo(+usuarioId, jogoData);
-    } catch (error) {
-      console.error('❌ Falha ao enviar o resultado para o backend.', error);
-    }
+  try {
+    await this.jogoService.salvarResultadosDeTodosOsJogos(+usuarioId, resultadosSalvos);
+    console.log('Todos os resultados salvos no banco de dados!');
+  } catch (error) {
+    console.error('Erro ao salvar resultados no banco:', error);
   }
+
+  // Limpa dados temporários, mas mantém o histórico
+  localStorage.removeItem('acertos_casa');
+  localStorage.removeItem('acertos_parque');
+  localStorage.removeItem('acertos_universidade');
+
+  // Redireciona após 6 segundos
+  setTimeout(() => {
+    this.router.navigate(['/home']);
+  }, 6000);
+}
+
+
+
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
@@ -190,6 +210,8 @@ export class AmbienteuniversidadeComponent implements OnInit {
   }
 
   navigate(destino: string): void {
-    this.router.navigate(['/' + destino]);
+    this.router.navigate(['/home']);
   }
+
+  
 }
