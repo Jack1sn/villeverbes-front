@@ -99,7 +99,8 @@ async cadastrar(content: any) {
       localStorage.setItem('usuarioNome', Jogador.nome); // guarda o nome no localStorage
 
       const response = await this.jogadorService.autoCadastro(Jogador);
-      this.successMessage = 'Cadastro realizado com sucesso! Por favor verifica seu e-mail.';
+      
+      this.successMessage = 'Cadastro realizado com sucesso!<br> Por favor verifica a  senha no e-mail de cadastro.';
       this.errorMessage = '';
       this.modalService.open(content);
 
