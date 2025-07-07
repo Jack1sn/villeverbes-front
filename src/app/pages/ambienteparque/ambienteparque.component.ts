@@ -71,20 +71,26 @@ export class AmbienteparqueComponent implements OnInit {
     this.progressoParque = this.progressoService.getProgresso('parque');
   }
 
-  carregarFrases(): void {
-    this.ambienteParqueService.getFrasesParque()
-      .then((frases: Frase[]) => {
-        for (let i = 1; i <= this.totalPerguntas; i++) {
-          const index = 22 + (i - 1) * 2;
-          this.frasesAleatorias[i] = [
-            frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-            frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
-          ];
-        }
-        this.selecionarFrase(1);
-      })
-      .catch(error => console.error('Erro ao carregar frases:', error));
-  }
+carregarFrases(): void {
+  this.ambienteParqueService.getFrasesParque()
+    .then((frases: Frase[]) => {
+      for (let i = 1; i <= 11; i++) {  // Garantindo 11 questões no total
+        // Cálculo do índice da primeira frase conforme o padrão (23, 24, 25, ...)
+        const index = 22 + i;  // Para 23, 24, 25, etc.
+        
+        // Atribuindo as frases de acordo com os índices calculados
+        this.frasesAleatorias[i] = [
+          frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+          frases[index + 9] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (23 + 9 = 32)
+        ];
+      }
+      this.selecionarFrase(1);
+    })
+    .catch(error => console.error('Erro ao carregar frases:', error));
+}
+
+
+
 
   selecionarFrase(numero: number): void {
     this.respostaDigitada = '';

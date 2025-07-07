@@ -6,6 +6,7 @@ export interface Frase {
   complemento: string;
   complementoId: number;
   resposta: string;
+   complementoDescricao?: string;
 
   // Extras para exibição no frontend (não usados no envio à API)
   pronome?: string;

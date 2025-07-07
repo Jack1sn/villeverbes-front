@@ -63,21 +63,24 @@ export class AmbienteuniversidadeComponent implements OnInit {
     this.progresso = this.progressoService.getProgresso('universidade');
   }
 
-  carregarFrases(): void {
-    this.ambienteUniversidadeService.getFrasesUniversidade()
-      .then((frases: Frase[]) => {
-        for (let i = 1; i <= this.totalPerguntas; i++) {
-          const index = 44 + (i - 1) * 2;
-          this.frasesAleatorias[i] = [
-            frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-            frases[index + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
-          ];
-        }
+ carregarFrases(): void {
+  this.ambienteUniversidadeService.getFrasesUniversidade()
+    .then((frases: Frase[]) => {
+      for (let i = 1; i <= 11; i++) {  // Garantindo 11 questões no total
+        // Cálculo do índice da primeira frase conforme o padrão (46, 47, 48, ...)
+        const index = 45 + i;  // Para 46, 47, 48, etc.
+        
+        // Atribuindo as frases de acordo com os índices calculados
+        this.frasesAleatorias[i] = [
+          frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+          frases[index + 9] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (46 + 9 = 55)
+        ];
+      }
+      this.selecionarFrase(1);
+    })
+    .catch(error => console.error('Erro ao carregar frases universidade:', error));
+}
 
-        this.selecionarFrase(1);
-      })
-      .catch(err => console.error('Erro ao carregar frases universidade:', err));
-  }
 
   perguntasArray(): number[] {
     return Array.from({ length: this.totalPerguntas }, (_, i) => i + 1);

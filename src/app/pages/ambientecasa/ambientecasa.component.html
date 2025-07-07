@@ -74,7 +74,7 @@
 </div>
 
   <!-- Botões de navegação -->
-  <div class="absolute bottom-28 right-16 flex gap-x-4" *ngIf="fraseSelecionada">
+  <div class="absolute bottom-28 right-10 flex gap-x-4" *ngIf="fraseSelecionada">
     <!-- Botão RETOUR -->
     <button
       (click)="navigate('home')"
@@ -90,7 +90,8 @@
     <!-- Botão AVANCER -->
     <button
       (click)="navigate('ambienteparque')"
-      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 
+      rounded-lg shadow-md transition duration-300">
       CHANGER MILEU
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg">
@@ -99,7 +100,7 @@
     </button>
   </div>
   <!-- Barra de progresso -->
-    <div class="relative mt-96 mb-4 mx-auto w-full max-w-md text-center">
+    <div class="relative mt-96 mr-20 mb-4  w-full max-w-md text-center">
 
   <!-- Barra de fundo -->
   <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">

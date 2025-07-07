@@ -128,15 +128,15 @@
         <option *ngFor="let v of verbos" [value]="v.verbo">{{ v.verbo }}</option>
       </select>
 
-      <!-- Complemento (opcional) -->
-      <label class="block mb-1 font-medium">Complemento:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="novaFrase.complemento" 
-        name="complemento" 
-        class="w-full p-2 border rounded mb-4" 
-        #complemento="ngModel"
-      />
+    <label class="block mb-1 font-medium">Descrição do Complemento:</label>
+<input 
+  type="text" 
+  [(ngModel)]="novaFrase.complementoDescricao" 
+  name="complementoDescricao" 
+  class="w-full p-2 border rounded mb-4"
+  #complementoDescricao="ngModel"
+/>
+
 
       <!-- Selecione Tempo Verbal -->
       <label class="block mb-1 font-medium">Tempo Verbal:</label>

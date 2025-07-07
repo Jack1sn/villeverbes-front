@@ -79,11 +79,13 @@
              96-96 96zm192-222.4V96h48v32c0 29.8-20.4 55.6-48 65.6z"/>
       </svg>
     </div>
-    <h1 class="text-white font-bold text-lg tracking-wide uppercase drop-shadow-lg">FIN</h1>
-    <span class="text-yellow-300 font-semibold text-sm tracking-wide">Trophée</span>
+    <h1  class="text-white font-bold text-lg tracking-wide uppercase drop-shadow-lg">FIN</h1>
+  <span class="text-yellow-300 font-semibold text-sm tracking-wide"
+  (click)="navigate('trophee')">
+  Trophée
+</span>
   </div>
 
-  <!-- Modal Seleção de Personagem -->
   <!-- Modal Seleção de Personagem -->
 <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 z-50">
   <div class="absolute top-10 left-10 bg-white rounded-lg shadow-lg p-6 w-96">

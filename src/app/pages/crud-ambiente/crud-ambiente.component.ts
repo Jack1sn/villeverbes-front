@@ -42,7 +42,7 @@ export class CrudAmbienteComponent implements OnInit {
   pronomes: { id: number; texto: string }[] = [];
   verbos: { id: number; verbo: string }[] = [];
   tempos: { id: number; tempo: string }[] = [];
-  complementos: { id?: number; texto: string }[] = [];
+  complementos: { id?: number; texto: string; descricao?: string  }[] = [];
 
   novaFrase: Frase = {
     pronomeId: 0,
@@ -116,19 +116,21 @@ export class CrudAmbienteComponent implements OnInit {
   }
 
   convertDtoToFrase(dto: any): Frase {
-    return {
-      id: dto.id,
-      pronomeId: dto.pronomeId,
-      verboId: dto.verboInfinitivoId,
-      complementoId: dto.complementoId,
-      complemento: this.complementos.find(c => c.id === dto.complementoId)?.texto || '',
-      tempoId: dto.tempoVerbalId,
-      resposta: dto.respostaCorreta,
-      pronome: this.pronomes.find(p => p.id === dto.pronomeId)?.texto || '',
-      verbo: this.verbos.find(v => v.id === dto.verboInfinitivoId)?.verbo || '',
-      tempo: this.tempos.find(t => t.id === dto.tempoVerbalId)?.tempo || ''
-    };
-  }
+  return {
+    id: dto.id,
+    pronomeId: dto.pronomeId,
+    verboId: dto.verboInfinitivoId,
+    complementoId: dto.complementoId,
+    complemento: this.complementos.find(c => c.id === dto.complementoId)?.texto || '',
+    complementoDescricao: this.complementos.find(c => c.id === dto.complementoId)?.descricao || '', // Ajuste aqui
+    tempoId: dto.tempoVerbalId,
+    resposta: dto.respostaCorreta,
+    pronome: this.pronomes.find(p => p.id === dto.pronomeId)?.texto || '',
+    verbo: this.verbos.find(v => v.id === dto.verboInfinitivoId)?.verbo || '',
+    tempo: this.tempos.find(t => t.id === dto.tempoVerbalId)?.tempo || ''
+  };
+}
+
 
   convertFraseToDto(frase: Frase): any {
   const pronomeObj = this.pronomes.find(p => p.texto === frase.pronome || p.id === frase.pronomeId);
@@ -164,31 +166,45 @@ export class CrudAmbienteComponent implements OnInit {
 }
 
 
-  openModalAdicionarFrase(ambienteIndex: number): void {
-    this.ambienteSelecionadoIndex = ambienteIndex;
-    this.novaFrase = {
-      pronomeId: 0,
-      verboId: 0,
-      complementoId: 0,
-      complemento: '',
-      tempoId: 0,
-      resposta: '',
-      pronome: '',
-      verbo: '',
-      tempo: ''
-    };
-    this.isEditingFrase = false;
-    this.isFraseModalOpen = true;
-  }
+ openModalAdicionarFrase(ambienteIndex: number): void {
+  this.ambienteSelecionadoIndex = ambienteIndex;
 
-  openModalEditarFrase(ambienteIndex: number, fraseIndex: number): void {
-    this.ambienteSelecionadoIndex = ambienteIndex;
-    this.fraseEditandoIndex = fraseIndex;
-    const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
-    this.novaFrase = { ...frase };
-    this.isEditingFrase = true;
-    this.isFraseModalOpen = true;
+  // Inicializa novaFrase com todos os campos necessários, incluindo 'complementoDescricao'
+  this.novaFrase = {
+    pronomeId: 0,
+    verboId: 0,
+    complementoId: 0,
+    complemento: '',
+    complementoDescricao: '',  // Agora inicializa o campo 'complementoDescricao'
+    tempoId: 0,
+    resposta: '',
+    pronome: '',
+    verbo: '',
+    tempo: ''
+  };
+
+  this.isEditingFrase = false;
+  this.isFraseModalOpen = true;
+}
+
+
+openModalEditarFrase(ambienteIndex: number, fraseIndex: number): void {
+  this.ambienteSelecionadoIndex = ambienteIndex;
+  this.fraseEditandoIndex = fraseIndex;
+  const frase = this.ambientes[ambienteIndex].frases[fraseIndex];
+  this.novaFrase = { ...frase };
+  this.isEditingFrase = true;
+  this.isFraseModalOpen = true;
+
+  // Preenchendo complementoDescricao se existir
+  if (frase.complementoId) {
+    const complemento = this.complementos.find(c => c.id === frase.complementoId);
+    if (complemento) {
+      this.novaFrase.complementoDescricao = complemento.descricao || ''; // Agora 'descricao' existe
+    }
   }
+}
+
 
   closeModal(): void {
     this.isFraseModalOpen = false;

@@ -87,20 +87,25 @@ export class AmbientecasaComponent implements OnInit {
     }
   }
 
-  carregarFrases(): void {
-    this.ambientecasaService.getFrasesCasa()
-      .then(frases => {
-        for (let i = 1; i <= this.totalPerguntas; i++) {
-          const idx = (i - 1) * 2;
-          this.frasesAleatorias[i] = [
-            frases[idx] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-            frases[idx + 1] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
-          ];
-        }
-        this.selecionarFrase(1);
-      })
-      .catch(err => console.error('Erro ao carregar frases:', err));
-  }
+ carregarFrases(): void {
+  this.ambientecasaService.getFrasesCasa()
+    .then(frases => {
+      // Organiza as frases em pares como você deseja
+      for (let i = 1; i <= this.totalPerguntas; i++) {
+        const idx1 = i - 1; // Índice da primeira frase (1, 2, 3, ...)
+        const idx2 = (i + 11) % frases.length; // Índice da segunda frase (12, 13, 14, ...)
+
+        // Atribui as frases para a questão
+        this.frasesAleatorias[i] = [
+          frases[idx1] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+          frases[idx2] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
+        ];
+      }
+      this.selecionarFrase(1);
+    })
+    .catch(err => console.error('Erro ao carregar frases:', err));
+}
+
 
   selecionarFrase(numero: number): void {
     this.perguntaAtual = numero;
