@@ -20,7 +20,7 @@ import { JogoData } from 'src/app/models/jogo-data.model';
 export class AmbienteuniversidadeComponent implements OnInit {
   personagemSelecionado: string | null = null;
   tempoVerbal: string = 'Présent';
-  usuarioNome ?: string = 'Utilisateur';
+  usuarioNome: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
   respostaDigitada: string = '';
   resultado: string | null = null;

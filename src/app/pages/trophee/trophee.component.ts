@@ -4,6 +4,11 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { TropheeService, SeloMedalhaDTO } from '../../services/trophee.service';
 
+interface TrofeuItem {
+  selo: 'Maison' | 'Place' | 'Université';
+  value: number;
+}
+
 @Component({
   selector: 'app-trophee',
   standalone: true,
@@ -11,8 +16,10 @@ import { TropheeService, SeloMedalhaDTO } from '../../services/trophee.service';
   templateUrl: './trophee.component.html',
 })
 export class TropheeComponent implements OnInit {
-  userId: string | null = null; // Corrigido para string, pois paramMap.get() retorna string | null
-  trofeus: any[] = [];
+  userId: string | null = null;
+  trofeus: TrofeuItem[] = [];
+  medalhaValor: number = 0;
+  mostrarMedalha: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -21,14 +28,10 @@ export class TropheeComponent implements OnInit {
 
   ngOnInit() {
     this.userId = this.route.snapshot.paramMap.get('id');
+    const idNum = this.userId ? Number(this.userId) : NaN;
 
-    if (this.userId !== null) {
-      const idNumerico = Number(this.userId);
-      if (!isNaN(idNumerico)) {
-        this.carregarTrofeusPorUsuario(idNumerico);
-      } else {
-        console.warn('ID inválido na URL:', this.userId);
-      }
+    if (!isNaN(idNum)) {
+      this.carregarTrofeusPorUsuario(idNum);
     } else {
       this.carregarTodosTrofeus();
     }
@@ -38,26 +41,24 @@ export class TropheeComponent implements OnInit {
     this.tropheeService.getTrofeusPorUsuario(id).subscribe({
       next: (res: SeloMedalhaDTO[]) => {
         this.trofeus = [];
-
-        res.forEach((selo) => {
-          this.trofeus.push({ selo: 'Casa', numero: selo.seloCasa });
-          this.trofeus.push({ selo: 'Parque', numero: selo.seloParque });
-          this.trofeus.push({ selo: 'Universidade', numero: selo.seloUniversidade });
-          this.trofeus.push({ selo: 'Medalha', numero: selo.medalha });
+        res.forEach(selo => {
+          this.trofeus.push({ selo: 'Maison', value: selo.seloCasa });
+          this.trofeus.push({ selo: 'Place', value: selo.seloParque });
+          this.trofeus.push({ selo: 'Université', value: selo.seloUniversidade });
+          this.medalhaValor = selo.medalha;
+          this.mostrarMedalha = this.medalhaValor >= 0;
         });
       },
-      error: (err) => {
-        console.error('Erro ao carregar troféus do usuário:', err);
-      }
+      error: err => console.error('Erreur lors du chargement des trophées :', err)
     });
   }
 
   carregarTodosTrofeus() {
-    // Pode ser adaptado futuramente para buscar de uma API real
-    this.trofeus = [
-      { usuario: 'Ana', selo: 'Casa', trofeu: 'Bronze' },
-      { usuario: 'Ana', selo: 'Parque', trofeu: 'Prata' },
-      { usuario: 'Ana', selo: 'Universidade', trofeu: 'Ouro' }
-    ];
+    // Aqui se quiser carregar tudo, você pode implementar
+  }
+
+  incrementar(item: TrofeuItem) {
+    item.value++;
+    // Aqui pode chamar API para salvar ou atualizar backend se quiser
   }
 }

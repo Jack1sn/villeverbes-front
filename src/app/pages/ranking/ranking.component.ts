@@ -1,15 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { HeaderComponent } from "../header/header.component";
-
-interface Jogador {
-  nome: string;
-  posicao: string;
-  seloAmbiente: string;
-}
+import { RankingService, JogadorRanking } from '../../services/ranking.service'; // ajuste aqui
+import { HeaderComponent } from '../header/header.component';
+import { AuthService } from 'src/app/auth.service';
 
 @Component({
   selector: 'app-ranking',
@@ -19,30 +13,50 @@ interface Jogador {
   styleUrls: ['./ranking.component.css']
 })
 export class RankingComponent implements OnInit {
-  jogador: Jogador | null = null;
-  idJogador: string | null = null;
+  ranking: JogadorRanking[] = [];
   erro: string | null = null;
+  isAdmin: boolean = false;
+  usuarioId: string | null = null;
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private rankingService: RankingService
+  ) {}
 
   ngOnInit() {
-    this.idJogador = this.route.snapshot.paramMap.get('id');
-    if (this.idJogador) {
-      this.getRanking(this.idJogador).subscribe({
-        next: (data) => {
-          this.jogador = data;
-        },
-        error: (err) => {
-          console.error('Erro ao buscar ranking:', err);
-          this.erro = 'Não foi possível carregar os dados do ranking.';
-        }
-      });
+    const perfil = this.authService.getRole();
+    this.isAdmin = perfil === 'ADMIN';
+
+    if (this.isAdmin) {
+      this.carregarRankingGeral();
     } else {
-      this.erro = 'ID do jogador não informado.';
+      this.usuarioId = this.authService.getUserId();
+      if (this.usuarioId) {
+        this.carregarRankingJogador(this.usuarioId);
+      } else {
+        this.erro = 'ID do jogador não encontrado.';
+      }
     }
   }
 
-  getRanking(id: string): Observable<Jogador> {
-    return this.http.get<Jogador>(`/api/usuarios/jogador/${id}/ranking`);
+  carregarRankingJogador(id: string) {
+    this.rankingService.getRankingPorUsuario(id).subscribe({
+      next: (data) => (this.ranking = data),
+      error: (err) => {
+        console.error('Erro ao buscar ranking do jogador:', err);
+        this.erro = 'Erro ao carregar ranking do jogador.';
+      }
+    });
+  }
+
+  carregarRankingGeral() {
+    this.rankingService.getRankingGeral().subscribe({
+      next: (data) => (this.ranking = data),
+      error: (err) => {
+        console.error('Erro ao buscar ranking geral:', err);
+        this.erro = 'Erro ao carregar ranking geral.';
+      }
+    });
   }
 }

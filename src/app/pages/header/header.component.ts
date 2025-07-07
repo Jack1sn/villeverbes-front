@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.checkAuthenticationStatus();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/tela-inicial']);
   }
 
   getHomeLink(): string {
@@ -70,17 +70,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return '/';
   }
 
-  getRankingLink(): string {
-    if (this.userRole === 'ADMIN') return '/visualizar-ranking';
-    if (this.userRole === 'JOGADOR') return `/ranking/${this.authService.getUserId()}`;
-    return '/';
+getRankingLink(): string {
+  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORADOR') {
+    return '/ranking/todos-simples'; // vai disparar chamada para API /api/selos/ranking
   }
+  if (this.userRole === 'JOGADOR') {
+    return `/ranking/${this.authService.getUserId()}`; // /api/selos/usuario/{id}/ranking
+  }
+  return '/';
+}
 
-  getTropheeLink(): string {
-    if (this.userRole === 'ADMIN') return '/trophee';
-    if (this.userRole === 'JOGADOR') return `/trophee/${this.authService.getUserId()}`;
-    return '/';
-  }
+
+ getTropheeLink(): string {
+  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORADOR') return '/trophee/todos';
+  if (this.userRole === 'JOGADOR') return `/trophee/${this.authService.getUserId()}`;
+  return '/';
+}
+
 
   getConfigurationLink(): string {
     if (this.userRole === 'ADMIN') return '/crudAmbiente';

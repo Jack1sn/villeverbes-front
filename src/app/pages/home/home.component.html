@@ -3,8 +3,8 @@
 <!-- Botão flutuante para abrir o modal -->
 <button
   (click)="abrirModal()"
-  class="fixed top-72 right-36 bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded shadow-lg z-50">
-  Vous pouvez choisir un personnage pour demarrer le jeu.
+  class="fixed top-56 left-10 bg-blue-700 hover:bg-blue-800 text-white px-2 py-3 rounded shadow-lg z-50">
+  Choisir un personnage pour demarrer le jeu.
 </button>
 
 <div class="background">
@@ -20,10 +20,10 @@
       {{ progressoCasa | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">1</div>
-    <span>Milieu Maison</span>
+    <span>Environnement Maison</span>
 
-    <p class="hidden group-hover:block text-sm absolute top-2 text-white transform -translate-x-1/2 mt-4 text-center">
-      Sua porcentagem de acerto no último jogo.
+    <p class="hidden group-hover:block text-lg absolute top-2 text-white transform -translate-x-1/2 mt-4 text-center">
+      Votre pourcentage de bonnes réponses au dernier jeu de verbes.
     </p>
 
   
@@ -35,11 +35,11 @@
       {{ progressoParque | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">2</div>
-    <span>Milieu Place</span>
+    <span>Environnement Place</span>
 
     <!-- Texto que aparece fora da bolinha, acima dela, quando o mouse passa sobre -->
-    <p class="hidden group-hover:block text-sm absolute text-white  top-2 transform -translate-x-1/2 mt-4 text-center">
-      Sua porcentagem de acerto no último jogo.
+    <p class="hidden group-hover:block text-lg absolute text-white  top-2 transform -translate-x-1/2 mt-4 text-center">
+      Votre pourcentage de bonnes réponses au dernier jeu de verbes.
     </p>
 
     <!-- Texto adicional quando o mouse passa sobre a bolinha maior -->
@@ -51,12 +51,12 @@
       {{ progressoUniversidade | number:'1.0-0' }}%
     </div>
     <div class="text-white text-3xl font-bold">3</div>
-    <span>Milieu Université</span>
+    <span>Environnement <br> Université</span>
 
     <!-- Texto adicional quando o mouse passa sobre a bolinha maior -->
-    <div class="absolute bottom-92 transform -translate-x-1/2 bottom-4 text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Sua porcentagem de acerto no último jogo.
-    </div>
+        <p class="hidden group-hover:block text-lg absolute top-2 text-white transform -translate-x-1/2 mt-4 text-center">
+      Votre pourcentage de bonnes réponses au dernier jeu de verbes.
+    </p>
   </div>
 
   <!-- Selo Final -->

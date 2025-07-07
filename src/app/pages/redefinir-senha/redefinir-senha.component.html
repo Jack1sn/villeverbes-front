@@ -3,7 +3,7 @@
 <!-- Centralização total -->
 <div class="min-h-screen w-screen bg-gray-50 flex flex-col"> 
   <div class="w-full max-w-md bg-white p-8  ml-96 mt-10 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Redefinir Senha</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Changer le mot de passe</h2>
 
     <form (ngSubmit)="redefinirSenha()" #form="ngForm" novalidate >
 
@@ -16,24 +16,24 @@
           name="email"
           required
           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Digite seu e-mail" autocomplete="off"  />
+          placeholder="Entrez votre email" autocomplete="off"  />
       </div>
 
       <!-- Senha atual -->
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-600 mb-1">Senha atual (temporária)</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Mot de passe  atuel </label>
         <input
           type="password"
           [(ngModel)]="senhaAtual"
           name="senhaAtual"
           required
           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Senha temporária"  autocomplete="off" />
+          placeholder="Mot de passe temporaire"  autocomplete="off" />
       </div>
 
       <!-- Nova senha -->
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-600 mb-1">Nova senha</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Nouveau mot de passe</label>
         <input
           type="password"
           [(ngModel)]="novaSenha"
@@ -41,19 +41,19 @@
           required
           minlength="6"
           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Nova senha" autocomplete="off"  />
+          placeholder="Nouveau mot de passe" autocomplete="off"  />
       </div>
 
       <!-- Confirmar nova senha -->
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-600 mb-1">Confirmar nova senha</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Confirmer nouveau mot de passe</label>
         <input
           type="password"
           [(ngModel)]="confirmarSenha"
           name="confirmarSenha"
           required
           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Confirme a nova senha" autocomplete="off"  />
+          placeholder="Confirmer le nouveau mot de passe" autocomplete="off"  />
       </div>
 
       <!-- Mensagem de erro -->
@@ -66,7 +66,7 @@
         type="submit"
         [disabled]="form.invalid"
         class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300">
-        Redefinir Senha
+        Changer mot de passe
       </button>
     </form>
   </div>

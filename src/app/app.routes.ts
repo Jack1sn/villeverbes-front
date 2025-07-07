@@ -64,6 +64,17 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },
+  {
+  path: 'ranking/todos',
+  component:RankingComponent,
+  canActivate: [authGuard],
+  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] }
+}, {
+  path: 'ranking/todos-simples',
+  component:RankingComponent,
+  canActivate: [authGuard],
+  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] }
+},
 
 
   {
@@ -72,13 +83,25 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },
+   {
+  path: 'trophee/:id/todos',
+  component: TropheeComponent,
+  canActivate: [authGuard],
+  data: { expectedRoles: ['JOGADOR'] },
+},
+  {
+  path: 'trophee/todos',
+  component: TropheeComponent,
+  canActivate: [authGuard],
+  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] },
+},
   {
     path: 'trophee/:id',
     component: TropheeComponent,
     canActivate: [authGuard],
     data: { expectedRoles: ['JOGADOR'] },
   },
-
+   
    {
     path: 'redefinir-senha',
     component: RedefinirSenhaComponent,
@@ -144,6 +167,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
   },
+  {
+  path: 'ranking-completo',
+  component: RankingComponent,
+  canActivate: [authGuard],
+  data: { expectedRoles: ['ADMIN'] }
+},
+
   
   // Fases para jogadores
   {

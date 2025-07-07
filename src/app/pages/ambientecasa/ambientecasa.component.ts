@@ -37,7 +37,7 @@ export class AmbientecasaComponent implements OnInit {
   fraseExibida: { [key: number]: boolean } = {};
   bolinhasEstado: { [key: number]: 'naoClicada' | 'clicada' | 'correta' | 'incorreta' } = {};
   acertos = 0;
-  usuarioNome = 'Utilisateur';
+  usuarioNome: string = 'Utilisateur';
   personagemImagem = 'assets/vvimagens/usuario2.png';
   voices: SpeechSynthesisVoice[] = [];
   dest='ambienteparque';

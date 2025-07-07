@@ -1,85 +1,74 @@
-
-
 <app-header></app-header>
 
-<!-- Container flex para centralizar o conteúdo -->
-<div class="min-h-screen w-screen bg-gray-50 flex flex-col"> 
-    <div class="flex-grow w-full px-72 py-5">
-
-    <!-- Título -->
+<div class="min-h-screen w-screen bg-gray-50 flex flex-col">
+  <div class="flex-grow w-full px-72 py-5">
     <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
-    Trophées Remportés
+      Trophées Remportés
     </h1>
 
-  
-
-    <!-- Se jogador (com ID na URL) -->
     <div *ngIf="userId" class="overflow-x-auto">
-    <table class="min-w-full border border-gray-300 text-center">
-  <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
-    <tr>
-      <th class="border px-6 py-3">Sceaux x Milieu</th>
-      <th class="border px-6 py-3">Sceaux</th>
-      <th class="border px-6 py-3">Médails</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let item of trofeus" class="hover:bg-gray-50">
-      <!-- Primeira coluna -->
-      <td class="border px-6 py-2">{{ item.selo }}</td>
-
-      <!-- Segunda e terceira colunas unidas -->
-      <td  class="border px-6 py-4 text-xl font-semibold text-gray-800">
-        {{ item.numero }}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-    </div>
-
-    <!-- Se admin (sem ID na URL) -->
-    <div *ngIf="!userId" class="overflow-x-auto mt-10">
       <table class="min-w-full border border-gray-300 text-center">
-        <thead class="bg-blue-100 text-blue-800 uppercase text-sm">
+        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
           <tr>
-            <th class="border px-6 py-3">Utilisateur</th>
-            <th class="border px-6 py-3">Sceaux | Milieu</th>
-            <th class="border px-6 py-3">Médails</th>
+            <th class="border px-6 py-3">Sceaux  Environnements </th>
+            <th class="border px-6 py-3">Quantités</th>
+            <th class="border px-6 py-3">Médailles</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of trofeus" class="hover:bg-blue-50">
-            <td class="border px-6 py-2">{{ item.usuario }}</td>
-            <td class="border px-6 py-2">{{ item.selo }}</td>
+          <tr *ngFor="let item of trofeus" class="hover:bg-gray-50">
+            <!-- Etiqueta colorida + nome do selo -->
             <td class="border px-6 py-2">
               <div class="flex items-center justify-center gap-2">
-                {{ item.trofeu }}
-                <!-- Medalhas com Tailwind CSS -->
+                <!-- Etiqueta redonda colorida -->
                 <div
-                  *ngIf="item.trofeu === 'Bronze'"
-                  class="w-12 h-12 bg-gradient-to-b from-yellow-500 to-yellow-700 rounded-full flex justify-center items-center text-white text-xl font-bold"
-                >
-                  B
-                </div>
+                  class="w-8 h-8 shadow-md selo-zigzag"
+                  [ngClass]="{
+                    'bg-yellow-900': item.selo === 'Maison',
+                    'bg-blue-600': item.selo === 'Place',
+                    'bg-yellow-400': item.selo === 'Université'
+                  }"
+                  title="Selo {{ item.selo }}"
+                ></div>
+
+                <!-- Nome do ambiente -->
+                <span class="font-medium text-gray-800">{{ item.selo }}</span>
+              </div>
+            </td>
+
+            <!-- Valor (quantidade de selos) -->
+            <td
+              class="border px-6 py-2 text-lg font-semibold text-gray-800 cursor-pointer select-none"
+              (click)="incrementar(item)"
+              title="Clique para incrementar"
+            >
+              {{ item.value }}
+            </td>
+
+            <!-- Medalha na primeira linha -->
+            <td
+              class="border px-6 py-2"
+              *ngIf="trofeus.indexOf(item) === 0"
+              [attr.rowspan]="trofeus.length"
+            >
+              <div *ngIf="mostrarMedalha" class="flex flex-col items-center gap-1">
                 <div
-                  *ngIf="item.trofeu === 'Prata'"
-                  class="w-12 h-12 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full flex justify-center items-center text-white text-xl font-bold"
+                  class="w-14 h-14 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-md flex items-center justify-center text-white text-3xl font-bold"
+                  title="Medalha"
                 >
-                  P
+                  🥇
                 </div>
-                <div
-                  *ngIf="item.trofeu === 'Ouro'"
-                  class="w-12 h-12 bg-gradient-to-b from-yellow-600 to-yellow-900 rounded-full flex justify-center items-center text-white text-xl font-bold"
-                >
-                  O
-                </div>
+                <span class="text-sm text-gray-600 font-semibold">
+                  Médailles: {{ medalhaValor }}
+                </span>
+              </div>
+              <div *ngIf="!mostrarMedalha" class="text-gray-400 italic text-sm">
+                Incomplète
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
   </div>
 </div>

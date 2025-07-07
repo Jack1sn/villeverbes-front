@@ -168,4 +168,14 @@ export class AuthService {
       return false;
     }
   }
+isAdmin(): boolean {
+  return this.getRole() === 'ADMIN';
+}
+
+isJogador(): boolean {
+  return this.getRole() === 'JOGADOR';
+}
+
+
+
 }

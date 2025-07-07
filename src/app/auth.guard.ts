@@ -55,7 +55,7 @@ export const authGuard: CanActivateFn = (
      // console.log('Usuário não tem permissão para acessar esta página. Redirecionando para login...');
     }
     //alert('Você não tem permissão para acessar esta página.');
-    router.navigate(['/login']);
+    router.navigate(['/tela-inicial']);
     return false;
   }
 

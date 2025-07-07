@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 export interface SeloMedalhaDTO {
   id: number;
   usuarioJogoId: number;
+  usuarioNome: string;
   seloCasa: number;
   seloParque: number;
   seloUniversidade: number;
@@ -16,18 +17,22 @@ export interface SeloMedalhaDTO {
   providedIn: 'root',
 })
 export class TropheeService {
-
   private apiUrl = 'http://localhost:8080/api/selos';  // URL base do backend
 
   constructor(private http: HttpClient) {}
 
-  // Buscar os selos/troféus de um usuário específico
+  // Buscar os selos/troféus básicos de um usuário específico (endpoint existente)
   getTrofeusPorUsuario(usuarioId: number): Observable<SeloMedalhaDTO[]> {
     return this.http.get<SeloMedalhaDTO[]>(`${this.apiUrl}/usuario/${usuarioId}`);
   }
 
-  // Caso tenha um endpoint para buscar todos os troféus (admin), ajustar a URL aqui
+  // Buscar todos os troféus (admin) — endpoint existente
   getTodosTrofeus(): Observable<SeloMedalhaDTO[]> {
-    return this.http.get<SeloMedalhaDTO[]>(`${this.apiUrl}/todos`); 
+    return this.http.get<SeloMedalhaDTO[]>(`${this.apiUrl}/todos`);
+  }
+
+  // Novo método para buscar todos os selos e medalhas do usuário (endpoint /usuario/{usuarioId}/todos)
+  getTodosTrofeusPorUsuario(usuarioId: number): Observable<SeloMedalhaDTO[]> {
+    return this.http.get<SeloMedalhaDTO[]>(`${this.apiUrl}/todos-simples`);
   }
 }

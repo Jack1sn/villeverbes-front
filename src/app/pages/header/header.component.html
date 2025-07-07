@@ -12,11 +12,11 @@
     </a>
 
     <a [routerLink]="getRankingLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
-      <i class="fas fa-trophy mr-2"></i> Ranking
+      <i class="fas fa-trophy mr-2"></i> Position
     </a>
 
     <a [routerLink]="getTropheeLink()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
-      <i class="fas fa-medal mr-2"></i> Médails
+      <i class="fas fa-medal mr-2"></i> Médailles
     </a>
 <!-- Ajuda com badge -->
 <a
@@ -24,7 +24,7 @@
   [routerLink]="getAjudaLink()"
   class="relative flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition"
 >
-  <i class="fas fa-question-circle mr-2"></i> Ajuda
+  <i class="fas fa-question-circle mr-2"></i> Aide
 
   <!-- Badge com número de mensagens -->
   <span
@@ -59,13 +59,13 @@
     <!-- Logout/Login -->
     <ng-container *ngIf="isAuthenticated; else showLogin">
       <a (click)="logout()" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition cursor-pointer">
-        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        <i class="fas fa-sign-out-alt mr-2"></i> Sortir
       </a>
     </ng-container>
 
     <ng-template #showLogin>
       <a [routerLink]="'/login'" class="flex items-center text-white hover:text-red-600 hover:bg-blue-100 px-3 py-2 rounded transition">
-        <i class="fas fa-sign-in-alt mr-2"></i> Login
+        <i class="fas fa-sign-in-alt mr-2"></i> Se Connecter
       </a>
     </ng-template>
   </nav>
