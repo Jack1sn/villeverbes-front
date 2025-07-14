@@ -40,8 +40,7 @@ export class AmbientecasaComponent implements OnInit {
   usuarioNome: string = 'Utilisateur';
   personagemImagem = 'assets/vvimagens/usuario2.png';
   voices: SpeechSynthesisVoice[] = [];
-  dest='ambienteparque';
-
+  dest = 'ambienteparque';
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -87,25 +86,21 @@ export class AmbientecasaComponent implements OnInit {
     }
   }
 
- carregarFrases(): void {
-  this.ambientecasaService.getFrasesCasa()
-    .then(frases => {
-      // Organiza as frases em pares como você deseja
-      for (let i = 1; i <= this.totalPerguntas; i++) {
-        const idx1 = i - 1; // Índice da primeira frase (1, 2, 3, ...)
-        const idx2 = (i + 10) % frases.length; // Índice da segunda frase (12, 13, 14, ...)
-
-        // Atribui as frases para a questão
-        this.frasesAleatorias[i] = [
-          frases[idx1] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-          frases[idx2] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
-        ];
-      }
-      this.selecionarFrase(1);
-    })
-    .catch(err => console.error('Erro ao carregar frases:', err));
-}
-
+  carregarFrases(): void {
+    this.ambientecasaService.getFrasesCasa()
+      .then(frases => {
+        for (let i = 1; i <= this.totalPerguntas; i++) {
+          const idx1 = i - 1;
+          const idx2 = (i + 10) % frases.length;
+          this.frasesAleatorias[i] = [
+            frases[idx1] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+            frases[idx2] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
+          ];
+        }
+        this.selecionarFrase(1);
+      })
+      .catch(err => console.error('Erro ao carregar frases:', err));
+  }
 
   selecionarFrase(numero: number): void {
     this.perguntaAtual = numero;
@@ -119,7 +114,7 @@ export class AmbientecasaComponent implements OnInit {
     this.fraseSelecionada = this.fraseAtual.frase;
     this.fraseExibida[numero] = !used;
 
-    setTimeout(() => this.respostaInputRef.nativeElement.focus());
+    setTimeout(() => this.respostaInputRef?.nativeElement?.focus(), 100);
   }
 
   verificarResposta(): void {
@@ -139,10 +134,12 @@ export class AmbientecasaComponent implements OnInit {
       this.progressoService.setProgresso('casa', this.progresso);
       this.tentativas[num] = 0;
 
-      setTimeout(() => {
-        this.resultado = `🎉 Félicitations, ${this.usuarioNome}! La bonne réponse: "${this.fraseAtual!.respostaCorreta}"`;
-        num === this.totalPerguntas ? this.finalizarJogoCasa() : setTimeout(() => this.selecionarFrase(num + 1), 1000);
-      }, 1000);
+      this.resultado = `🎉 Félicitations, ${this.usuarioNome}! La bonne réponse: "${this.fraseAtual!.respostaCorreta}"`;
+
+      if (num === this.totalPerguntas) {
+        setTimeout(() => this.finalizarJogoCasa(), 3000);
+      }
+
     } else {
       this.tentativas[num] = (this.tentativas[num] || 0) + 1;
       if (this.tentativas[num] < 2) {
@@ -150,60 +147,59 @@ export class AmbientecasaComponent implements OnInit {
       } else {
         this.bolinhasEstado[num] = 'incorreta';
         this.resultado = `❌ La réponse correcte: "${this.fraseAtual.respostaCorreta}".`;
-        setTimeout(() => num === this.totalPerguntas ? this.finalizarJogoCasa() : this.selecionarFrase(num + 1), 3000);
         this.tentativas[num] = 0;
+
+        if (num === this.totalPerguntas) {
+          setTimeout(() => this.finalizarJogoCasa(), 3000);
+        }
       }
     }
   }
 
+  avancarPergunta(): void {
+    if (this.perguntaAtual != null && this.perguntaAtual < this.totalPerguntas) {
+      this.selecionarFrase(this.perguntaAtual + 1);
+    }
+  }
+
   async finalizarJogoCasa(): Promise<void> {
-  console.log('Valor de acertos na casa:', this.acertos);
+    this.mensagemFinalVisivel = true;
+    const dataAtual = new Date().toISOString().split('T')[0];
 
-  // Exibir a mensagem final
-  this.mensagemFinalVisivel = true;
+    const resultadoCasa = {
+      personagem: this.personagemSelecionado || 'Anonyme',
+      acertosCasa: this.acertos,
+      acertosParque: 0,
+      acertosUniversidade: 0,
+      totalAcertos: this.acertos,
+      data: dataAtual,
+      nomeUsuario: this.usuarioNome
+    };
 
-  // Obter a data atual
-  const dataAtual = new Date().toISOString().split('T')[0];
+    const prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
+    prev.push(resultadoCasa);
+    localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
+    localStorage.setItem('acertos_casa', this.acertos.toString());
 
-  // Criar o objeto de resultado para o ambiente Casa
-  const resultadoCasa = {
-    personagem: this.personagemSelecionado || 'Anonyme',
-    acertosCasa: this.acertos,
-    acertosParque: 0,  // Não há acertos no Parque ainda
-    acertosUniversidade: 0,  // Não há acertos na Universidade ainda
-    totalAcertos: this.acertos,  // Total de acertos só no ambiente Casa
-    data: dataAtual,
-    nomeUsuario: this.usuarioNome
-  };
-
-  // Salvar o resultado no localStorage
-  let prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
-  prev.push(resultadoCasa);
-  localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
-
-  localStorage.setItem('acertos_casa', this.acertos.toString());
-
-  // Redirecionar para o próximo ambiente (Parque)
-  setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
-}
-
+    setTimeout(() => this.router.navigate(['/ambienteparque']), 6000);
+  }
 
   getCorClasse(i: number): string {
     const est = this.bolinhasEstado[i] || 'naoClicada';
-    return ['correta','incorreta'].includes(est) ? est : (i === this.perguntaAtual ? `${est} respondendo` : est);
+    return ['correta', 'incorreta'].includes(est)
+      ? est
+      : (i === this.perguntaAtual ? `${est} respondendo` : est);
   }
 
   atualizarResposta(v: string): void {
     this.respostaDigitada = this.transLetrasPipe.transform(v);
   }
-  
+
   navigate(dest: string): void {
     this.router.navigate(['/ambienteparque']);
   }
 
-  navi(dest: string): void{
-    this.router.navigate(['/home'])
+  navi(dest: string): void {
+    this.router.navigate(['/home']);
   }
-  
-
 }

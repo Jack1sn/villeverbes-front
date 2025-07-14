@@ -10,7 +10,6 @@ import { AmbienteParqueService, Frase } from '../../services/ambiente-parque.ser
 import { JogoService } from '../../services/jogo.service';
 import { JogadorService } from 'src/app/services/jogador.service';
 
-
 @Component({
   selector: 'app-ambientecasa',
   standalone: true,
@@ -40,7 +39,7 @@ export class AmbienteparqueComponent implements OnInit {
   usuarioNome: string = 'Utilisateur';
   personagemImagem: string = 'assets/vvimagens/usuario2.png';
   voices: SpeechSynthesisVoice[] = [];
-  destino: string ='ambienteuniversidade'
+  destino: string = 'ambienteuniversidade';
 
   @ViewChild('respostaInput') respostaInputRef!: ElementRef<HTMLInputElement>;
 
@@ -71,26 +70,20 @@ export class AmbienteparqueComponent implements OnInit {
     this.progressoParque = this.progressoService.getProgresso('parque');
   }
 
-carregarFrases(): void {
-  this.ambienteParqueService.getFrasesParque()
-    .then((frases: Frase[]) => {
-      for (let i = 1; i <= 11; i++) {  // Garantindo 11 questões no total
-        // Cálculo do índice da primeira frase conforme o padrão (23, 24, 25, ...)
-        const index = 21 + i;  // Para 23, 24, 25, etc.
-        
-        // Atribuindo as frases de acordo com os índices calculados
-        this.frasesAleatorias[i] = [
-          frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-          frases[index + 11] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (23 + 9 = 32)
-        ];
-      }
-      this.selecionarFrase(1);
-    })
-    .catch(error => console.error('Erro ao carregar frases:', error));
-}
-
-
-
+  carregarFrases(): void {
+    this.ambienteParqueService.getFrasesParque()
+      .then((frases: Frase[]) => {
+        for (let i = 1; i <= this.totalPerguntas; i++) {
+          const index = 21 + i;
+          this.frasesAleatorias[i] = [
+            frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
+            frases[index + 11] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }
+          ];
+        }
+        this.selecionarFrase(1);
+      })
+      .catch(error => console.error('Erro ao carregar frases:', error));
+  }
 
   selecionarFrase(numero: number): void {
     this.respostaDigitada = '';
@@ -124,19 +117,15 @@ carregarFrases(): void {
     if (estaCorreta) {
       this.bolinhasEstado[numero] = 'correta';
       this.acertos += 1;
-      console.log('Incrementou acertos:', this.acertos);
       this.progresso = Math.min((this.acertos / this.totalPerguntas) * 100, 100);
       this.progressoService.setProgresso('parque', this.progresso);
       this.tentativas[numero] = 0;
 
-      setTimeout(() => {
-        this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual!.respostaCorreta}"`;
-        if (numero === this.totalPerguntas) {
-          this.finalizarJogoParque();
-        } else {
-          setTimeout(() => this.selecionarFrase(numero + 1), 1000);
-        }
-      }, 1000);
+      this.resultado = `🎉 Félicitations, ${this.usuarioNome} ! La bonne réponse est : "${this.fraseAtual.respostaCorreta}"`;
+
+      if (numero === this.totalPerguntas) {
+        this.finalizarJogoParque();
+      }
     } else {
       this.tentativas[numero] = (this.tentativas[numero] || 0) + 1;
 
@@ -146,51 +135,36 @@ carregarFrases(): void {
         this.bolinhasEstado[numero] = 'incorreta';
         this.resultado = `❌ La réponse correcte est : "${this.fraseAtual.respostaCorreta}".`;
 
-        setTimeout(() => {
-          if (numero === this.totalPerguntas) {
-            this.finalizarJogoParque();
-          } else {
-            this.selecionarFrase(numero + 1);
-          }
-        }, 3000);
+        if (numero === this.totalPerguntas) {
+          setTimeout(() => this.finalizarJogoParque(), 3000);
+        }
       }
     }
   }
 
-async finalizarJogoParque(): Promise<void> {
-  console.log('Valor de acertos no parque:', this.acertos);
+  async finalizarJogoParque(): Promise<void> {
+    this.mensagemFinalVisivel = true;
+    const dataAtual = new Date().toISOString().split('T')[0];
+    const acertosCasa = parseInt(localStorage.getItem('acertos_casa') || '0', 10);
 
-  // Exibir a mensagem final
-  this.mensagemFinalVisivel = true;
+    const resultadoParque = {
+      personagem: this.personagemSelecionado || 'Anonyme',
+      acertosCasa: acertosCasa,
+      acertosParque: this.acertos,
+      acertosUniversidade: 0,
+      totalAcertos: acertosCasa + this.acertos,
+      data: dataAtual,
+      nomeUsuario: this.usuarioNome
+    };
 
-  // Obter a data atual
-  const dataAtual = new Date().toISOString().split('T')[0];
+    let prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
+    prev.push(resultadoParque);
+    localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
 
-  // Obter os acertos do ambiente Casa
-  const acertosCasa = parseInt(localStorage.getItem('acertos_casa') || '0', 10);
-  
-  // Criar o objeto de resultado para o ambiente Parque
-  const resultadoParque = {
-    personagem: this.personagemSelecionado || 'Anonyme',
-    acertosCasa: acertosCasa,
-    acertosParque: this.acertos,  // Acertos no ambiente Parque
-    acertosUniversidade: 0,  // Não há acertos na Universidade ainda
-    totalAcertos: acertosCasa + this.acertos,  // Total de acertos no ambiente Casa + Parque
-    data: dataAtual,
-    nomeUsuario: this.usuarioNome
-  };
+    localStorage.setItem('acertos_parque', this.acertos.toString());
 
-  // Salvar o resultado no localStorage
-  let prev = JSON.parse(localStorage.getItem('ultimoResultadoJogo') || '[]');
-  prev.push(resultadoParque);
-  localStorage.setItem('ultimoResultadoJogo', JSON.stringify(prev));
-
-  localStorage.setItem('acertos_parque', this.acertos.toString());
-
-  // Redirecionar para o próximo ambiente (Universidade)
-  setTimeout(() => this.router.navigate(['/ambienteuniversidade']), 6000);
-}
-
+    setTimeout(() => this.router.navigate(['/ambienteuniversidade']), 6000);
+  }
 
   getCorClasse(numero: number): string {
     const estado = this.bolinhasEstado[numero] || 'naoClicada';
@@ -204,14 +178,10 @@ async finalizarJogoParque(): Promise<void> {
   }
 
   navigate(destino: string): void {
- 
     this.router.navigate(['/ambienteuniversidade']);
   }
 
-   navi(destino: string): void {
- 
+  navi(destino: string): void {
     this.router.navigate(['/ambientecasa']);
   }
-
-  
 }

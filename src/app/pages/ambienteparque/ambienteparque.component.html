@@ -1,6 +1,6 @@
-<div class="min-h-screen flex flex-col"> 
+<div class="min-h-screen flex flex-col">
   <app-header></app-header>
-  <link rel="stylesheet" href="../../../assets/estiloComun.css">
+  <link rel="stylesheet" href="../../../assets/estiloComun.css" />
 
   <div class="background">
     <!-- Barra superior -->
@@ -18,25 +18,26 @@
     </div>
 
     <!-- Imagem de fundo -->
-    <div class="ambiente" [ngStyle]="{'background-image': 'url(' + fundoImagem + ')'}"></div>
+    <div class="ambiente" [ngStyle]="{ 'background-image': 'url(' + fundoImagem + ')' }"></div>
 
     <!-- Bolinhas numeradas -->
-    <div 
-      *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11]" 
-      class="circle casa{{i}}" 
+    <div
+      *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+      class="circle casa{{ i }}"
       [ngClass]="getCorClasse(i)"
       (click)="(bolinhasEstado[i] !== 'correta' && bolinhasEstado[i] !== 'incorreta') && selecionarFrase(i)"
-      [class.cursor-not-allowed]="bolinhasEstado[i] === 'correta'">
-      <img src="assets/vvimagens/{{i}}.png" alt="{{i}}" />
+      [class.cursor-not-allowed]="bolinhasEstado[i] === 'correta'"
+    >
+      <img src="assets/vvimagens/{{ i }}.png" alt="{{ i }}" />
       <span>{{ i }}</span>
     </div>
 
-    <!-- Frase e campo de resposta -->
+    <!-- Caixa da frase e campo de resposta -->
     <div class="frase-box" *ngIf="fraseSelecionada">
-      <p class="whitespace-pre-line">{{ fraseSelecionada }}</p>
+      <p class="whitespace-pre-line text-lg font-semibold mb-4">{{ fraseSelecionada }}</p>
 
-      <!-- Campo de resposta e botão aparecem somente se ainda não acertou -->
-      <div *ngIf="resultado !== 'Félicitations! 🎉'">
+      <!-- Campo de resposta (enquanto ainda pode responder) -->
+      <div *ngIf="bolinhasEstado[perguntaAtual!] !== 'correta' && bolinhasEstado[perguntaAtual!] !== 'incorreta'">
         <input
           #respostaInput
           type="text"
@@ -44,13 +45,19 @@
           (ngModelChange)="respostaDigitada = $event"
           placeholder="Conjuguez ici..."
           (keyup.enter)="verificarResposta()"
+          class="px-4 py-2 border rounded-md w-full max-w-md text-lg"
         />
-        <button (click)="verificarResposta()">Entrer</button>
+        <button
+          (click)="verificarResposta()"
+          class="mt-2 bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-300"
+        >
+          Entrer
+        </button>
       </div>
 
       <!-- Mensagem de resultado -->
-      <p 
-        *ngIf="resultado" 
+      <p
+        *ngIf="resultado"
         [class.text-green-600]="resultado.includes('Félicitations')"
         [class.text-red-600]="!resultado.includes('Félicitations')"
         class="text-xl font-bold mt-4 transition-colors duration-500"
@@ -61,6 +68,16 @@
           <i class="fas fa-hands-clapping text-yellow-500 text-3xl animate-bounce ml-2"></i>
         </ng-container>
       </p>
+
+      <!-- Botão Prochaine Question (somente se não for a última) -->
+      <div *ngIf="resultado && perguntaAtual !== totalPerguntas">
+        <button
+          (click)="selecionarFrase(perguntaAtual! + 1)"
+          class="mt-4 bg-green-600 hover:bg-green-800 text-white font-bold py-2 px-4 rounded transition duration-300"
+        >
+          👉 Prochaine Question
+        </button>
+      </div>
     </div>
 
     <!-- Botões de navegação -->
@@ -70,8 +87,8 @@
         (click)="navi('ambientecasa')"
         class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-1.5 px-5 rounded-lg shadow-md transition duration-300"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 21V3a1 1 0 011-1h9.5a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1zM13.5 12H10"/>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 21V3a1 1 0 011-1h9.5a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1zM13.5 12H10" />
         </svg>
         RETOUR
       </button>
@@ -81,33 +98,28 @@
         (click)="navigate('ambienteuniversidade')"
         class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-1.5 px-5 rounded-lg shadow-md transition duration-300"
       >
-        CHANGER MILEU
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        CHANGER MILIEU
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
     </div>
 
-   <!-- Barra de progresso -->
-    <div class="relative mt-96 mr-20 mb-4  w-full max-w-md text-center">
+    <!-- Barra de progresso -->
+    <div class="relative mt-96 mr-20 mb-4 w-full max-w-md text-center">
+      <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
+        <div
+          class="bg-green-500 h-full transition-all duration-500 ease-in-out"
+          [style.width.%]="(acertos / totalPerguntas) * 100"
+        ></div>
+      </div>
 
-  <!-- Barra de fundo -->
-  <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
-    <!-- Progresso preenchido -->
-    <div 
-      class="bg-green-500 h-full transition-all duration-500 ease-in-out"
-      [style.width.%]="(acertos / totalPerguntas) * 100">
+      <!-- Bolinha azul com acertos -->
+      <div
+        class="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10"
+      >
+        {{ acertos }}/{{ totalPerguntas }}
+      </div>
     </div>
-  </div>
-
-  <!-- Texto: Exibe "3/11 acertos (27%)" -->
-  
-
-  <!-- Bolinha azul com progresso total (opcional, se quiser exibir ao lado) -->
-  <div 
-    class="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10">
-    {{ acertos }}/{{ totalPerguntas }}
-  </div>
-</div>
   </div>
 </div>
