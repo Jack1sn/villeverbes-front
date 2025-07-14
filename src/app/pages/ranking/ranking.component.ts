@@ -44,8 +44,8 @@ export class RankingComponent implements OnInit {
     this.rankingService.getRankingPorUsuario(id).subscribe({
       next: (data) => (this.ranking = data),
       error: (err) => {
-        console.error('Erro ao buscar ranking do jogador:', err);
-        this.erro = 'Erro ao carregar ranking do jogador.';
+        console.error( 'Erreur lors de la recherche du classement du joueur :', err);
+        this.erro = 'Erreur lors du chargement du classement du joueur.' ;
       }
     });
   }
@@ -54,8 +54,8 @@ export class RankingComponent implements OnInit {
     this.rankingService.getRankingGeral().subscribe({
       next: (data) => (this.ranking = data),
       error: (err) => {
-        console.error('Erro ao buscar ranking geral:', err);
-        this.erro = 'Erro ao carregar ranking geral.';
+        console.error('Erreur lors de la recherche du classement général:', err);
+        this.erro = 'Erreur lors du chargement du classement général.';
       }
     });
   }

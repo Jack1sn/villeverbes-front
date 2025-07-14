@@ -76,12 +76,12 @@ carregarFrases(): void {
     .then((frases: Frase[]) => {
       for (let i = 1; i <= 11; i++) {  // Garantindo 11 questões no total
         // Cálculo do índice da primeira frase conforme o padrão (23, 24, 25, ...)
-        const index = 22 + i;  // Para 23, 24, 25, etc.
+        const index = 21 + i;  // Para 23, 24, 25, etc.
         
         // Atribuindo as frases de acordo com os índices calculados
         this.frasesAleatorias[i] = [
           frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-          frases[index + 9] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (23 + 9 = 32)
+          frases[index + 11] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (23 + 9 = 32)
         ];
       }
       this.selecionarFrase(1);
@@ -206,6 +206,11 @@ async finalizarJogoParque(): Promise<void> {
   navigate(destino: string): void {
  
     this.router.navigate(['/ambienteuniversidade']);
+  }
+
+   navi(destino: string): void {
+ 
+    this.router.navigate(['/ambientecasa']);
   }
 
   

@@ -68,12 +68,12 @@ export class AmbienteuniversidadeComponent implements OnInit {
     .then((frases: Frase[]) => {
       for (let i = 1; i <= 11; i++) {  // Garantindo 11 questões no total
         // Cálculo do índice da primeira frase conforme o padrão (46, 47, 48, ...)
-        const index = 45 + i;  // Para 46, 47, 48, etc.
+        const index = 43 + i;  // Para 46, 47, 48, etc.
         
         // Atribuindo as frases de acordo com os índices calculados
         this.frasesAleatorias[i] = [
           frases[index] || { frase: `Frase ${i}-A`, respostaCorreta: '???' },
-          frases[index + 9] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (46 + 9 = 55)
+          frases[index + 11] || { frase: `Frase ${i}-B`, respostaCorreta: '???' }  // Pegando a segunda frase com +9 (46 + 9 = 55)
         ];
       }
       this.selecionarFrase(1);
@@ -216,5 +216,8 @@ async finalizarJogo(): Promise<void> {
     this.router.navigate(['/home']);
   }
 
+  navi(destino: string): void {
+    this.router.navigate(['/ambienteparque']);
+  }
   
 }

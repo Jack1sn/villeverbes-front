@@ -146,9 +146,9 @@
 .progress-bar-container {
   position: absolute;
   bottom: 0;
-  left: 700px;
+  left: 600px;
   top: 550px;
-  width: 40%;
+  width: 35%;
   height: 15px;
   background-color: #ddd;
 }
@@ -220,8 +220,8 @@
 }
 
 .botao-direcao {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 8px 18px;
+  font-size: 14px;
   font-weight: bold;
   background-color: #1d048d;
   color: white;

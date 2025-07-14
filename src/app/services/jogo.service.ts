@@ -83,11 +83,11 @@ export class JogoService {
 
     switch (ambiente) {
       case 'casa':
-        return todasFrases.slice(0, 22);     // 11 perguntas * 2 frases
+        return todasFrases.slice(0, 21);     // 11 perguntas * 2 frases
       case 'parque':
-        return todasFrases.slice(22, 44);
+        return todasFrases.slice(22, 43);
       case 'universidade':
-        return todasFrases.slice(44, 66);
+        return todasFrases.slice(44, 65);
       default:
         throw new Error(`Ambiente inválido: ${ambiente}`);
     }

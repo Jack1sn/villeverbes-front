@@ -93,7 +93,7 @@ export class AmbientecasaComponent implements OnInit {
       // Organiza as frases em pares como você deseja
       for (let i = 1; i <= this.totalPerguntas; i++) {
         const idx1 = i - 1; // Índice da primeira frase (1, 2, 3, ...)
-        const idx2 = (i + 11) % frases.length; // Índice da segunda frase (12, 13, 14, ...)
+        const idx2 = (i + 10) % frases.length; // Índice da segunda frase (12, 13, 14, ...)
 
         // Atribui as frases para a questão
         this.frasesAleatorias[i] = [
@@ -199,6 +199,10 @@ export class AmbientecasaComponent implements OnInit {
   
   navigate(dest: string): void {
     this.router.navigate(['/ambienteparque']);
+  }
+
+  navi(dest: string): void{
+    this.router.navigate(['/home'])
   }
   
 

@@ -12,7 +12,7 @@
 
       <h2 class="titulos">
         Bienvenue {{ personagemSelecionado }}, Choisissez un Numero!<br />
-        <strong>Tempo:</strong> {{ tempoVerbal }}
+        <strong>Temps:</strong> {{ tempoVerbal }}
       </h2>
     </div>
 
@@ -68,8 +68,8 @@
     <div class="absolute bottom-28 right-16 flex gap-x-4" *ngIf="fraseSelecionada">
       <!-- Voltar -->
       <button
-        (click)="navigate('ambienteparque')"
-        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+        (click)="navi('ambienteparque')"
+        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-1.5 px-4 rounded-lg shadow-md transition duration-300"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 21V3a1 1 0 011-1h9.5a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1zM13.5 12H10" />
@@ -80,7 +80,7 @@
       <!-- Próximo ambiente -->
       <button
         (click)="navigate('home')"
-        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+        class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-1.5 px-5 rounded-lg shadow-md transition duration-300"
       >
         CHANGER MILIEU
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -90,13 +90,14 @@
     </div>
 
     <!-- Barra de progresso -->
-    <div class="relative mt-96 mb-4 mx-auto w-full max-w-md text-center">
-      <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
-        <div
-          class="bg-green-500 h-full transition-all duration-500 ease-in-out"
-          [style.width.%]="(acertos / totalPerguntas) * 100"
-        ></div>
-      </div>
+   <div class="relative mt-96 mr-20 mb-4  w-full max-w-md text-center"> 
+       <div class="w-full bg-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
+    <!-- Progresso preenchido -->
+    <div 
+      class="bg-green-500 h-full transition-all duration-500 ease-in-out"
+      [style.width.%]="(acertos / totalPerguntas) * 100">
+    </div>
+  </div>
 
       <div
         class="absolute -top-4 -right-4 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold shadow-md border border-white z-10"

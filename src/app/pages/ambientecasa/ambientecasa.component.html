@@ -14,7 +14,7 @@
 
     <h2 class="titulos">
       Bienvenue {{ personagemSelecionado }}, Choisissez un Numero!<br />
-      <strong>Tempo:</strong> {{ tempoVerbal }}
+      <strong>Temps:</strong> {{ tempoVerbal }}
     </h2>
   </div>
 
@@ -77,8 +77,8 @@
   <div class="absolute bottom-28 right-10 flex gap-x-4" *ngIf="fraseSelecionada">
     <!-- Botão RETOUR -->
     <button
-      (click)="navigate('home')"
-      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+      (click)="navi('home')"
+      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-900 text-white font-semibold py-1.5 px-5 rounded-lg shadow-md transition duration-300">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -90,7 +90,7 @@
     <!-- Botão AVANCER -->
     <button
       (click)="navigate('ambienteparque')"
-      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-2 px-6 
+      class="flex items-center gap-2 bg-blue-500 hover:bg-blue-800 text-white font-semibold py-1.5 px-5 
       rounded-lg shadow-md transition duration-300">
       CHANGER MILEU
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
