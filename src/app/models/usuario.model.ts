@@ -1,4 +1,4 @@
-type Perfil = 'ADMIN' | 'JOGADOR' ;
+type Perfil = 'ADMIN' | 'JOUEUR' ;
 
 export interface Usuario {
   id?: number;
@@ -14,5 +14,5 @@ export interface Usuario {
   estado: string;
   perfil: Perfil;
   email: string;
-  ativo:boolean;
+  actif:boolean;
 }

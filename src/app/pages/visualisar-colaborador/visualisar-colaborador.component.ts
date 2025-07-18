@@ -45,23 +45,23 @@ export class VisualisarColaboradorComponent implements OnInit {
       const response = await axios.get<Colaborador[]>(this.apiUrl);
       this.colaboradores = response.data;
     } catch (err) {
-      this.tratarErro(err, 'carregar');
+      this.tratarErro(err, 'telecharger');
     }
   }
 
   async excluir(id?: number): Promise<void> {
     if (!id) {
-      this.mensagemErro = 'ID do colaborador inválido.';
+      this.mensagemErro = 'ID du colaborateur  inválide.';
       return;
     }
 
-    if (!confirm('Deseja realmente excluir este colaborador?')) return;
+    if (!confirm('Voulez-vous vraiment supprimer ce collaborateur ?')) return;
 
     try {
       await axios.delete(`${this.apiUrl}/${id}`);
       await this.carregarColaboradores();
     } catch (err) {
-      this.tratarErro(err, 'excluir');
+      this.tratarErro(err, 'supprimer');
     }
   }
 
@@ -86,7 +86,7 @@ export class VisualisarColaboradorComponent implements OnInit {
       await this.carregarColaboradores();
       this.fecharModal();
     } catch (err) {
-      this.tratarErro(err, 'atualizar');
+      this.tratarErro(err, 'mettre à jour');
     }
   }
 

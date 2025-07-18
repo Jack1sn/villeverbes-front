@@ -87,12 +87,12 @@ async cadastrar(content: any) {
       endereco: this.cadastroForm.get('endereco.logradouro')?.value,
       numero: '',
       email: this.cadastroForm.get('email')?.value,
-      perfil: "JOGADOR",
+      perfil: "JOUEUR",
       complemento: this.cadastroForm.get('endereco.complemento')?.value,
       bairro: this.cadastroForm.get('endereco.bairro')?.value,
       cidade: this.cadastroForm.get('endereco.localidade')?.value,
       estado: this.cadastroForm.get('endereco.uf')?.value,
-      ativo:true
+      actif:true
     };
 
     try {
@@ -100,7 +100,7 @@ async cadastrar(content: any) {
 
       const response = await this.jogadorService.autoCadastro(Jogador);
       
-      this.successMessage = 'Cadastro realizado com sucesso!<br> Por favor verifica a  senha no e-mail de cadastro.';
+      this.successMessage = 'Inscription réussie ! Veuillez vérifier votre e-mail pour obtenir votre mot de passe.';
       this.errorMessage = '';
       this.modalService.open(content);
 
@@ -113,19 +113,19 @@ async cadastrar(content: any) {
       // Aqui a mágica acontece para capturar a mensagem do backend
       if (error.response && error.response.status === 409) {
         // Se o backend retornou 409, pega a mensagem
-        this.errorMessage = error.response.data?.message || 'Email já cadastrado.';
+        this.errorMessage = error.response.data?.message || 'E-mail déjà utilisé.';
       } else if (error.message) {
         // Outras mensagens de erro genéricas
         this.errorMessage = error.message;
       } else {
-        this.errorMessage = 'Erro ao realizar o cadastro. Tente novamente.';
+        this.errorMessage = 'Une erreur est survenue lors de l´inscription. Veuillez réessayer.';
       }
 
       this.successMessage = '';
       this.modalService.open(content);
     }
   } else {
-    this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+    this.errorMessage = 'Veuillez remplir tous les champs correctement, s’il vous plaît.';
     this.successMessage = '';
     this.modalService.open(content);
   }

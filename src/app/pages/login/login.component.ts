@@ -24,7 +24,7 @@ export class LoginComponent {
 
   async realizarLogin(form: any) {
     if (form.invalid) {
-      this.errorMessage = 'Preencha todos os campos corretamente.';
+      this.errorMessage = 'Remplisez tous champs corretement';
       return;
     }
   
@@ -53,7 +53,7 @@ export class LoginComponent {
     
       }
 
-      this.successMessage = 'Login realizado com sucesso!';
+      this.successMessage = 'Login realisé  avec succès!';
       this.errorMessage = '';
   
       // ⏱ Espera 2 segundos para exibir a mensagem de sucesso
@@ -73,7 +73,7 @@ export class LoginComponent {
   
     } catch (error) {
       // Caso o login falhe, exibe mensagem de erro
-      this.errorMessage = 'E-mail ou senha incorretos';
+      this.errorMessage = 'E-mail ou  Mot de passe incorrect';
       this.successMessage = '';
   
       setTimeout(() => {

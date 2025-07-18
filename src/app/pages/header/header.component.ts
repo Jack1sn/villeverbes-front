@@ -66,15 +66,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   getHomeLink(): string {
     if (this.userRole === 'ADMIN') return '/home-admin';
-    if (this.userRole === 'JOGADOR') return '/home';
+    if (this.userRole === 'JOUEUR') return '/home';
     return '/';
   }
 
 getRankingLink(): string {
-  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORADOR') {
+  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORATEUR') {
     return '/ranking/todos-simples'; // vai disparar chamada para API /api/selos/ranking
   }
-  if (this.userRole === 'JOGADOR') {
+  if (this.userRole === 'JOUEUR') {
     return `/ranking/${this.authService.getUserId()}`; // /api/selos/usuario/{id}/ranking
   }
   return '/';
@@ -82,15 +82,15 @@ getRankingLink(): string {
 
 
  getTropheeLink(): string {
-  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORADOR') return '/trophee/todos';
-  if (this.userRole === 'JOGADOR') return `/trophee/${this.authService.getUserId()}`;
+  if (this.userRole === 'ADMIN' || this.userRole === 'COLABORATEUR') return '/trophee/todos';
+  if (this.userRole === 'JOUEUR') return `/trophee/${this.authService.getUserId()}`;
   return '/';
 }
 
 
   getConfigurationLink(): string {
     if (this.userRole === 'ADMIN') return '/crudAmbiente';
-    if (this.userRole === 'JOGADOR') return '/redefinir-senha';
+    if (this.userRole === 'JOUEUR') return '/redefinir-senha';
     return '/';
   }
 
@@ -101,7 +101,7 @@ getRankingLink(): string {
 
   getJogadorLink(): string | null {
     if (this.userRole === 'ADMIN') return '/visualizar-jogadores';
-    if (this.userRole === 'COLABORADOR') return '/home-admin';
+    if (this.userRole === 'COLABORATEUR') return '/home-admin';
     return null;
   }
 
@@ -113,7 +113,7 @@ getRankingLink(): string {
     this.authService.temNovaMensagem().then((tem: boolean) => {
       this.temNovaMensagem = tem;
     }).catch((err: any) => {
-      console.error('Erro ao verificar novas mensagens:', err);
+      console.error('Erreur lors de la vérification des nouveaux messages:', err);
       this.temNovaMensagem = false;
     });
   }
@@ -124,7 +124,7 @@ getRankingLink(): string {
         this.quantidadeMensagensNaoRespondidas = qtd;
       },
       error: (err: any) => {
-        console.error('Erro ao buscar quantidade de mensagens não respondidas:', err);
+        console.error('Erreur lors de la récupération du nombre de messages non répondus.', err);
         this.quantidadeMensagensNaoRespondidas = 0;
       }
     });

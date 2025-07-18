@@ -6,7 +6,7 @@
     <br>
     <!-- Título -->
     <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
-      Colaboradores
+      Colaborateurs
     </h1>
 
     <!-- Se houver mensagem de erro -->
@@ -16,7 +16,7 @@
 
     <!-- Caso não haja colaboradores -->
     <div *ngIf="colaboradores.length === 0 && !mensagemErro" class="text-center text-gray-500 mb-6">
-      Nenhum colaborador cadastrado.
+       Aucun colaborateur enregistré.
     </div>
 
     <!-- Lista de colaboradores -->
@@ -27,10 +27,10 @@
         <!-- Cabeçalho da tabela -->
         <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
           <tr>
-            <th class="border px-6 py-3">Nome</th>
-            <th class="border px-6 py-3">Email</th>
-            <th class="border px-6 py-3">Perfil</th>
-            <th class="border px-6 py-3">Ações</th>
+            <th class="border px-6 py-3">Nom</th>
+            <th class="border px-6 py-3">E-mail</th>
+            <th class="border px-6 py-3">Profil</th>
+            <th class="border px-6 py-3">Actions</th>
           </tr>
         </thead>
 
@@ -45,12 +45,12 @@
               <div class="flex justify-center gap-4">
                 <!-- Botão de Edição -->
                 <button (click)="editar(colab)" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-sm transition duration-200 flex items-center">
-                  <i class="fa fa-pencil-alt mr-2"></i> Editar
+                  <i class="fa fa-pencil-alt mr-2"></i> Editer
                 </button>
 
                 <!-- Botão de Exclusão -->
                 <button (click)="excluir(colab.id)" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm transition duration-200 flex items-center">
-                  <i class="fa fa-trash-alt mr-2"></i> Excluir
+                  <i class="fa fa-trash-alt mr-2"></i> Supprimer
                 </button>
               </div>
             </td>
@@ -61,7 +61,7 @@
 
     <!-- Modal de Edição -->
     <dialog id="modalEditar" class="rounded-lg p-6 shadow-xl max-w-md w-full bg-white">
-      <h2 class="text-xl font-bold mb-4 text-center">Editar Colaborador</h2>
+      <h2 class="text-xl font-bold mb-4 text-center">Editer colaborateur</h2>
       <form [formGroup]="colaboradorForm" (ngSubmit)="salvarEdicao()" class="space-y-4">
 
         <!-- Campos do formulário -->
@@ -81,10 +81,10 @@
         <!-- Botões de Ação -->
         <div class="flex justify-end space-x-4 mt-6">
           <button type="button" (click)="fecharModal()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200">
-            Cancelar
+           Annuler
           </button>
           <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200" [disabled]="colaboradorForm.invalid">
-            Salvar
+            Sauvegarder
           </button>
         </div>
       </form>

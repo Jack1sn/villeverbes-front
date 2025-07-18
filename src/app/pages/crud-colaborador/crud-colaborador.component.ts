@@ -30,7 +30,7 @@ export class CrudColaboradorComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.carregarColaboradores(); // ✅ carregar ao iniciar
+    this.carregarColaboradores(); 
   }
 
   initForm(): void {
@@ -47,17 +47,17 @@ export class CrudColaboradorComponent implements OnInit {
     this.mensagemErro = '';
 
     if (this.colaboradorForm.invalid) {
-      this.mensagemErro = 'Por favor, preencha todos os campos corretamente.';
+      this.mensagemErro = 'Veuillez remplir correctement tous les champs, s´il vous plaît.';
       return;
     }
 
     try {
       if (this.editando) {
         await this.colaboradorService.atualizar(this.colaboradorSelecionadoId, this.colaboradorForm.value);
-        this.mensagemSucesso = 'Colaborador atualizado com sucesso!';
+        this.mensagemSucesso = 'Colaborateur actualisé avec succès!';
       } else {
         const res = await this.colaboradorService.salvar(this.colaboradorForm.value);
-        this.mensagemSucesso = res.message || 'Colaborador cadastrado com sucesso!';
+        this.mensagemSucesso = res.message || 'Colaborateur enregistré avec succès!';
       }
 
       this.limparAutomaticamente();
@@ -81,7 +81,7 @@ export class CrudColaboradorComponent implements OnInit {
 
     try {
       await this.colaboradorService.excluir(id);
-      this.mensagemSucesso = 'Colaborador excluído com sucesso!';
+      this.mensagemSucesso = 'Colaborateur supprimé avec succès!';
       this.carregarColaboradores();
     } catch (err) {
       this.tratarErro(err);
@@ -118,7 +118,7 @@ export class CrudColaboradorComponent implements OnInit {
     } else if (err.message) {
       this.mensagemErro = err.message;
     } else {
-      this.mensagemErro = 'Ocorreu um erro inesperado.';
+      this.mensagemErro = 'Erreur inattendue.';
     }
 
     console.error('Erro:', err);

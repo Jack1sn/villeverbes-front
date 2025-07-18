@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<!-- Container flex para centralizar o conteúdo -->
+
 <div class="min-h-screen w-screen bg-gray-50 flex justify-center items-center">
 
   <!-- Frame com largura ajustada e padding reduzido -->
@@ -8,22 +8,22 @@
 
     <!-- Cabeçalho com título e link -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Cadastro de Colaboradores</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Inscription des collaborateurs</h1>
       <a routerLink="/visualizar-colaborador"
          class="text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer">
-        Visualizar Colaboradores
+        Afficher les collaborateurs
       </a>
     </div>
 
     <!-- Mensagens de Sucesso e Erro -->
     <div class="max-w-xl mx-auto mb-6" aria-live="polite">
       <div *ngIf="mensagemSucesso" class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-sm relative" role="alert">
-        <strong class="font-bold">Sucesso! </strong>
+        <strong class="font-bold">Succès ! </strong>
         <span class="block sm:inline">{{ mensagemSucesso }}</span>
         <button (click)="mensagemSucesso=''" aria-label="Fechar mensagem de sucesso"
                 class="absolute top-0 bottom-0 right-0 px-4 py-3 focus:outline-none">
           <svg class="fill-current h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" role="img">
-            <title>Fechar</title>
+            <title>Fermer</title>
             <path d="M14.348 5.652a1 1 0 0 0-1.414 0L10 8.586 7.066 5.652a1 1 0 1 0-1.414 1.414L8.586 10l-2.934 2.934a1 1 0 1 0 1.414 1.414L10 11.414l2.934 2.934a1 1 0 0 0 1.414-1.414L11.414 10l2.934-2.934a1 1 0 0 0 0-1.414z"/>
           </svg>
         </button>
@@ -45,38 +45,38 @@
     <!-- Formulário de Cadastro -->
     <form [formGroup]="colaboradorForm" (ngSubmit)="salvar()" class="space-y-6 mb-6" novalidate>
       <div class="relative">
-        <input formControlName="nome" placeholder="Nome"
+        <input formControlName="nome" placeholder="Nom"
                [class.border-red-500]="colaboradorForm.get('nome')?.invalid && colaboradorForm.get('nome')?.touched"
                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
         <div *ngIf="colaboradorForm.get('nome')?.invalid && colaboradorForm.get('nome')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
-          O nome é obrigatório.
+          Le nom est obrigatoire.
         </div>
       </div>
 
       <div class="relative">
-        <input formControlName="email" placeholder="Email"
+        <input formControlName="email" placeholder="E-mail"
                [class.border-red-500]="colaboradorForm.get('email')?.invalid && colaboradorForm.get('email')?.touched"
                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
         <div *ngIf="colaboradorForm.get('email')?.invalid && colaboradorForm.get('email')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
-          Informe um email válido.
+          Veuillez saisir une adresse e-mail valide.
         </div>
       </div>
 
       <div class="relative">
-        <input formControlName="telefone" placeholder="Telefone"
+        <input formControlName="telefone" placeholder="Téléphone"
                [class.border-red-500]="colaboradorForm.get('telefone')?.invalid && colaboradorForm.get('telefone')?.touched"
                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
         <div *ngIf="colaboradorForm.get('telefone')?.invalid && colaboradorForm.get('telefone')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
-          O telefone é obrigatório.
+          Le téléphone est obrigatoire.
         </div>
       </div>
 
       <div class="relative">
-        <input formControlName="senha" placeholder="Senha" type="password"
+        <input formControlName="senha" placeholder="Mot de passe" type="password"
                [class.border-red-500]="colaboradorForm.get('senha')?.invalid && colaboradorForm.get('senha')?.touched"
                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
         <div *ngIf="colaboradorForm.get('senha')?.invalid && colaboradorForm.get('senha')?.touched" class="text-red-500 text-sm absolute left-0 bottom-[-20px]">
-          A senha é obrigatória.
+          Mot de passe  est obrigatoire.
         </div>
       </div>
 
@@ -85,14 +85,14 @@
         <button type="submit"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-lg transition duration-200"
                 [disabled]="colaboradorForm.invalid">
-          Salvar
+         Enregistrer
         </button>
       </div>
     </form>
 
     <!-- Lista de Colaboradores -->
     <div *ngIf="colaboradores.length === 0" class="text-center text-gray-500">
-      <p>Nenhum colaborador cadastrado ainda.</p>
+      <p>Aucun collaborateur enregistré pour le moment.</p>
     </div>
 
   </div>

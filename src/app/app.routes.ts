@@ -8,12 +8,11 @@ import { AutoCadastroComponent } from './pages/auto-cadastro/auto-cadastro.compo
 import { AmbientecasaComponent } from './pages/ambientecasa/ambientecasa.component';
 import { AmbienteparqueComponent } from './pages/ambienteparque/ambienteparque.component';
 import { AmbienteuniversidadeComponent } from './pages/ambienteuniversidade/ambienteuniversidade.component';
-import { Fase1Component } from './pages/fase1/fase1.component';
+import { HeaderComponent } from './pages/header/header.component';
 
 import { CrudfasesComponent } from './pages/crudfases/crudfases.component';
-import { Fase2Component } from './pages/fase2/fase2.component';
-import { Fase3Component } from './pages/fase3/fase3.component';
-import { HeaderComponent } from './pages/header/header.component';
+
+
 import { CrudAmbienteComponent } from './pages/crud-ambiente/crud-ambiente.component';
 import { HomeAdminComponent } from './pages/home-admin/home-admin.component';
 import { TropheeComponent } from './pages/trophee/trophee.component';
@@ -36,7 +35,7 @@ export const routes: Routes = [
 
   { path: 'crudAmbiente', component: CrudAmbienteComponent, 
     canActivate:[authGuard],
-    data:{expectedRoles:['ADMIN','COLABORADOR']}
+    data:{expectedRoles:['ADMIN','COLABORATEUR']}
    },
 
   // Rotas acessíveis apenas para JOGADOR
@@ -44,36 +43,36 @@ export const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
   {
     path: 'ambientecasa',
     component: AmbientecasaComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
   {
     path: 'ambienteuniversidade',
     component: AmbienteuniversidadeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
   {
     path: 'ambienteparque',
     component: AmbienteparqueComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
   {
   path: 'ranking/todos',
   component:RankingComponent,
   canActivate: [authGuard],
-  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] }
+  data: { expectedRoles: ['ADMIN', 'COLABORATEUR'] }
 }, {
   path: 'ranking/todos-simples',
   component:RankingComponent,
   canActivate: [authGuard],
-  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] }
+  data: { expectedRoles: ['ADMIN', 'COLABORATEUR'] }
 },
 
 
@@ -81,32 +80,32 @@ export const routes: Routes = [
     path: 'ranking/:id',
     component: RankingComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
    {
   path: 'trophee/:id/todos',
   component: TropheeComponent,
   canActivate: [authGuard],
-  data: { expectedRoles: ['JOGADOR'] },
+  data: { expectedRoles: ['JOUEUR'] },
 },
   {
   path: 'trophee/todos',
   component: TropheeComponent,
   canActivate: [authGuard],
-  data: { expectedRoles: ['ADMIN', 'COLABORADOR'] },
+  data: { expectedRoles: ['ADMIN', 'COLABORATEUR'] },
 },
   {
     path: 'trophee/:id',
     component: TropheeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
    
    {
     path: 'redefinir-senha',
     component: RedefinirSenhaComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
+    data: { expectedRoles: ['JOUEUR'] },
   },
 
 
@@ -114,7 +113,7 @@ export const routes: Routes = [
     path: 'congig-jogador',
     component: ConfigJogadorComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR', 'ADMIN', 'COLABORADOR'] },
+    data: { expectedRoles: ['JOUEUR', 'ADMIN', 'COLABORATEUR'] },
   },
 
 
@@ -126,7 +125,7 @@ export const routes: Routes = [
     path: 'home-admin',
     component: HomeAdminComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: [ 'ADMIN', 'COLABORADOR'] },
+    data: { expectedRoles: [ 'ADMIN', 'COLABORATEUR'] },
   },
   {
     path: 'crud-colaborador',
@@ -151,21 +150,21 @@ export const routes: Routes = [
     path: 'crudAbiente',
     component: CrudAmbienteComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORATEUR', 'ADMIN'] },
   },
 
   {
     path: 'trophee',
     component: TropheeComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORATEUR', 'ADMIN'] },
   },
 
   {
     path: 'ajuda',
     component: AjudaComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORATEUR', 'ADMIN'] },
   },
   {
   path: 'ranking-completo',
@@ -176,24 +175,10 @@ export const routes: Routes = [
 
   
   // Fases para jogadores
-  {
-    path: 'fase1',
-    component: Fase1Component,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'fase2',
-    component: Fase2Component,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
-  {
-    path: 'fase3',
-    component: Fase3Component,
-    canActivate: [authGuard],
-    data: { expectedRoles: ['JOGADOR'] },
-  },
+  
+    
+   
+ 
 
   // CRUDs para admins
   
@@ -201,7 +186,7 @@ export const routes: Routes = [
     path: 'crudfases',
     component: CrudfasesComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['COLABORADOR', 'ADMIN'] },
+    data: { expectedRoles: ['COLABORATEUR', 'ADMIN'] },
   },
 
   // Ranking visualização por admin
@@ -209,7 +194,7 @@ export const routes: Routes = [
     path: 'visualizar-ranking/:id',
     component: VisualizarRankingComponent,
     canActivate: [authGuard],
-    data: { expectedRoles: ['ADMIN', 'COLABORADOR'] },
+    data: { expectedRoles: ['ADMIN', 'COLABORATEUR'] },
   },
 
   // Redirecionamento padrão

@@ -24,27 +24,27 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error("❌ Erro ao carregar jogadores:", err);
-      throw new Error("Erro ao carregar jogadores.");
+      console.error("❌ Erreur lors du chargement des joueurs :", err);
+      throw new Error("Erreur lors du chargement des joueurs.");
     }
   }
 
   /**
    * Altera o status (ativo/inativo) de um jogador
    * @param id ID do jogador
-   * @param ativo Novo status booleano
+   * @param actif Novo status booleano
    */
-  async alterarStatusJogador(id: number, ativo: boolean): Promise<void> {
+  async alterarStatusJogador(id: number, actif: boolean): Promise<void> {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${this.baseUrl}/usuario/jogadores/${id}/ativo?ativo=${ativo}`, {}, {
+      await axios.put(`${this.baseUrl}/usuario/jogadores/${id}/actif?actif=${actif}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
     } catch (err: any) {
-      console.error("❌ Erro ao alterar status do jogador:", err);
-      throw new Error("Erro ao alterar status do jogador.");
+      console.error("❌ Erreur lors de la modification du statut du joueur:", err);
+      throw new Error("Erreur lors de la modification du statut du joueur.");
     }
   }
 
@@ -63,11 +63,11 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error("❌ Erro no autocadastro:", err);
+      console.error("❌ Erreur lors de l'auto-inscription:", err);
       if (err.response) {
-        throw new Error(err.response.data?.mensagem || 'Erro no autocadastro.');
+        throw new Error(err.response.data?.mensagem || 'Erreur lors de l´auto-inscription.');
       }
-      throw new Error("Erro inesperado no autocadastro.");
+      throw new Error("Erreur inattendue lors de l'auto-inscription.");
     }
   }
 
@@ -86,8 +86,8 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error('❌ Erro ao buscar usuário por ID:', err);
-      throw new Error("Erro ao buscar os dados do usuário.");
+      console.error('❌ Erreur lors de la recherche de l’utilisateur par ID :', err);
+      throw new Error("Erreur lors de la récupération des données de l’utilisateur.");
     }
   }
 }

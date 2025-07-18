@@ -35,8 +35,8 @@ export class VisualizarJogadoresComponent implements OnInit {
       this.jogadores = await this.jogadorService.listarJogadores();
     } catch (err) {
       // Se ocorrer erro, exibe uma mensagem
-      console.error('Erro ao carregar jogadores:', err);
-      this.errorMessage = 'Erro ao carregar jogadores.';
+      console.error('Erreur lors du chargement des joueurs:', err);
+      this.errorMessage = 'Erreur lors du chargement des joueurs.';
     } finally {
       this.loading = false; // Finaliza o carregamento
     }
@@ -46,16 +46,16 @@ export class VisualizarJogadoresComponent implements OnInit {
    * Alterna o status do jogador (ativo/inativo)
    */
   async alternarStatus(jogador: Usuario): Promise<void> {
-    const novoStatus = !jogador.ativo; // Inverte o status do jogador
+    const novoStatus = !jogador.actif; // Inverte o status do jogador
 
     try {
       // Chama o serviço para alterar o status do jogador
       await this.jogadorService.alterarStatusJogador(jogador.id!, novoStatus);
-      jogador.ativo = novoStatus; // Atualiza o status localmente
+      jogador.actif = novoStatus; // Atualiza o status localmente
     } catch (err) {
       // Se ocorrer erro, exibe uma mensagem de erro
-      console.error('Erro ao atualizar status do jogador:', err);
-      alert('Erro ao atualizar status do jogador');
+      console.error('Erreur lors de la mise à jour du statut du joueur:', err);
+      alert('Erreur lors de la mise à jour du statut du joueur');
     }
   }
 }
