@@ -138,7 +138,7 @@ export class CrudAmbienteComponent implements OnInit {
   const tempoObj = this.tempos.find(t => t.tempo === frase.tempo || t.id === frase.tempoId);
 
   if (!pronomeObj || !verboObj || !tempoObj) {
-    throw new Error('Todos os campos obrigatórios (pronome, verbo e tempo) devem ser preenchidos corretamente.');
+    throw new Error('Tous les champos (pronom, verbe et temps) doivent être remplir corretement.');
   }
 
   // Inicializa complementoId como 0 (valor default, porque será gerado pelo back-end)
@@ -279,11 +279,21 @@ async saveFrase(): Promise<void> {
         this.totalItems--;
       }
     } catch (error) {
-      console.error('Erro ao deletar frase:', error);
+      console.error('Erreur lors de supprimer la phrase:', error);
     }
   }
 
   trackById(index: number, item: any): number {
     return item.id!;
   }
+
+
+  // Nomes dos ambientes por faixa de página
+ambientesNomes: string[] = ['Maison', 'Parc', 'Université'];
+
+getAmbienteAtual(): string {
+  const index = Math.floor((this.page - 1) / 2);
+  return this.ambientesNomes[index] || 'Autre';
+}
+
 }

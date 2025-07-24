@@ -114,10 +114,10 @@ carregarMensagens(): void {
   const fim = inicio + this.mensagensPorPagina;
   this.mensagensExibidas = this.mensagens.slice(inicio, fim);
 }
-mudarPagina(direcao: 'anterior' | 'proxima'): void {
-  if (direcao === 'anterior' && this.paginaAtual > 1) {
+mudarPagina(direcao: 'anterieur' | 'prochin'): void {
+  if (direcao === 'anterieur' && this.paginaAtual > 1) {
     this.paginaAtual--;
-  } else if (direcao === 'proxima' && this.paginaAtual < this.totalPaginas) {
+  } else if (direcao === 'prochin' && this.paginaAtual < this.totalPaginas) {
     this.paginaAtual++;
   }
 

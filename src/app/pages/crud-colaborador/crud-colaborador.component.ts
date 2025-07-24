@@ -121,6 +121,6 @@ export class CrudColaboradorComponent implements OnInit {
       this.mensagemErro = 'Erreur inattendue.';
     }
 
-    console.error('Erro:', err);
+    console.error('Erreur:', err);
   }
 }

@@ -173,7 +173,7 @@ isAdmin(): boolean {
 }
 
 isJogador(): boolean {
-  return this.getRole() === 'JOGADOR';
+  return this.getRole() === 'JOUEUR';
 }
 
 

@@ -17,7 +17,7 @@ import { JogoData } from 'src/app/models/jogo-data.model';
   templateUrl: './ambienteuniversidade.component.html',
   styleUrls: ['./ambienteuniversidade.component.css'],
 })
-// ... (imports permanecem os mesmos)
+
 
 export class AmbienteuniversidadeComponent implements OnInit {
   personagemSelecionado: string | null = null;

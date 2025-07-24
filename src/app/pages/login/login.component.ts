@@ -62,9 +62,9 @@ export class LoginComponent {
         this.mostrarLogin = false;
   
         // Redireciona de acordo com o papel do usuário
-        if (userRole === 'COLABORADOR' || userRole === 'ADMIN') {
+        if (userRole === 'COLABORATEUR' || userRole === 'ADMIN') {
           this.router.navigate(['/home-admin']);
-        } else if (userRole === 'JOGADOR') {
+        } else if (userRole === 'JOUEUR') {
           this.router.navigate(['/home']);
         } else {
           this.router.navigate(['/login']);
