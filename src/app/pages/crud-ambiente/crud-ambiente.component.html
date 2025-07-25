@@ -1,54 +1,49 @@
 <app-header></app-header>
 
 <div class="min-h-screen w-screen bg-gray-50 flex flex-col">
-  <!-- Conteúdo principal -->
   <div class="flex-grow w-full px-72 mt-1">
     <div class="w-full max-w-[1600px] mx-auto">
-      
-      <h2 class="text-l font-bold mt-1 text-gray-800">
-  Configuration de l'environnement : {{ getAmbienteAtual() }}
-</h2>
+      <h2 class="text-lg font-bold mt-1 text-gray-800">
+        Configuration de l'environnement : {{ getAmbienteAtual() }}
+      </h2>
 
-
-      <!-- Tabela de Ambientes -->
-      <div class="overflow-x-auto mb-1 shadow border border-gray-200 rounded-lg bg-white">
+      <div class="overflow-x-auto mb-4 shadow border border-gray-200 rounded-lg bg-white">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-300 text-gray-800">
             <tr>
-              <th class="px-4 py-1 text-left text-sm font-semibold tracking-wider">Milieu</th>
-              <th class="px-4 py-1 text-left text-sm font-semibold tracking-wider">Temps Verbal</th>
-              <th class="px-4 py-1 text-left text-sm font-semibold tracking-wider">Questions</th>
-              <th class="px-4 py-1 text-left text-sm font-semibold tracking-wider">Actions</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Milieu</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Temps Verbal</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Questions</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             <tr *ngFor="let ambiente of ambientes; let i = index" class="bg-white border-b">
-              <td class="px-4 py-2">{{ getAmbienteAtual() }}</td>
-              <td class="px-4 py-2">{{ ambiente.tempo }}</td>
+              <td class="px-4 py-2 font-medium text-gray-700">{{ ambiente.nome }}</td>
+              <td class="px-4 py-2 text-gray-600">{{ ambiente.tempo }}</td>
               <td class="px-4 py-2">
                 <ul class="space-y-1">
                   <li *ngFor="let frase of ambiente.frases | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let j = index; trackBy: trackById" 
-                      class="flex justify-between items-center bg-gray-50 px-2 py-1 rounded shadow-sm">
+                      class="flex justify-between items-center bg-gray-100 px-3 py-2 rounded shadow-sm">
                     <span class="text-sm text-gray-700">
-                      {{ j + 1 }}. {{ frase.pronome }} --- <strong>({{ frase.verbo }})</strong> {{ frase.complemento }}
+                      {{ j + 1 }}. {{ frase.pronome }} <strong>({{ frase.verbo }})</strong> {{ frase.complemento }}
                       <span class="text-blue-600 underline italic">{{ frase.resposta }}</span>
                     </span>
                     <div class="flex space-x-2">
-                      <button (click)="openModalEditarFrase(i, j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
+                      <button (click)="openModalEditarFrase(i,(page - 1) * itemsPerPage + j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
                         <fa-icon [icon]="faEdit"></fa-icon>
                       </button>
-                     <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
-  <fa-icon [icon]="faTrash"></fa-icon>
-</button>
+                      <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                      </button>
                     </div>
                   </li>
                 </ul>
               </td>
-
-              <td class="px-4 py-4">
-              
-
+              <td class="px-4 py-4 text-center">
+                <button (click)="openModalAdicionarFrase(i)" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
+                  <fa-icon [icon]="faPlus"></fa-icon> Ajouter
+                </button>
               </td>
             </tr>
           </tbody>
@@ -57,20 +52,15 @@
 
       <!-- Paginação -->
       <div class="flex justify-between items-center mt-4">
-        <div class="flex items-center justify-center space-x-4 mt-1">
-          <!-- Botão Anterior -->
+        <div class="flex items-center space-x-4">
           <button 
             (click)="page = page > 1 ? page - 1 : page" 
             class="bg-gray-300 text-gray-700 px-4 py-1 rounded">
             &lt;--
           </button>
-
-          <!-- Exibição da Página Atual -->
           <span class="text-sm text-gray-700">
             Page {{ page }} de {{ totalPages }}
           </span>
-
-          <!-- Botão Próximo -->
           <button 
             (click)="page = page < totalPages ? page + 1 : page" 
             class="bg-gray-300 text-gray-700 px-4 py-1 rounded">
@@ -78,52 +68,48 @@
           </button>
         </div>
 
-        <!-- Botão Adicionar frase-->
         <button *ngIf="ambientes.length > 0" (click)="openModalAdicionarFrase(0)"
           class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded inline-flex items-center space-x-2 shadow">
           <fa-icon [icon]="faPlus"></fa-icon>
           <span>Ajouter une phrase</span>
         </button>
       </div>
-<!-- Modal Frase -->
+    </div>
+  </div>
+</div>
+
 <!-- Modal Frase -->
 <div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
     <h3 class="text-lg font-bold mb-4">
-      {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
+      {{ isEditingFrase ? 'Editar Frase' : 'Ajouter une Nouvelle Phrase' }}
     </h3>
 
     <form #form="ngForm" (ngSubmit)="saveFrase()" novalidate>
-
-      <!-- Pronome -->
       <label class="block mb-1 font-medium">Pronom:</label>
       <select [(ngModel)]="novaFrase.pronomeId" name="pronomeId" class="w-full p-2 border rounded mb-4" required>
         <option *ngFor="let p of pronomes" [value]="p.id">{{ p.texto }}</option>
       </select>
 
-      <!-- Verbo -->
       <label class="block mb-1 font-medium">Verbe (Infinitif):</label>
       <select [(ngModel)]="novaFrase.verboId" name="verboId" class="w-full p-2 border rounded mb-4" required>
         <option *ngFor="let v of verbos" [value]="v.id">{{ v.verbo }}</option>
       </select>
 
-      <!-- Tempo Verbal -->
       <label class="block mb-1 font-medium">Temps Verbal:</label>
       <select [(ngModel)]="novaFrase.tempoId" name="tempoId" class="w-full p-2 border rounded mb-4" required>
         <option *ngFor="let t of tempos" [value]="t.id">{{ t.tempo }}</option>
       </select>
 
-      <!-- Complemento (exibindo apenas a descrição) -->
       <label class="block mb-1 font-medium">Description du Complément:</label>
       <textarea 
         [(ngModel)]="novaFrase.complementoDescricao" 
         name="complementoDescricao" 
         class="w-full p-2 border rounded mb-4"
         rows="2"
-        placeholder="Sera usado apenas para visualização ou criação">
+        placeholder="Utilisé uniquement pour affichage ou création">
       </textarea>
 
-      <!-- Resposta -->
       <label class="block mb-1 font-medium">Réponse (Verbe Conjugué):</label>
       <input 
         type="text" 
@@ -138,7 +124,6 @@
         La réponse est obligatoire.
       </div>
 
-      <!-- Ações -->
       <div class="flex justify-end gap-2 mt-4">
         <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
           Annuler
@@ -147,7 +132,7 @@
           type="submit" 
           class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
           [disabled]="form.invalid">
-          {{ isEditingFrase ? 'Mettre à jour' : 'Enregistrer la phrase' }}
+          {{ isEditingFrase ? 'Mettre à jour' : 'Enregistrer' }}
         </button>
       </div>
     </form>
