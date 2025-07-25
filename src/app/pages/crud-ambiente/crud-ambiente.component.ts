@@ -258,17 +258,23 @@ async saveFrase(): Promise<void> {
     const dto = this.convertFraseToDto(this.novaFrase);
 
     if (this.isEditingFrase && this.fraseEditandoIndex >= 0) {
-      // Atualizando a frase existente
-      await this.crudService.updateFrase(dto);
-      const fraseAtualizada = this.convertDtoToFrase(dto);
+      // Atualizando frase existente
+      const respostaAtualizada = await this.crudService.updateFrase(dto);
+
+      // Garante que o back-end tenha retornado a frase atualizada
+      const fraseAtualizada = this.convertDtoToFrase(respostaAtualizada);
       ambiente.frases[this.fraseEditandoIndex] = fraseAtualizada;
+
     } else {
-      // Adicionando uma nova frase
+      // Criando nova frase
       const novoDto = await this.crudService.addFrase(dto);
       const novaFraseUI = this.convertDtoToFrase(novoDto);
       ambiente.frases.push(novaFraseUI);
+      this.totalItems++;
     }
+
     this.closeModal();
+
   } catch (error: any) {
     const errorMessage = error?.message || 'Erro desconhecido';
     console.error('Erro ao salvar a frase:', errorMessage);
