@@ -30,7 +30,7 @@
                       <span class="text-blue-600 underline italic">{{ frase.resposta }}</span>
                     </span>
                     <div class="flex space-x-2">
-                      <button (click)="openModalEditarFrase(i,(page - 1) * itemsPerPage + j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
+                      <button (click)="openModalEditarFrase(i, j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
                         <fa-icon [icon]="faEdit"></fa-icon>
                       </button>
                       <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
