@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosError } from 'axios';
+import { environment } from 'src/environments/environment';
 
 // Interfaces para as frases
 export interface FraseApi {
@@ -27,11 +28,14 @@ export interface JogoData {
   providedIn: 'root'
 })
 export class AmbienteCasaService {
-  private readonly apiUrlFrases = 'http://localhost:8080/api/frases';
-  private readonly apiUrlJogo = 'http://localhost:8080/api/jogos';
+  private readonly apiUrlFrases = `${environment.apiUrl}/api/frases`;
+  private readonly apiUrlJogo = `${environment.apiUrl}/api/jogos`;
 
   constructor() {}
 
+  /**
+   * Busca e transforma as frases do ambiente "casa".
+   */
   async getFrasesCasa(): Promise<Frase[]> {
     try {
       const response = await axios.get<FraseApi[]>(this.apiUrlFrases);
@@ -41,6 +45,7 @@ export class AmbienteCasaService {
         let descricao = f.descricaoMontada || '';
         const resposta = f.respostaCorreta.trim();
 
+        // Remove a resposta correta da descrição, se estiver incluída
         if (resposta && descricao.toLowerCase().includes(resposta.toLowerCase())) {
           const regex = new RegExp(resposta, 'i');
           descricao = descricao.replace(regex, '').trim();
@@ -53,31 +58,45 @@ export class AmbienteCasaService {
       });
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('Erro ao buscar frases da casa:', error.response?.data || error.message);
+        console.error('❌ Erro ao buscar frases da casa:', error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Erro ao buscar frases da casa.');
       } else {
-        console.error('Erro desconhecido:', error);
+        console.error('❌ Erro desconhecido:', error);
+        throw new Error('Não foi possível carregar as frases do ambiente casa.');
       }
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message || 'Erro desconhecido' : 'Não foi possível carregar as frases do ambiente casa.');
     }
   }
 
+  /**
+   * Verifica se a resposta do usuário está correta.
+   */
   verificarRespostaDigitada(respostaDigitada: string, respostaCorreta: string): boolean {
     if (!respostaDigitada || !respostaCorreta) return false;
 
     return respostaDigitada.trim().toLowerCase() === respostaCorreta.trim().toLowerCase();
   }
 
+  /**
+   * Salva o resultado do jogo no backend.
+   */
   async salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<void> {
     try {
-      const response = await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData);
-      console.log('Resultado do jogo salvo com sucesso:', response.data);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${this.apiUrlJogo}/${usuarioId}`, jogoData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('✅ Resultado do jogo salvo com sucesso:', response.data);
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error('Erro ao salvar o resultado do jogo:', error.response?.data || error.message);
+        console.error('❌ Erro ao salvar o resultado do jogo:', error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Erro ao salvar resultado do jogo.');
       } else {
-        console.error('Erro desconhecido:', error);
+        console.error('❌ Erro desconhecido:', error);
+        throw new Error('Não foi possível salvar o resultado do jogo.');
       }
-      throw new Error('Não foi possível salvar o resultado do jogo.');
     }
   }
 }

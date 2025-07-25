@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http'; 
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';  // Importar environment
 
 @Component({
   selector: 'app-tela-inicial',
@@ -25,6 +26,8 @@ export class TelaInicialComponent {
   sucesso: boolean = false;
   erro: boolean = false;
   enviandoMensagem: boolean = false;
+
+  private apiBaseUrl = environment.apiUrl;  // Base URL da API
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -57,7 +60,7 @@ export class TelaInicialComponent {
       .set('assunto', 'Pedido de ajuda.')
       .set('texto', `Email do remetente: ${this.emailRemetente}\n\nMensagem:\n${this.mensagemAjuda}`);
 
-    const reqSimples = this.http.post('http://localhost:8080/email/simples', null, {
+    const reqSimples = this.http.post(`${this.apiBaseUrl}/email/simples`, null, {
       params,
       responseType: 'text'
     }).pipe(
@@ -67,7 +70,7 @@ export class TelaInicialComponent {
       })
     );
 
-    const reqAjuda = this.http.post('http://localhost:8080/ajuda', ajudaPayload, {
+    const reqAjuda = this.http.post(`${this.apiBaseUrl}/ajuda`, ajudaPayload, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
       catchError(err => {

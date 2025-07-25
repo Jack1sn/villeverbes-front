@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { JogoData } from '../models/jogo-data.model';
+import { environment } from 'src/environments/environment'; // ✅ importado aqui
 
 export interface Frase {
   frase: string;
@@ -11,14 +12,11 @@ export interface Frase {
   providedIn: 'root',
 })
 export class JogoService {
-  private apiUrl = 'http://localhost:8080/api/jogos';     // Para salvar resultados
-  private frasesUrl = 'http://localhost:8080/api/frases'; // Para buscar todas as frases
+  private apiUrl = `${environment.apiUrl}/api/jogos`;     // ✅ com environment
+  private frasesUrl = `${environment.apiUrl}/api/frases`; // ✅ com environment
 
   constructor() {}
 
-  /**
-   * Salva o resultado do jogo no backend
-   */
   salvarResultadoJogo(usuarioId: number, jogoData: JogoData): Promise<any> {
     const token = localStorage.getItem('token');
 
@@ -52,9 +50,6 @@ export class JogoService {
       });
   }
 
-  /**
-   * Busca todas as frases do backend (compartilhadas entre ambientes)
-   */
   async getTodasFrases(): Promise<Frase[]> {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -75,15 +70,12 @@ export class JogoService {
     }
   }
 
-  /**
-   * Retorna as frases específicas de um ambiente (casa, parque, universidade)
-   */
   async getFrasesPorAmbiente(ambiente: 'casa' | 'parque' | 'universidade'): Promise<Frase[]> {
     const todasFrases = await this.getTodasFrases();
 
     switch (ambiente) {
       case 'casa':
-        return todasFrases.slice(0, 21);     // 11 perguntas * 2 frases
+        return todasFrases.slice(0, 21);
       case 'parque':
         return todasFrases.slice(22, 43);
       case 'universidade':
@@ -93,16 +85,10 @@ export class JogoService {
     }
   }
 
-  /**
-   * Verifica se a resposta do usuário está correta
-   */
   verificarRespostaDigitada(resposta: string, correta: string): boolean {
     return resposta.trim().toLowerCase() === correta.trim().toLowerCase();
   }
 
-    /**
-   * Salva todos os resultados acumulados de uma vez no backend
-   */
   salvarResultadosDeTodosOsJogos(usuarioId: number, resultados: JogoData[]): Promise<any> {
     const token = localStorage.getItem('token');
 
@@ -133,5 +119,4 @@ export class JogoService {
         throw error;
       });
   }
-
 }

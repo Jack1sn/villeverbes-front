@@ -109,10 +109,10 @@ ngOnInit(): void {
   }
 
   getTropheeLink(): string {
-    if (this.userRole === 'ADMIN' || this.userRole === 'COLABORADOR') {
+    if (this.userRole === 'ADMIN' || this.userRole === 'COLABORATEUR') {
       return '/trophee/todos';  // Admin ou colaborador, veem todos os troféus
     }
-    if (this.userRole === 'JOGADOR') {
+    if (this.userRole === 'JOUEUR') {
       return `/trophee/${this.authService.getUserId()}`;  // Jogador vê seus próprios troféus
     }
     return '/';  // Default para caso não seja identificado o papel
