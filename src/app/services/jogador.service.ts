@@ -1,22 +1,24 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosResponse } from 'axios';
 import { Usuario } from '../models/usuario.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JogadorService {
-  private baseUrl = 'http://localhost:8080'; // URL base da sua API
+  // ✅ Usa a URL da API conforme o ambiente (dev ou produção)
+  private baseUrl = environment.apiUrl;
 
   constructor() {}
 
   /**
-   * Lista todos os usuários com perfil de JOGADOR
-   * @returns Promise<Usuario[]> Lista de jogadores
+   * Lista todos os usuários com perfil de JOGADOR.
+   * @returns Lista de jogadores.
    */
   async listarJogadores(): Promise<Usuario[]> {
     try {
-      const token = localStorage.getItem('token'); // se a API precisar de autenticação
+      const token = localStorage.getItem('token');
       const response: AxiosResponse<Usuario[]> = await axios.get(`${this.baseUrl}/usuario/jogadores`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -24,15 +26,15 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error("❌ Erreur lors du chargement des joueurs :", err);
-      throw new Error("Erreur lors du chargement des joueurs.");
+      console.error("❌ Erro ao carregar jogadores:", err);
+      throw new Error("Erro ao carregar jogadores.");
     }
   }
 
   /**
-   * Altera o status (ativo/inativo) de um jogador
-   * @param id ID do jogador
-   * @param actif Novo status booleano
+   * Altera o status (ativo/inativo) de um jogador.
+   * @param id ID do jogador.
+   * @param actif Novo status booleano.
    */
   async alterarStatusJogador(id: number, actif: boolean): Promise<void> {
     try {
@@ -43,15 +45,15 @@ export class JogadorService {
         }
       });
     } catch (err: any) {
-      console.error("❌ Erreur lors de la modification du statut du joueur:", err);
-      throw new Error("Erreur lors de la modification du statut du joueur.");
+      console.error("❌ Erro ao alterar status do jogador:", err);
+      throw new Error("Erro ao alterar status do jogador.");
     }
   }
 
   /**
-   * Realiza o autocadastro de um novo jogador
-   * @param jogador Objeto do tipo Usuario
-   * @returns Dados de resposta da API (pode conter token ou mensagem)
+   * Realiza o autocadastro de um novo jogador.
+   * @param jogador Objeto com os dados do jogador.
+   * @returns Resposta da API (ex: mensagem ou token).
    */
   async autoCadastro(jogador: Usuario): Promise<any> {
     try {
@@ -63,18 +65,18 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error("❌ Erreur lors de l'auto-inscription:", err);
+      console.error("❌ Erro no autocadastro:", err);
       if (err.response) {
-        throw new Error(err.response.data?.mensagem || 'Erreur lors de l´auto-inscription.');
+        throw new Error(err.response.data?.mensagem || 'Erro ao realizar autocadastro.');
       }
-      throw new Error("Erreur inattendue lors de l'auto-inscription.");
+      throw new Error("Erro inesperado ao realizar autocadastro.");
     }
   }
 
   /**
-   * Busca um usuário pelo ID (pode ser usado para pegar nome ou dados completos)
-   * @param id ID do usuário
-   * @returns Objeto do tipo Usuario
+   * Busca um jogador pelo ID.
+   * @param id ID do jogador.
+   * @returns Objeto do tipo Usuario.
    */
   async buscarUsuarioPorId(id: number): Promise<Usuario> {
     try {
@@ -86,8 +88,8 @@ export class JogadorService {
       });
       return response.data;
     } catch (err: any) {
-      console.error('❌ Erreur lors de la recherche de l’utilisateur par ID :', err);
-      throw new Error("Erreur lors de la récupération des données de l’utilisateur.");
+      console.error("❌ Erro ao buscar jogador por ID:", err);
+      throw new Error("Erro ao buscar jogador.");
     }
   }
 }
