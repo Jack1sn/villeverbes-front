@@ -1,37 +1,39 @@
-import axios, { AxiosInstance } from 'axios';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment'; // ✅ Importa a URL da API
+import axios, { AxiosInstance } from 'axios';
+import { environment } from 'src/environments/environment'; // ✅ Importa o base URL do ambiente
 
 @Injectable({
   providedIn: 'root',
 })
 export class CrudAmbienteService {
-  private readonly apiUrl = `${environment.apiUrl}/api`; // ✅ Base dinâmica
+  private readonly apiUrl = `${environment.apiUrl}/api`; // ✅ Base dinâmica correta
   private axiosInstance: AxiosInstance;
 
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: this.apiUrl,
-      withCredentials: true, // Se necessário para cookies de sessão
+      withCredentials: true, // Habilita cookies se necessário
     });
 
-    // Se desejar usar token no futuro, você pode adicionar aqui:
+    // Interceptor para token de autenticação (descomentável)
     // this.axiosInstance.interceptors.request.use(config => {
     //   const token = localStorage.getItem('token');
-    //   if (token) config.headers.Authorization = `Bearer ${token}`;
+    //   if (token) {
+    //     config.headers.Authorization = `Bearer ${token}`;
+    //   }
     //   return config;
     // });
   }
 
-  // -------- FRases CRUD --------
+  // ------------------- CRUD de Frases -------------------
 
-  /** Busca todas as frases */
+  /** Lista todas as frases */
   async getFrases(): Promise<any[]> {
     const response = await this.axiosInstance.get('/frases');
     return response.data;
   }
 
-  /** Busca uma frase específica por ID */
+  /** Busca uma frase por ID */
   async getFrasePorId(id: number): Promise<any> {
     const response = await this.axiosInstance.get(`/frases/${id}`);
     return response.data;
@@ -55,7 +57,7 @@ export class CrudAmbienteService {
     return response.data;
   }
 
-  // -------- Itens de apoio --------
+  // ------------------- Itens de apoio linguístico -------------------
 
   /** Lista todos os pronomes */
   async getPronomes(): Promise<any[]> {
