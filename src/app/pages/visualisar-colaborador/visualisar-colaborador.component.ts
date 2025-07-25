@@ -5,7 +5,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import axios, { AxiosError } from 'axios';
-import { environment } from '../../../environments/environment';
+import { environment } from 'src/environments/environment'; 
+
 
 @Component({
   selector: 'app-visualisar-colaborador',
