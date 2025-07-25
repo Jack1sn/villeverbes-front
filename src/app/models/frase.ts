@@ -12,5 +12,5 @@ export interface Frase {
   pronome?: string;
   verbo?: string;
   tempo?: string;
-  
+  ambiente?: string; 
 }

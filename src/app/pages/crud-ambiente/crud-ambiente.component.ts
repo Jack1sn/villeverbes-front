@@ -103,13 +103,26 @@ export class CrudAmbienteComponent implements OnInit {
       const frasesConvertidas = frasesDto.map(f => this.convertDtoToFrase(f));
       this.totalItems = frasesConvertidas.length;
 
-      this.ambientes = [{
-        id: 1,
-        nome: 'Maison',
-        tempo: 'Présent',
-        texto: '',
-        frases: frasesConvertidas
-      }];
+      const ambientesMap = new Map<string, Frase[]>();
+
+for (const frase of frasesConvertidas) {
+  const nomeAmbiente = frase['ambiente'] || 'Outro';
+
+  if (!ambientesMap.has(nomeAmbiente)) {
+    ambientesMap.set(nomeAmbiente, []);
+  }
+
+  ambientesMap.get(nomeAmbiente)?.push(frase);
+}
+
+this.ambientes = Array.from(ambientesMap.entries()).map(([nome, frases], index) => ({
+  id: index + 1,
+  nome,
+  tempo: frases[0]?.tempo || '',
+  texto: '',
+  frases
+}));
+;
     } catch (error) {
       console.error('Erro ao carregar frases:', error);
     }
