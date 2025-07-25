@@ -4,11 +4,10 @@
   <!-- Conteúdo principal -->
   <div class="flex-grow w-full px-72 mt-1">
     <div class="w-full max-w-[1600px] mx-auto">
-      
-      <h2 class="text-l font-bold mt-1 text-gray-800">
-  Configuration de l'environnement : {{ getAmbienteAtual() }}
-</h2>
 
+      <h2 class="text-l font-bold mt-1 text-gray-800">
+        Configuration de l'environnement : {{ getAmbienteAtual() }}
+      </h2>
 
       <!-- Tabela de Ambientes -->
       <div class="overflow-x-auto mb-1 shadow border border-gray-200 rounded-lg bg-white">
@@ -28,28 +27,25 @@
               <td class="px-4 py-2">{{ ambiente.tempo }}</td>
               <td class="px-4 py-2">
                 <ul class="space-y-1">
-                  <li *ngFor="let frase of ambiente.frases | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let j = index; trackBy: trackById" 
+                  <li *ngFor="let frase of ambiente.frases | paginate: { itemsPerPage: itemsPerPage, currentPage: page }; let j = index; trackBy: trackById"
                       class="flex justify-between items-center bg-gray-50 px-2 py-1 rounded shadow-sm">
                     <span class="text-sm text-gray-700">
-                      {{ j + 1 }}. {{ frase.pronome }} --- <strong>({{ frase.verbo }})</strong> {{ frase.complemento }}
+                      {{ (page - 1) * itemsPerPage + j + 1 }}. {{ frase.pronome }} --- <strong>({{ frase.verbo }})</strong> {{ frase.complemento }}
                       <span class="text-blue-600 underline italic">{{ frase.resposta }}</span>
                     </span>
                     <div class="flex space-x-2">
-                      <button (click)="openModalEditarFrase(i, j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
+                      <button (click)="openModalEditarFrase(i, (page - 1) * itemsPerPage + j)" class="text-yellow-500 hover:text-yellow-700" title="Editar frase">
                         <fa-icon [icon]="faEdit"></fa-icon>
                       </button>
-                     <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
-  <fa-icon [icon]="faTrash"></fa-icon>
-</button>
+                      <button (click)="deleteFrase(i, frase)" class="text-red-500 hover:text-red-700" title="Excluir frase">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                      </button>
                     </div>
                   </li>
                 </ul>
               </td>
 
-              <td class="px-4 py-4">
-              
-
-              </td>
+              <td class="px-4 py-4"></td>
             </tr>
           </tbody>
         </table>
@@ -85,70 +81,76 @@
           <span>Ajouter une phrase</span>
         </button>
       </div>
-<!-- Modal Frase -->
-<div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
-    <h3 class="text-lg font-bold mb-4">
-      {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
-    </h3>
 
- <form #form="ngForm" (ngSubmit)="saveFrase()" novalidate>
-      <!-- Selecione Pronome -->
-      <ng-container *ngIf="pronomes.length > 0">
-        <label class="block mb-1 font-medium">Pronom:</label>
-        <select [(ngModel)]="novaFrase.pronome" name="pronome" class="w-full p-2 border rounded mb-4">
-          <option *ngFor="let p of pronomes" [value]="p.texto">{{ p.texto }}</option>
-        </select>
-      </ng-container>
+      <!-- Modal Frase -->
+      <div *ngIf="isFraseModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded w-[90%] max-w-md shadow-lg">
+          <h3 class="text-lg font-bold mb-4">
+            {{ isEditingFrase ? 'Editar Frase' : 'Adicionar Nova Frase' }}
+          </h3>
 
-      <!-- Selecione Verbo -->
-      <label class="block mb-1 font-medium">Verbe (Infinitif):</label>
-      <select [(ngModel)]="novaFrase.verbo" name="verbo" class="w-full p-2 border rounded mb-4">
-        <option *ngFor="let v of verbos" [value]="v.verbo">{{ v.verbo }}</option>
-      </select>
+          <form #form="ngForm" (ngSubmit)="saveFrase()" novalidate>
+            <!-- Pronome -->
+            <ng-container *ngIf="pronomes.length > 0">
+              <label class="block mb-1 font-medium">Pronom:</label>
+              <select [(ngModel)]="novaFrase.pronome" name="pronome" class="w-full p-2 border rounded mb-4">
+                <option *ngFor="let p of pronomes" [value]="p.texto">{{ p.texto }}</option>
+              </select>
+            </ng-container>
 
-    <label class="block mb-1 font-medium">Description du Complement:</label>
-<input 
-  type="text" 
-  [(ngModel)]="novaFrase.complementoDescricao" 
-  name="complementoDescricao" 
-  class="w-full p-2 border rounded mb-4"
-  #complementoDescricao="ngModel"
-/>
+            <!-- Verbo -->
+            <label class="block mb-1 font-medium">Verbe (Infinitif):</label>
+            <select [(ngModel)]="novaFrase.verbo" name="verbo" class="w-full p-2 border rounded mb-4">
+              <option *ngFor="let v of verbos" [value]="v.verbo">{{ v.verbo }}</option>
+            </select>
 
+            <!-- Complemento Descrição -->
+            <label class="block mb-1 font-medium">Description du Complément:</label>
+            <input 
+              type="text" 
+              [(ngModel)]="novaFrase.complementoDescricao" 
+              name="complementoDescricao" 
+              class="w-full p-2 border rounded mb-4"
+              #complementoDescricao="ngModel"
+            />
 
-      <!-- Selecione Tempo Verbal -->
-      <label class="block mb-1 font-medium">Temps Verbal:</label>
-      <select [(ngModel)]="novaFrase.tempo" name="tempoVerbalFrase" class="w-full p-2 border rounded mb-4">
-        <option *ngFor="let t of tempos" [value]="t.tempo">{{ t.tempo }}</option>
-      </select>
+            <!-- Tempo Verbal -->
+            <label class="block mb-1 font-medium">Temps Verbal:</label>
+            <select [(ngModel)]="novaFrase.tempo" name="tempoVerbalFrase" class="w-full p-2 border rounded mb-4">
+              <option *ngFor="let t of tempos" [value]="t.tempo">{{ t.tempo }}</option>
+            </select>
 
-      <!-- Resposta (Verbo Conjugado) -->
-      <label class="block mb-1 font-medium">Reponse (Verbe Conjugué):</label>
-      <input 
-        type="text" 
-        [(ngModel)]="novaFrase.resposta" 
-        name="resposta" 
-        class="w-full p-2 border rounded mb-4" 
-        required 
-        #resposta="ngModel"
-        [ngClass]="{'border-red-500': resposta.invalid && resposta.touched}"
-      />
-      <div *ngIf="resposta.invalid && resposta.touched" class="text-red-500 text-sm">
-        La reponse est obrigatoire.
+            <!-- Resposta -->
+            <label class="block mb-1 font-medium">Réponse (Verbe Conjugué):</label>
+            <input 
+              type="text" 
+              [(ngModel)]="novaFrase.resposta" 
+              name="resposta" 
+              class="w-full p-2 border rounded mb-4" 
+              required 
+              #resposta="ngModel"
+              [ngClass]="{'border-red-500': resposta.invalid && resposta.touched}"
+            />
+            <div *ngIf="resposta.invalid && resposta.touched" class="text-red-500 text-sm">
+              La réponse est obligatoire.
+            </div>
+
+            <!-- Ações -->
+            <div class="flex justify-end gap-2 mt-4">
+              <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                [disabled]="form.invalid">
+                {{ isEditingFrase ? 'Mettre à jour' : 'Enregistrer la phrase' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
-      <div class="flex justify-end gap-2 mt-4">
-        <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-gray-600" (click)="closeModal()">
-          Annuler
-        </button>
-        <button 
-          type="submit" 
-          class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-          [disabled]="form.invalid">
-          {{ isEditingFrase ? 'Mettre à jour' : 'Enregistrer la phrase' }}
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
